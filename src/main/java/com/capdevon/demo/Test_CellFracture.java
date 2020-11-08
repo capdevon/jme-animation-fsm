@@ -42,11 +42,7 @@ public class Test_CellFracture extends SimpleApplication {
         AppSettings settings = new AppSettings(true);
         settings.setTitle(Test_CellFracture.class.getSimpleName());
         settings.setResolution(1024, 768);
-        settings.setFrameRate(30);
-        settings.setBitsPerPixel(32);
-        settings.setSamples(4);
         app.setSettings(settings);
-        app.setShowSettings(false);
         app.setPauseOnLostFocus(false);
         app.start();
     }
