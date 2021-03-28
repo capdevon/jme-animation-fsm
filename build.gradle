@@ -23,16 +23,13 @@ sourceCompatibility = '1.8'
 //targetCompatibility = '1.7'
 targetCompatibility = '1.8'
 
-// select one version of the Engine
-//ext.jmonkeyengineVersion = '3.1.0-stable' // from jCenter
-//ext.jmonkeyengineVersion = '3.2.0-stable' // from jCenter
-//ext.jmonkeyengineVersion = '3.2.1-stable' // from jCenter
-//ext.jmonkeyengineVersion = '3.2.2-stable' // from jCenter
-//ext.jmonkeyengineVersion = '3.2.3-stable' // from jCenter
-ext.jmonkeyengineVersion = '3.2.4-stable' // from jCenter
-//ext.jmonkeyengineVersion = '3.3.0-alpha5' // from jCenter
-//ext.jmonkeyengineVersion = '3.3.0-beta1' // from jCenter
-//ext.jmonkeyengineVersion = '3.3.0-beta2' // from jCenter
+// select one version of the Engine:
+//ext.jmonkeyengineVersion = '3.1.0-stable' // from mavenCentral
+//ext.jmonkeyengineVersion = '3.2.3-stable' // from mavenCentral
+//ext.jmonkeyengineVersion = '3.2.4-stable' // from mavenCentral
+//ext.jmonkeyengineVersion = '3.3.0-stable' // from mavenCentral
+ext.jmonkeyengineVersion = '3.3.2-stable' // from mavenCentral
+//ext.jmonkeyengineVersion = '3.4.0-alpha3' // from mavenCentral
 //ext.jmonkeyengineVersion = '3.4.0-SNAPSHOT' // from mavenLocal
 
 gradle.projectsEvaluated {
@@ -57,41 +54,41 @@ gradle.projectsEvaluated {
 }
 
 repositories {
-    // Use jcenter for resolving dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    jcenter()
-    
+	//mavenLocal()
+    mavenCentral()
     //maven { url 'http://nifty-gui.sourceforge.net/nifty-maven-repo' }
     maven { url 'https://dl.bintray.com/stephengold/org.jmonkeyengine' }
+    //maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    api 'org.apache.commons:commons-math3:3.6.1'
+	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
 
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation 'com.google.guava:guava:28.2-jre'
-
-    // Use JUnit test framework
-    testImplementation 'junit:junit:4.12'
-    
     // You can read more about how to add dependencies here:
     //   https://docs.gradle.org/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
 
     // from jcenter (or mavenLocal) repositories:
     implementation 'org.jmonkeyengine:jme3-core:' + jmonkeyengineVersion
-    implementation 'org.jmonkeyengine:jme3-bullet:' + jmonkeyengineVersion
-    runtimeOnly 'org.jmonkeyengine:jme3-bullet-native:' + jmonkeyengineVersion
     implementation 'org.jmonkeyengine:jme3-desktop:' + jmonkeyengineVersion
     //implementation 'org.jmonkeyengine:jme3-effects:' + jmonkeyengineVersion
     //implementation 'org.jmonkeyengine:jme3-jogl:' + jmonkeyengineVersion
     //implementation 'org.jmonkeyengine:jme3-networking:' + jmonkeyengineVersion
     //implementation 'org.jmonkeyengine:jme3-niftygui:' + jmonkeyengineVersion
     //implementation 'org.jmonkeyengine:jme3-terrain:' + jmonkeyengineVersion
+    
+    // BasicGame doesn't use physics. If your game needs physics, select either:
+    //    1. Minie
+    implementation 'com.github.stephengold:Minie:4.0.2'
+    //    2. jme3-jbullet
+    //implementation 'org.jmonkeyengine:jme3-jbullet:' + jmonkeyengineVersion
+    //    3. jme3-bullet + jme3-bullet-native
+    //implementation 'org.jmonkeyengine:jme3-bullet:' + jmonkeyengineVersion
+    //runtimeOnly 'org.jmonkeyengine:jme3-bullet-native:' + jmonkeyengineVersion
 
     // select one version of LWJGL (from jCenter or mavenLocal)
-    //runtimeOnly 'org.jmonkeyengine:jme3-lwjgl:' + jmonkeyengineVersion  // LWJGL 2.x
-    runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jmonkeyengineVersion // LWJGL 3.x
+    runtimeOnly 'org.jmonkeyengine:jme3-lwjgl:' + jmonkeyengineVersion  // LWJGL 2.x
+    //runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jmonkeyengineVersion // LWJGL 3.x
 
     // BasicGame doesn't use jme3-blender, jme3-jogg, or jme3-plugins
     //  -- they are added solely to avoid warnings from AssetConfig
@@ -102,6 +99,12 @@ dependencies {
     // from stephengold's bintray repositories:
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
     //runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.3.0-alpha2'
+        
+    // Libraries related to the Lemur GUI and Groovy:
+    //implementation 'com.simsilica:lemur:1.14.0'
+    //implementation 'com.simsilica:lemur-props:1.1.1'
+    //implementation 'com.simsilica:lemur-proto:1.11.0'
+    //runtimeOnly 'org.codehaus.groovy:groovy-jsr223:3.0.7'
 }
 
 // cleanup tasks
