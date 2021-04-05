@@ -1,4 +1,4 @@
-package xmod.anim;
+package com.capdevon.anim;
 
 import java.util.BitSet;
 import java.util.logging.Level;
@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 
 import com.jme3.anim.AnimationMask;
 import com.jme3.anim.Armature;
-import com.jme3.anim.ArmatureMask;
 import com.jme3.anim.Joint;
 
 /**
