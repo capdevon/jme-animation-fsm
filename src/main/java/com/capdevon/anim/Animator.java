@@ -15,70 +15,74 @@ import com.jme3.anim.tween.action.BaseAction;
 import com.jme3.animation.LoopMode;
 import com.jme3.scene.Spatial;
 
+/**
+ * 
+ * @author capdevon
+ */
 public class Animator extends AdapterControl {
 
-	public AnimComposer animComposer;
-	public SkinningControl skinningControl;
+    public AnimComposer animComposer;
+    public SkinningControl skinningControl;
 
-	private final Map<String, CustomAction> animationMap = new HashMap<>();
-	private String currentAnim;
+    private final Map<String, CustomAction> animationMap = new HashMap<>();
+    private String currentAnim;
 
-	@Override
-	public void setSpatial(Spatial sp) {
-		super.setSpatial(sp);
-		if (spatial != null) {
-			animComposer = getComponentInChild(AnimComposer.class);
-			skinningControl = getComponentInChild(SkinningControl.class);
+    @Override
+    public void setSpatial(Spatial sp) {
+        super.setSpatial(sp);
+        if (spatial != null) {
+            animComposer = getComponentInChild(AnimComposer.class);
+            skinningControl = getComponentInChild(SkinningControl.class);
 
-			System.out.println("--Animations: " + animComposer.getAnimClipsNames());
-			System.out.println("--List Bones: " + AnimUtils.listBones(skinningControl.getArmature()));
-		}
-	}
+            System.out.println("--Animations: " + animComposer.getAnimClipsNames());
+            System.out.println("--List Bones: " + AnimUtils.listBones(skinningControl.getArmature()));
+        }
+    }
 
-	/**
-	 * @param anim
-	 */
-	public void addAction(Animation3 anim) {
-		addAction(anim, null);
-	}
-	
-	/**
-	 * @param anim
-	 * @param animListener
-	 */
-	public void addAction(Animation3 anim, ActionAnimEventListener animListener) {
-		String animName = anim.getName();
-		float speed = anim.getSpeed();
-		boolean isLooping = (anim.getLoopMode() == LoopMode.Loop);
+    /**
+     * @param anim
+     */
+    public void addAction(Animation3 anim) {
+        addAction(anim, null);
+    }
 
-		// Get action registered with specified name. It will make a new action if there isn't any.
-		Tween delegate = animComposer.action(animName);
-		// Configure custom action with specified name, layer, loop, speed and listener.
-		CustomAction action = new CustomAction(delegate, animComposer, animName, AnimComposer.DEFAULT_LAYER);
-		action.setLooping(isLooping);
-		action.setSpeed(speed);
-		action.setAnimEventListener(animListener);
-		// Register custom action with specified name.
-		animComposer.addAction(animName, action);
+    /**
+     * @param anim
+     * @param animListener
+     */
+    public void addAction(Animation3 anim, ActionAnimEventListener animListener) {
+        String animName = anim.getName();
+        float speed = anim.getSpeed();
+        boolean isLooping = (anim.getLoopMode() == LoopMode.Loop);
 
-		// Add custom action to map
-		animationMap.put(animName, action);
-	}
-	
-	/**
-	 * @param animName
-	 * @param callback
-	 * @param startOffset
-	 */
-	public void addCallbackAction(String animName, Tween callback, float startOffset) {
-		AnimClip animClip = animComposer.getAnimClip(animName);
-		if (animClip == null) {
-			throw new IllegalArgumentException("AnimClip not found: " + animName);
-		}
-		Action action = animComposer.action(animClip.getName());
+        // Get action registered with specified name. It will make a new action if there isn't any.
+        Tween delegate = animComposer.action(animName);
+        // Configure custom action with specified name, layer, loop, speed and listener.
+        CustomAction action = new CustomAction(delegate, animComposer, animName, AnimComposer.DEFAULT_LAYER);
+        action.setLooping(isLooping);
+        action.setSpeed(speed);
+        action.setAnimEventListener(animListener);
+        // Register custom action with specified name.
+        animComposer.addAction(animName, action);
+
+        // Add custom action to map
+        animationMap.put(animName, action);
+    }
+
+    /**
+     * @param animName
+     * @param callback
+     * @param startOffset
+     */
+    public void addCallbackAction(String animName, Tween callback, float startOffset) {
+        AnimClip animClip = animComposer.getAnimClip(animName);
+        if (animClip == null) {
+            throw new IllegalArgumentException("AnimClip not found: " + animName);
+        }
+        Action action = animComposer.action(animClip.getName());
         action = new BaseAction(Tweens.sequence(action, Tweens.delay(startOffset), callback));
         animComposer.addAction(animClip.getName(), action);
-	}
+    }
 
     /**
      * Run animation
@@ -88,7 +92,7 @@ public class Animator extends AdapterControl {
     public void setAnimation(Animation3 anim) {
         setAnimation(anim, false);
     }
-    
+
     /**
      * 
      * @param anim
@@ -109,8 +113,8 @@ public class Animator extends AdapterControl {
             currentAnim = animName;
         }
     }
-	
-	public Spatial getAnimRoot() {
-		return animComposer.getSpatial();
-	}
+
+    public Spatial getAnimRoot() {
+        return animComposer.getSpatial();
+    }
 }
