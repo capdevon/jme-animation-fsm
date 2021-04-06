@@ -28,23 +28,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class AnimUtils {
 
-    /**
-     * @param from
-     * @param to
-     */
-    public static void copyAnimation(Spatial from, Spatial to) {
-        AnimControl acFrom = getAnimControl(from);
-        AnimControl acTo = getAnimControl(to);
 
-        for (String animName : acFrom.getAnimationNames()) {
-            if (!acTo.getAnimationNames().contains(animName)) {
-                System.out.println("Copying Animation: " + animName);
-                Animation anim = acFrom.getAnim(animName);
-                acTo.addAnim(anim);
-            }
-        }
-    }
-    
     /**
      * Running Mixamo Armature Renaming Script.
      *
@@ -54,26 +38,18 @@ public class AnimUtils {
         Skeleton skeleton = getSkeletonControl(sp).getSkeleton();
         for (int i = 0; i < skeleton.getBoneCount(); ++i) {
             Bone bone = skeleton.getBone(i);
-            System.out.println("Bone= " + bone.getName());
 
             String replacement = StringUtils.substringAfterLast(bone.getName(), ":");
-            renameBone(bone, replacement);
-        }
-    }
-    
-    public static void sanitizeSkeletonBonesName(Spatial sp) {
-        Skeleton skeleton = getSkeletonControl(sp).getSkeleton();
-        int numBones = skeleton.getBoneCount();
-        for (int i = 0; i < numBones; ++i) {
-            Bone bone = skeleton.getBone(i);
-            if (bone.getName().isEmpty()) {
-                renameBone(bone, "bone_" + i);
+            if (!replacement.isBlank()) {
+                renameBone(bone, replacement);
             }
         }
     }
-    
+
     public static void renameBone(Bone bone, String newName) {
         try {
+            System.out.println("Renaming Bone= " + bone.getName() + " to= " + newName);
+
             Field fieldName = Bone.class.getDeclaredField("name");
             fieldName.setAccessible(true);
             fieldName.set(bone, newName);
@@ -83,21 +59,36 @@ public class AnimUtils {
 
             Node node = (Node) fieldAttachNode.get(bone);
             if (node != null) {
-                node.setName(newName + "_attachnode");
+                node.setName(newName + "_attachNode");
             }
-            
-            System.out.println(" - renamed to= " + newName);
 
         } catch (ReflectiveOperationException e) {
             e.printStackTrace();
         }
     }
-    
+
+    /**
+     * @param from
+     * @param to
+     */
+    public static void copyAnimation(Spatial from, Spatial to) {
+        AnimControl acFrom = getAnimControl(from);
+        AnimControl acTo = getAnimControl(to);
+
+        for (String animName: acFrom.getAnimationNames()) {
+            if (!acTo.getAnimationNames().contains(animName)) {
+                System.out.println("Copying Animation: " + animName);
+                Animation anim = acFrom.getAnim(animName);
+                acTo.addAnim(anim);
+            }
+        }
+    }
+
     public static void addSkeletonDebugger(AssetManager asm, Spatial sp) {
         SkeletonControl skControl = getSkeletonControl(sp);
         addSkeletonDebugger(asm, skControl);
     }
- 
+
     public static void addSkeletonDebugger(AssetManager asm, SkeletonControl skControl) {
         Node owner = (Node) skControl.getSpatial();
         SkeletonDebugger skDebugger = new SkeletonDebugger(owner.getName() + "_Skeleton", skControl.getSkeleton());
@@ -107,23 +98,23 @@ public class AnimUtils {
         skDebugger.setMaterial(mat);
         owner.attachChild(skDebugger);
     }
-    
+
     public static List<String> listBones(Spatial sp) {
         SkeletonControl skControl = getSkeletonControl(sp);
         return listBones(skControl);
     }
-    
+
     public static List<String> listBones(SkeletonControl skControl) {
         Skeleton skeleton = skControl.getSkeleton();
         int boneCount = skeleton.getBoneCount();
-        
+
         List<String> lst = new ArrayList<>(boneCount);
         for (int i = 0; i < boneCount; ++i) {
             lst.add(skeleton.getBone(i).getName());
         }
         return lst;
     }
-    
+
     public static Bone getBone(Spatial sp, String boneName) {
         SkeletonControl skControl = getSkeletonControl(sp);
         Bone bone = skControl.getSkeleton().getBone(boneName);
@@ -132,7 +123,7 @@ public class AnimUtils {
         }
         return bone;
     }
-    
+
     public static Node getAttachments(Spatial sp, String boneName) {
         SkeletonControl skControl = getSkeletonControl(sp);
         Node attachedNode = skControl.getAttachmentsNode(boneName);
@@ -164,13 +155,13 @@ public class AnimUtils {
      * @param clazz
      * @return
      */
-    private static <T extends Control> T findControl(Spatial sp, Class<T> clazz) {
+    private static <T extends Control> T findControl(Spatial sp, Class <T> clazz) {
         T control = sp.getControl(clazz);
         if (control != null) {
             return control;
         }
         if (sp instanceof Node) {
-            for (Spatial child : ((Node) sp).getChildren()) {
+            for (Spatial child: ((Node) sp).getChildren()) {
                 control = findControl(child, clazz);
                 if (control != null) {
                     return control;
