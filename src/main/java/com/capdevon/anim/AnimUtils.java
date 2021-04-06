@@ -5,9 +5,12 @@
  */
 package com.capdevon.anim;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.jme3.anim.AnimClip;
 import com.jme3.anim.AnimComposer;
@@ -28,136 +31,174 @@ import com.jme3.util.SafeArrayList;
  */
 public class AnimUtils {
 
-	/**
-	 * @param from
-	 * @param to
-	 */
-	public static void copyAnimation(Spatial from, Spatial to) {
+    /**
+     * Running Mixamo Armature Renaming Script.
+     *
+     * @param sp
+     */
+    public static void renameMixamoArmature(Spatial sp) {
+        Armature skeleton = getSkeletonControl(sp).getArmature();
+        for (int i = 0; i < skeleton.getJointCount(); ++i) {
+            Joint joint = skeleton.getJoint(i);
 
-		AnimComposer source = getAnimControl(from);
-		AnimComposer target = getAnimControl(to);
-		Armature targetArmature = getSkeletonControl(to).getArmature();
+            String replacement = StringUtils.substringAfterLast(joint.getName(), ":");
+            if (!replacement.isBlank()) {
+                renameJoint(joint, replacement);
+            }
+        }
+    }
 
-		copyAnimation(source, target, targetArmature);
-	}
+    public static void renameJoint(Joint joint, String newName) {
+        try {
+            System.out.println("Renaming Joint= " + joint.getName() + " to= " + newName);
 
-	/**
-	 * 
-	 * @param source
-	 * @param target
-	 * @param targetArmature
-	 */
-	public static void copyAnimation(AnimComposer source, AnimComposer target, Armature targetArmature) {
-		for (String animName : source.getAnimClipsNames()) {
-			if (!target.getAnimClipsNames().contains(animName)) {
-				System.out.println("Copying Animation: " + animName);
+            Field fieldName = Joint.class.getDeclaredField("name");
+            fieldName.setAccessible(true);
+            fieldName.set(joint, newName);
 
-				AnimClip clip = new AnimClip(animName);
-				clip.setTracks(copyAnimTracks(source.getAnimClip(animName), targetArmature));
-				target.addAnimClip(clip);
-			}
-		}
-	}
+            Field fieldAttachNode = Joint.class.getDeclaredField("attachedNode");
+            fieldAttachNode.setAccessible(true);
 
-	/**
-	 * 
-	 * @param sourceClip
-	 * @param targetArmature
-	 * @return
-	 */
-	private static AnimTrack[] copyAnimTracks(AnimClip sourceClip, Armature targetArmature) {
+            Node node = (Node) fieldAttachNode.get(joint);
+            if (node != null) {
+                node.setName(newName + "_attachedNode");
+            }
 
-		SafeArrayList<AnimTrack> tracks = new SafeArrayList<>(AnimTrack.class);
+        } catch (ReflectiveOperationException e) {
+            e.printStackTrace();
+        }
+    }
 
-		for (AnimTrack track : sourceClip.getTracks()) {
+    /**
+     * @param from
+     * @param to
+     */
+    public static void copyAnimation(Spatial from, Spatial to) {
 
-			TransformTrack tt = (TransformTrack) track;
+        AnimComposer source = getAnimControl(from);
+        AnimComposer target = getAnimControl(to);
+        Armature targetArmature = getSkeletonControl(to).getArmature();
 
-			if (tt.getTarget() instanceof Joint) {
-				Joint joint = (Joint) tt.getTarget();
-				HasLocalTransform target = targetArmature.getJoint(joint.getName());
-//				TransformTrack newTrack = new TransformTrack(target, tt.getTimes(), tt.getTranslations(), tt.getRotations(), tt.getScales());
-				TransformTrack newTrack = tt.jmeClone(); // optimization
-				newTrack.setTarget(target);
-				tracks.add(newTrack);
-			}
-		}
+        copyAnimation(source, target, targetArmature);
+    }
 
-		return tracks.getArray();
-	}
+    /**
+     * 
+     * @param source
+     * @param target
+     * @param targetArmature
+     */
+    public static void copyAnimation(AnimComposer source, AnimComposer target, Armature targetArmature) {
+        for (String animName: source.getAnimClipsNames()) {
+            if (!target.getAnimClipsNames().contains(animName)) {
+                System.out.println("Copying Animation: " + animName);
 
-	public static AnimComposer getAnimControl(Spatial sp) {
-		AnimComposer control = findControl(sp, AnimComposer.class);
-		if (control == null) {
-			throw new IllegalArgumentException("AnimComposer not found: " + sp);
-		}
-		return control;
-	}
+                AnimClip clip = new AnimClip(animName);
+                clip.setTracks(copyAnimTracks(source.getAnimClip(animName), targetArmature));
+                target.addAnimClip(clip);
+            }
+        }
+    }
 
-	public static SkinningControl getSkeletonControl(Spatial sp) {
-		SkinningControl control = findControl(sp, SkinningControl.class);
-		if (control == null) {
-			throw new IllegalArgumentException("SkinningControl not found: " + sp);
-		}
-		return control;
-	}
+    /**
+     * 
+     * @param sourceClip
+     * @param targetArmature
+     * @return
+     */
+    private static AnimTrack[] copyAnimTracks(AnimClip sourceClip, Armature targetArmature) {
 
-	public static Joint findBone(Spatial sp, String boneName) {
-		SkinningControl skControl = getSkeletonControl(sp);
-		Joint bone = skControl.getArmature().getJoint(boneName);
-		if (bone == null) {
-			throw new IllegalArgumentException("Armature Joint not found: " + boneName);
-		}
-		return bone;
-	}
+        SafeArrayList <AnimTrack> tracks = new SafeArrayList<>(AnimTrack.class);
 
-	public static Node getAttachments(Spatial sp, String boneName) {
-		SkinningControl skControl = getSkeletonControl(sp);
-		Node attachedNode = skControl.getAttachmentsNode(boneName);
-		if (attachedNode == null) {
-			throw new IllegalArgumentException("AttachedNode not found: " + boneName);
-		}
-		return attachedNode;
-	}
+        for (AnimTrack track: sourceClip.getTracks()) {
 
-	public static List<String> listBones(Spatial sp) {
-		SkinningControl skControl = getSkeletonControl(sp);
-		List<String> lst = listBones(skControl.getArmature());
-		Collections.sort(lst);
-		return lst;
-	}
+            TransformTrack tt = (TransformTrack) track;
 
-	public static List<String> listBones(Armature skeleton) {
-		int boneCount = skeleton.getJointCount();
-		List<String> lst = new ArrayList<>(boneCount);
+            if (tt.getTarget() instanceof Joint) {
+                Joint joint = (Joint) tt.getTarget();
+                HasLocalTransform target = targetArmature.getJoint(joint.getName());
+                //TransformTrack newTrack = new TransformTrack(target, tt.getTimes(), tt.getTranslations(), tt.getRotations(), tt.getScales());
+                TransformTrack newTrack = tt.jmeClone(); // optimization
+                newTrack.setTarget(target);
+                tracks.add(newTrack);
+            }
+        }
 
-		for (Joint bone : skeleton.getJointList()) {
-			lst.add(bone.getName());
-		}
+        return tracks.getArray();
+    }
 
-		return lst;
-	}
+    public static AnimComposer getAnimControl(Spatial sp) {
+        AnimComposer control = findControl(sp, AnimComposer.class);
+        if (control == null) {
+            throw new IllegalArgumentException("AnimComposer not found: " + sp);
+        }
+        return control;
+    }
 
-	/**
-	 * @param <T>
-	 * @param sp
-	 * @param clazz
-	 * @return
-	 */
-	private static <T extends Control> T findControl(Spatial sp, Class<T> clazz) {
-		T control = sp.getControl(clazz);
-		if (control != null) {
-			return control;
-		}
-		if (sp instanceof Node) {
-			for (Spatial child : ((Node) sp).getChildren()) {
-				control = findControl(child, clazz);
-				if (control != null) {
-					return control;
-				}
-			}
-		}
-		return null;
-	}
+    public static SkinningControl getSkeletonControl(Spatial sp) {
+        SkinningControl control = findControl(sp, SkinningControl.class);
+        if (control == null) {
+            throw new IllegalArgumentException("SkinningControl not found: " + sp);
+        }
+        return control;
+    }
+
+    public static Joint findBone(Spatial sp, String boneName) {
+        SkinningControl skControl = getSkeletonControl(sp);
+        Joint bone = skControl.getArmature().getJoint(boneName);
+        if (bone == null) {
+            throw new IllegalArgumentException("Armature Joint not found: " + boneName);
+        }
+        return bone;
+    }
+
+    public static Node getAttachments(Spatial sp, String boneName) {
+        SkinningControl skControl = getSkeletonControl(sp);
+        Node attachedNode = skControl.getAttachmentsNode(boneName);
+        if (attachedNode == null) {
+            throw new IllegalArgumentException("AttachedNode not found: " + boneName);
+        }
+        return attachedNode;
+    }
+
+    public static List<String> listBones(Spatial sp) {
+        SkinningControl skControl = getSkeletonControl(sp);
+        List<String> lst = listBones(skControl.getArmature());
+        Collections.sort(lst);
+        return lst;
+    }
+
+    public static List<String> listBones(Armature skeleton) {
+        int boneCount = skeleton.getJointCount();
+        List<String> lst = new ArrayList<>(boneCount);
+
+        for (Joint bone: skeleton.getJointList()) {
+            lst.add(bone.getName());
+        }
+
+        return lst;
+    }
+
+    /**
+     * @param <T>
+     * @param sp
+     * @param clazz
+     * @return
+     */
+    private static <T extends Control> T findControl(Spatial sp, Class <T> clazz) {
+        T control = sp.getControl(clazz);
+        if (control != null) {
+            return control;
+        }
+        if (sp instanceof Node) {
+            for (Spatial child: ((Node) sp).getChildren()) {
+                control = findControl(child, clazz);
+                if (control != null) {
+                    return control;
+                }
+            }
+        }
+        return null;
+    }
 
 }
