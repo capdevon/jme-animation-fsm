@@ -150,7 +150,7 @@ public class Test_AnimStateController extends SimpleApplication {
         Box box = new Box(20, .1f, 20);
         box.scaleTextureCoordinates(new Vector2f(20, 20));
         Geometry floorGeo = new Geometry("Floor.GeoMesh", box);
-        Material mat = new Material(assetManager, Materials.UNSHADED);
+        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         Texture tex = assetManager.loadTexture("Textures/white_grid.jpg");
         tex.setWrap(Texture.WrapMode.Repeat);
         mat.setTexture("ColorMap", tex);
@@ -184,17 +184,33 @@ public class Test_AnimStateController extends SimpleApplication {
         // setup AnimState
         AnimatorController animator = new AnimatorController();
         animator.addParameter("moveSpeed", AnimatorControllerParameterType.Float);
+        animator.addParameter("isRunning", AnimatorControllerParameterType.Bool);
+        animator.addParameter("isJumping", AnimatorControllerParameterType.Trigger);
         player.addControl(animator);
         
         AnimatorStateMachine sm = animator.getStateMachine();
         AnimatorState idle = sm.addState("Idle", AnimDefs.rifleIdle.getName());
         AnimatorState walk = sm.addState("Run", AnimDefs.rifleRun.getName());
         
+        // 1. example
+//        AnimatorStateTransition idleToWalk = idle.addTransition(walk);
+//        idleToWalk.addCondition(AnimatorConditionMode.Greater, 0.3f, "moveSpeed");
+//        
+//        AnimatorStateTransition walkToIdle = walk.addTransition(idle);
+//        walkToIdle.addCondition(AnimatorConditionMode.Less, 0.3f, "moveSpeed");
+        
+        // 2. example
         AnimatorStateTransition idleToWalk = idle.addTransition(walk);
-        idleToWalk.addCondition(AnimatorConditionMode.Greater, 0.3f, "moveSpeed");
+        idleToWalk.addCondition(AnimatorConditionMode.If, 0f, "isRunning");
         
         AnimatorStateTransition walkToIdle = walk.addTransition(idle);
-        walkToIdle.addCondition(AnimatorConditionMode.Less, 0.3f, "moveSpeed");
+        walkToIdle.addCondition(AnimatorConditionMode.IfNot, 0f, "isRunning");
+        
+        // 3. example
+//        AnimatorStateTransition idleToWalk = idle.addTransition(walk);
+//        idleToWalk.addCondition(AnimatorConditionMode.If, 0f, "isJumping");
+//        
+//        AnimatorStateTransition walkToIdle = walk.addTransition(idle, 0.9f);
         
         sm.setDefaultState(idle);
         
@@ -255,10 +271,10 @@ public class Test_AnimStateController extends SimpleApplication {
             }
         }
 
-        @Override
-        public void onAnalog(String name, float value, float tpf) {
-            // TODO Auto-generated method stub
-        }
+	@Override
+	public void onAnalog(String name, float value, float tpf) {
+		// TODO Auto-generated method stub
+	}
 
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
@@ -271,9 +287,8 @@ public class Test_AnimStateController extends SimpleApplication {
                 _TurnLeft = isPressed;
             } else if (name.equals(InputMapping.MOVE_RIGHT)) {
                 _TurnRight = isPressed;
-            } else if (name.equals(InputMapping.TOGGLE_CROUCH) && isPressed) {
-                boolean isDucked = bcc.isDucked();
-                bcc.setDucked(!isDucked);
+            } else if (name.equals(InputMapping.RUNNING) && isPressed) {
+                animator.setTrigger("isJumping");
             }
         }
 
@@ -309,15 +324,8 @@ public class Test_AnimStateController extends SimpleApplication {
             
             bcc.setWalkDirection(walkDirection.multLocal(m_MoveSpeed));
             
-            animator.setFloat("moveSpeed", bcc.getVelocity().length());
-
-            // update animation
-            //----------------------------------------------------------------
-//            if (isMoving) {
-//                mocap.setAnimation(bcc.isDucked() ? YBot.WalkCrouching_FW : YBot.Walk_FW);
-//            } else {
-//                mocap.setAnimation(bcc.isDucked() ? YBot.IdleCrouching : YBot.IdleAiming);
-//            }
+            animator.setBool("isRunning", isMoving);
+//            animator.setFloat("moveSpeed", bcc.getVelocity().length());
         }
 
         @Override
@@ -333,9 +341,7 @@ public class Test_AnimStateController extends SimpleApplication {
         final String MOVE_RIGHT 	= "MOVE_RIGHT";
         final String MOVE_FORWARD 	= "MOVE_FORWARD";
         final String MOVE_BACKWARD 	= "MOVE_BACKWARD";
-        final String TOGGLE_CROUCH 	= "TOGGLE_CROUCH";
-        final String SWITCH_WEAPON 	= "SWITCH_WEAPON";
-        final String RELOAD_WEAPON 	= "RELOAD_WEAPON";
+        final String RUNNING 		= "RUNNING";
         final String FIRE 		= "FIRE";
     }
 	
@@ -368,9 +374,7 @@ public class Test_AnimStateController extends SimpleApplication {
             addMapping(InputMapping.MOVE_BACKWARD, 	new KeyTrigger(KeyInput.KEY_S));
             addMapping(InputMapping.MOVE_LEFT, 		new KeyTrigger(KeyInput.KEY_A));
             addMapping(InputMapping.MOVE_RIGHT, 	new KeyTrigger(KeyInput.KEY_D));
-            addMapping(InputMapping.RELOAD_WEAPON, 	new KeyTrigger(KeyInput.KEY_R));
-            addMapping(InputMapping.SWITCH_WEAPON, 	new KeyTrigger(KeyInput.KEY_F));
-            addMapping(InputMapping.TOGGLE_CROUCH, 	new KeyTrigger(KeyInput.KEY_LSHIFT));
+            addMapping(InputMapping.RUNNING, 		new KeyTrigger(KeyInput.KEY_SPACE));
             addMapping(InputMapping.FIRE, 		new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
         }
 
