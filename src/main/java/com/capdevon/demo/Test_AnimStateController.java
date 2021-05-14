@@ -35,6 +35,7 @@ import com.jme3.material.Materials;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.Camera;
@@ -50,6 +51,7 @@ import com.jme3.scene.control.LightControl;
 import com.jme3.scene.shape.Box;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.jme3.system.AppSettings;
+import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 
 /**
@@ -58,12 +60,12 @@ import com.jme3.util.SkyFactory;
  */
 public class Test_AnimStateController extends SimpleApplication {
 
-	/**
+    /**
      * 
      * @param args 
      */
     public static void main(String[] args) {
-    	Test_AnimStateController app = new Test_AnimStateController();
+        Test_AnimStateController app = new Test_AnimStateController();
         AppSettings settings = new AppSettings(true);
         settings.setResolution(1024, 768);
         settings.setFrameRate(60);
@@ -82,7 +84,6 @@ public class Test_AnimStateController extends SimpleApplication {
     
     @Override
     public void simpleInitApp() {
-        viewPort.setBackgroundColor(new ColorRGBA(0.5f, 0.6f, 0.7f, 1.0f));
         
         initPhysics();
         createFloor();
@@ -134,22 +135,6 @@ public class Test_AnimStateController extends SimpleApplication {
         fpp.addFilter(shadowFilter);
     }
     
-    private Material getUnshadedMaterial(ColorRGBA color) {
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", color);
-        return mat;
-    }
-    
-    private Material getShinyMat() {
-        Material mat = new Material(assetManager, Materials.LIGHTING);
-        mat.setColor("Diffuse", ColorRGBA.Green);
-        mat.setColor("Specular", ColorRGBA.White);
-        mat.setColor("Ambient", ColorRGBA.Black);
-        mat.setFloat("Shininess", 0);
-        mat.setBoolean("UseMaterialColors", true);
-        return mat;
-    }
-    
     /**
      * a sky as background
      */
@@ -160,11 +145,17 @@ public class Test_AnimStateController extends SimpleApplication {
     }
     
     private void createFloor() {
-        Box box = new Box(20, 0.2f, 20);
-        Geometry floorGeo = new Geometry("Floor.GeoMesh", box);
-        floorGeo.setMaterial(getShinyMat());
-        rootNode.attachChild(floorGeo);
         rootNode.setShadowMode(ShadowMode.CastAndReceive);
+        
+        Box box = new Box(20, .1f, 20);
+        box.scaleTextureCoordinates(new Vector2f(20, 20));
+        Geometry floorGeo = new Geometry("Floor.GeoMesh", box);
+        Material mat = new Material(assetManager, Materials.UNSHADED);
+        Texture tex = assetManager.loadTexture("Textures/white_grid.jpg");
+        tex.setWrap(Texture.WrapMode.Repeat);
+        mat.setTexture("ColorMap", tex);
+        floorGeo.setMaterial(mat);
+        rootNode.attachChild(floorGeo);
 
         CollisionShape collShape = CollisionShapeFactory.createMeshShape(floorGeo);
         RigidBodyControl rBody = new RigidBodyControl(collShape, 0f);
@@ -230,11 +221,11 @@ public class Test_AnimStateController extends SimpleApplication {
     }
     
     private interface AnimDefs {
-    	
-      final String MODEL = "Models/Rifle/soldier.gltf";
-      final Animation3 rifleIdle  = new Animation3("RifleIdle", LoopMode.Loop);
-      final Animation3 rifleRun   = new Animation3("RifleRun", LoopMode.Loop);
-  }
+
+        final String MODEL 		= "Models/Rifle/soldier.gltf";
+        final Animation3 rifleIdle 	= new Animation3("RifleIdle", LoopMode.Loop);
+        final Animation3 rifleRun 	= new Animation3("RifleRun", LoopMode.Loop);
+    }
     
     private class PlayerMovementControl extends AbstractControl implements ActionListener, AnalogListener {
 
@@ -264,10 +255,10 @@ public class Test_AnimStateController extends SimpleApplication {
             }
         }
 
-		@Override
-		public void onAnalog(String name, float value, float tpf) {
-			// TODO Auto-generated method stub
-		}
+        @Override
+        public void onAnalog(String name, float value, float tpf) {
+            // TODO Auto-generated method stub
+        }
 
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
@@ -335,19 +326,19 @@ public class Test_AnimStateController extends SimpleApplication {
         }
 
     }
-    
-	private interface InputMapping {
+	
+    private interface InputMapping {
 
-		final String MOVE_LEFT 		= "MOVE_LEFT";
-		final String MOVE_RIGHT 	= "MOVE_RIGHT";
-		final String MOVE_FORWARD 	= "MOVE_FORWARD";
-		final String MOVE_BACKWARD 	= "MOVE_BACKWARD";
-		final String TOGGLE_CROUCH 	= "TOGGLE_CROUCH";
-		final String SWITCH_WEAPON 	= "SWITCH_WEAPON";
-		final String RELOAD_WEAPON 	= "RELOAD_WEAPON";
-		final String FIRE 			= "FIRE";
-	}
-    
+        final String MOVE_LEFT 		= "MOVE_LEFT";
+        final String MOVE_RIGHT 	= "MOVE_RIGHT";
+        final String MOVE_FORWARD 	= "MOVE_FORWARD";
+        final String MOVE_BACKWARD 	= "MOVE_BACKWARD";
+        final String TOGGLE_CROUCH 	= "TOGGLE_CROUCH";
+        final String SWITCH_WEAPON 	= "SWITCH_WEAPON";
+        final String RELOAD_WEAPON 	= "RELOAD_WEAPON";
+        final String FIRE 		= "FIRE";
+    }
+	
     private class TPSInputAppState extends BaseAppState implements AnalogListener, ActionListener {
 
         private InputManager inputManager;
@@ -370,41 +361,41 @@ public class Test_AnimStateController extends SimpleApplication {
         @Override
         protected void onDisable() {
         }
-        
-		private void addInputMappings() {
 
-			addMapping(InputMapping.MOVE_FORWARD, 	new KeyTrigger(KeyInput.KEY_W));
-			addMapping(InputMapping.MOVE_BACKWARD, 	new KeyTrigger(KeyInput.KEY_S));
-			addMapping(InputMapping.MOVE_LEFT, 		new KeyTrigger(KeyInput.KEY_A));
-			addMapping(InputMapping.MOVE_RIGHT, 	new KeyTrigger(KeyInput.KEY_D));
-			addMapping(InputMapping.RELOAD_WEAPON, 	new KeyTrigger(KeyInput.KEY_R));
-			addMapping(InputMapping.SWITCH_WEAPON, 	new KeyTrigger(KeyInput.KEY_F));
-			addMapping(InputMapping.TOGGLE_CROUCH, 	new KeyTrigger(KeyInput.KEY_LSHIFT));
-			addMapping(InputMapping.FIRE, 			new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-		}
+        private void addInputMappings() {
 
-		private void addMapping(String bindingName, Trigger... triggers) {
-			inputManager.addMapping(bindingName, triggers);
-			inputManager.addListener(this, bindingName);
-		}
+            addMapping(InputMapping.MOVE_FORWARD, 	new KeyTrigger(KeyInput.KEY_W));
+            addMapping(InputMapping.MOVE_BACKWARD, 	new KeyTrigger(KeyInput.KEY_S));
+            addMapping(InputMapping.MOVE_LEFT, 		new KeyTrigger(KeyInput.KEY_A));
+            addMapping(InputMapping.MOVE_RIGHT, 	new KeyTrigger(KeyInput.KEY_D));
+            addMapping(InputMapping.RELOAD_WEAPON, 	new KeyTrigger(KeyInput.KEY_R));
+            addMapping(InputMapping.SWITCH_WEAPON, 	new KeyTrigger(KeyInput.KEY_F));
+            addMapping(InputMapping.TOGGLE_CROUCH, 	new KeyTrigger(KeyInput.KEY_LSHIFT));
+            addMapping(InputMapping.FIRE, 		new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+        }
 
-		@Override
-		public void onAnalog(String name, float value, float tpf) {
-			if (isEnabled() && playerControl != null) {
-				playerControl.onAnalog(name, value, tpf);
-			}
-		}
+        private void addMapping(String bindingName, Trigger...triggers) {
+            inputManager.addMapping(bindingName, triggers);
+            inputManager.addListener(this, bindingName);
+        }
 
-		@Override
-		public void onAction(String name, boolean isPressed, float tpf) {
-			if (isEnabled() && playerControl != null) {
-				playerControl.onAction(name, isPressed, tpf);
-			}
-		}
+        @Override
+        public void onAnalog(String name, float value, float tpf) {
+            if (isEnabled() && playerControl != null) {
+                playerControl.onAnalog(name, value, tpf);
+            }
+        }
 
-		public void setPlayerControl(PlayerMovementControl playerControl) {
-			this.playerControl = playerControl;
-		}
-	}
+        @Override
+        public void onAction(String name, boolean isPressed, float tpf) {
+            if (isEnabled() && playerControl != null) {
+                playerControl.onAction(name, isPressed, tpf);
+            }
+        }
+
+        public void setPlayerControl(PlayerMovementControl playerControl) {
+            this.playerControl = playerControl;
+        }
+    }
 
 }
