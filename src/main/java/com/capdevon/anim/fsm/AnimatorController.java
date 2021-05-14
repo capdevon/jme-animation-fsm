@@ -7,13 +7,13 @@ package com.capdevon.anim.fsm;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParameterType;
 import com.capdevon.control.AdapterControl;
 import com.jme3.anim.AnimComposer;
-import com.jme3.anim.SkinningControl;
 import com.jme3.scene.Spatial;
 
 /**
@@ -25,10 +25,9 @@ public class AnimatorController extends AdapterControl {
     
     private static final Logger logger = Logger.getLogger(AnimatorController.class.getName());
 
-    AnimComposer animComposer;
-    SkinningControl skinningControl;
-    AnimatorStateMachine stateMachine;
-    List<AnimatorControllerParameter> parameters = new ArrayList<>();
+    protected AnimComposer animComposer;
+    protected AnimatorStateMachine stateMachine;
+    protected List<AnimatorControllerParameter> parameters = new ArrayList<>();
     
     public AnimatorController() {
         stateMachine = new AnimatorStateMachine(this);
@@ -42,9 +41,9 @@ public class AnimatorController extends AdapterControl {
     public void setSpatial(Spatial sp) {
         super.setSpatial(sp);
         if (spatial != null) {
-            skinningControl = getComponentInChild(SkinningControl.class);
             animComposer = getComponentInChild(AnimComposer.class);
-            logger.log(Level.INFO, "{0} --Animations: {1}", new Object[]{spatial.getName(), animComposer.getAnimClipsNames()});
+            Objects.requireNonNull(animComposer, "AnimComposer not found in subtree: " + spatial);
+            logger.log(Level.INFO, "AnimatorController initialized.");
         }
     }
         
