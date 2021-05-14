@@ -4,6 +4,7 @@ A collection of useful and fun demos made with jMonkeyEngine
 Resource Used:
 - Code
     - [jMonkeyEngine](https://jmonkeyengine.org/)
+    - Physics with [Minie](https://stephengold.github.io/Minie/minie/overview.html)
     
 - Assets
     - [Mixamo](https://www.mixamo.com/)
