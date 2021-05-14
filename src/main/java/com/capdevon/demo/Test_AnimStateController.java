@@ -6,9 +6,7 @@ import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParam
 import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;
-import com.capdevon.animation.Animation3;
 import com.capdevon.physx.PhysxDebugAppState;
-import com.jme3.animation.LoopMode;
 import com.jme3.app.Application;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
@@ -189,8 +187,8 @@ public class Test_AnimStateController extends SimpleApplication {
         player.addControl(animator);
         
         AnimatorStateMachine sm = animator.getStateMachine();
-        AnimatorState idle = sm.addState("Idle", AnimDefs.rifleIdle.getName());
-        AnimatorState walk = sm.addState("Run", AnimDefs.rifleRun.getName());
+        AnimatorState idle = sm.addState("Idle", AnimDefs.rifleIdle);
+        AnimatorState walk = sm.addState("Run", AnimDefs.rifleRun);
         
         // 1. example
 //        AnimatorStateTransition idleToWalk = idle.addTransition(walk);
@@ -238,9 +236,9 @@ public class Test_AnimStateController extends SimpleApplication {
     
     private interface AnimDefs {
 
-        final String MODEL 		= "Models/Rifle/soldier.gltf";
-        final Animation3 rifleIdle 	= new Animation3("RifleIdle", LoopMode.Loop);
-        final Animation3 rifleRun 	= new Animation3("RifleRun", LoopMode.Loop);
+        final String MODEL 	= "Models/Rifle/soldier.gltf";
+        final String rifleIdle 	= "RifleIdle";
+        final String rifleRun 	= "RifleRun";
     }
     
     private class PlayerMovementControl extends AbstractControl implements ActionListener, AnalogListener {
