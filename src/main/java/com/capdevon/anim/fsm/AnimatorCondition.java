@@ -36,7 +36,7 @@ public class AnimatorCondition {
                     case Bool:
                         return evaluateBool(param);
                     case Trigger:
-                        return true;
+                    	return evaluateTrigger(param);
                 }
             }
         }
@@ -83,6 +83,14 @@ public class AnimatorCondition {
             default:
                 return false;
         }
+    }
+    
+    private boolean evaluateTrigger(AnimatorControllerParameter param) {
+    	boolean triggered = param.defaultBool;
+    	if (triggered) {
+    		param.defaultBool = false;
+    	}
+        return triggered;
     }
 
 }
