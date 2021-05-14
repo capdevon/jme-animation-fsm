@@ -158,4 +158,18 @@ public class AnimatorController extends AdapterControl {
         }
         throw new IllegalArgumentException("AnimatorControllerParameter not found: " + paramName);
     }
+    
+    //--------------------------------------------------------------------------
+    // Trigger
+    //--------------------------------------------------------------------------
+    public void setTrigger(String paramName) {
+    	for (AnimatorControllerParameter param : parameters) {
+            if (param.name.equals(paramName) && param.type == AnimatorControllerParameterType.Trigger) {
+            	param.defaultBool = true;
+                return;
+            }
+        }
+        throw new IllegalArgumentException("AnimatorControllerParameter not found: " + paramName);
+    }
+    
 }
