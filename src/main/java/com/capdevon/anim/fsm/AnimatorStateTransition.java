@@ -31,8 +31,11 @@ public class AnimatorStateTransition {
     //AnimatorCondition conditions that need to be met for a transition to happen.
     protected List<AnimatorCondition> conditions = new ArrayList<>();
     
-    AnimatorStateTransition(AnimatorController animator) {
-        // default constructor.
+    /**
+     * protected constructor.
+     * @param animator
+     */
+    protected AnimatorStateTransition(AnimatorController animator) {
         this.animator = animator;
     }
     
