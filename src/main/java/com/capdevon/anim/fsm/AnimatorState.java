@@ -31,8 +31,11 @@ public class AnimatorState {
     //The transitions that are going out of the state.
     protected List<AnimatorStateTransition> transitions = new ArrayList<>();
     
+    /**
+     * protected constructor.
+     * @param animator
+     */
     protected AnimatorState(AnimatorController animator) {
-        // default constructor.
         this.animator = animator;
     }
     
