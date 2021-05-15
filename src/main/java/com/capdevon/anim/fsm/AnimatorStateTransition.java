@@ -27,9 +27,9 @@ public class AnimatorStateTransition {
     //When active the transition will have an exit time condition.
     public boolean hasExitTime = false;
     //The destination state of the transition.
-    public AnimatorState destinationState;
+    protected AnimatorState destinationState;
     //AnimatorCondition conditions that need to be met for a transition to happen.
-    public List<AnimatorCondition> conditions = new ArrayList<>();
+    protected List<AnimatorCondition> conditions = new ArrayList<>();
     
     AnimatorStateTransition(AnimatorController animator) {
         // default constructor.
