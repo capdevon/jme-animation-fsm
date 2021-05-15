@@ -15,13 +15,13 @@ import java.util.List;
 public class AnimatorCondition {
 
     //The mode of the condition.
-    public AnimatorConditionMode mode;
+    protected AnimatorConditionMode mode;
     //The name of the parameter used in the condition.
-    public String parameter;
+    protected String parameter;
     //The AnimatorParameter's threshold value for the condition to be true.
-    public float threshold;
+    protected float threshold;
     
-    AnimatorCondition() {
+    protected AnimatorCondition() {
         // default constructor.
     }
 
