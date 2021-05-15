@@ -1,5 +1,6 @@
 # jme-capdevon-examples
-A collection of useful and fun demos made with jMonkeyEngine
+A collection of useful and fun demos made with jMonkeyEngine.
+For more details visit the Wiki section.
 
 Resource Used:
 - Code
