@@ -16,16 +16,16 @@ public class AnimatorControllerParameter {
     }
 
     //The default bool value for the parameter.
-    public boolean defaultBool = false;
+    protected boolean defaultBool = false;
     //The default float value for the parameter.
-    public float defaultFloat = 0f;
+    protected float defaultFloat = 0f;
     //The default int value for the parameter.
-    public int defaultInt = 0;
+    protected int defaultInt = 0;
     //The name of the parameter.
-    public String name;
+    protected String name;
     //Returns the hash of the parameter based on its name.
-    public int nameHash;
+    protected int nameHash;
     //The type of the parameter.
-    public AnimatorControllerParameterType type;
+    protected AnimatorControllerParameterType type;
     
 }
