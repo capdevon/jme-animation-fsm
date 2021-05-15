@@ -26,7 +26,11 @@ public class AnimatorStateMachine {
     //The list of states.
     protected Map<String, AnimatorState> states = new HashMap<>();
 
-    AnimatorStateMachine(AnimatorController animator) {
+    /**
+     * protected constructor.
+     * @param animator
+     */
+    protected AnimatorStateMachine(AnimatorController animator) {
         this.animator = animator;
     }
 
@@ -35,6 +39,22 @@ public class AnimatorStateMachine {
         animator.animComposer.setCurrentAction(defaultState.action);
     }
 
+    /**
+     * Utility function to remove a state from the state machine.
+     * 
+     * @param stateName
+     */
+    public void removeState(String stateName) {
+    	states.remove(stateName);
+    }
+
+    /**
+     * 	Utility function to add a state to the state machine.
+     * 
+     * @param stateName
+     * @param animName
+     * @return
+     */
     public AnimatorState addState(String stateName, String animName) {
         if (animator.animComposer.getAnimClip(animName) == null) {
             throw new IllegalArgumentException("Can't find an animation clip with name " + animName);
