@@ -22,16 +22,16 @@ public class AnimatorState {
 
     private final AnimatorController animator;
     
-    // The animation clip assigned to this state
-    public String action;
+    //The animation clip assigned to this state
+    protected String action;
     //A name can be used to identify a state.
-    public String name;
+    protected String name;
     //The default speed of the motion.
     public float speed = 1f;
     //The transitions that are going out of the state.
-    public List<AnimatorStateTransition> transitions = new ArrayList<>();
+    protected List<AnimatorStateTransition> transitions = new ArrayList<>();
     
-    AnimatorState(AnimatorController animator) {
+    protected AnimatorState(AnimatorController animator) {
         // default constructor.
         this.animator = animator;
     }
