@@ -6,6 +6,7 @@
 package com.capdevon.anim.fsm;
 
 /**
+ * Used to communicate between scripting and the controller.
  *
  * @author capdevon
  */
