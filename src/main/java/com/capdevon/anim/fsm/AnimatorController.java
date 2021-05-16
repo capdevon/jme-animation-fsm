@@ -49,12 +49,19 @@ public class AnimatorController extends AdapterControl {
         
     @Override
     protected void controlUpdate(float tpf) {
-        //To change body of generated methods, choose Tools | Templates.
         stateMachine.update(tpf);
+    }
+    
+    /**
+     * Utility function to remove a parameter from the controller.
+     * @param param
+     */
+    public void removeParameter(AnimatorControllerParameter param) {
+    	parameters.remove(param);
     }
 
     /**
-     * 
+     * Utility function to add a parameter to the controller.
      * @param name
      * @param type 
      */
