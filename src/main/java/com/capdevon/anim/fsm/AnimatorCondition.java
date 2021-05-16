@@ -65,10 +65,6 @@ public class AnimatorCondition {
                 return param.defaultFloat > threshold;
             case Less:
                 return param.defaultFloat < threshold;
-            case Equals:
-                return param.defaultFloat == threshold;
-            case NotEqual:
-                return param.defaultFloat != threshold;
             default:
                 return false;
         }
