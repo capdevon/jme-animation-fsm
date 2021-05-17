@@ -132,6 +132,7 @@ public class Test_OverlappingSphere extends SimpleApplication implements ActionL
             BetterCharacterControl bcc = new BetterCharacterControl(.5f, 2f, 40f);
             node.addControl(bcc);
             physics.getPhysicsSpace().add(bcc);
+            //bcc.getRigidBody().setDebugMaterial(getUnshadedMaterial(ColorRGBA.Red));
             bcc.getRigidBody().setCollisionGroup(PhysicsCollisionObject.COLLISION_GROUP_02);
         }
     }
@@ -168,7 +169,7 @@ public class Test_OverlappingSphere extends SimpleApplication implements ActionL
         return new Vector3f(dx, 0, dz);
     }
 
-    public Spatial createLabel(String text, ColorRGBA color) {
+    private Spatial createLabel(String text, ColorRGBA color) {
         BitmapText bmp = new BitmapText(guiFont, false);
         bmp.setText(text);
         bmp.setColor(color);
@@ -208,7 +209,7 @@ public class Test_OverlappingSphere extends SimpleApplication implements ActionL
 //        ghostControl.setCollisionGroup(PhysicsCollisionObject.COLLISION_GROUP_04);
 //        ghostControl.setCollideWithGroups(PhysicsCollisionObject.COLLISION_GROUP_02);
         
-        PlayerBaseControl baseControl = new PlayerBaseControl(inputManager);
+        PlayerBaseControl baseControl = new PlayerBaseControl(this);
         player.addControl(baseControl);
     }
 
@@ -251,13 +252,13 @@ public class Test_OverlappingSphere extends SimpleApplication implements ActionL
             
         } else if (name.equals("ContactTest") && isPressed) {
             
-            System.out.println("\nSTART");
+            System.out.println("\n--ContactTest:");
             Set<Spatial> set = PhysxQuery.contactTest(player.getWorldTranslation(), radius, LAYER_2);
             System.out.println(StringUtils.join(set, "; "));
             
         } else if (name.equals("OverlapSphere") && isPressed) {
             
-            System.out.println("\nSTART");
+            System.out.println("\n--OverlapSphere:");
             for (PhysicsRigidBody pco : PhysxQuery.overlapSphere(player.getWorldTranslation(), radius)) {// LAYER_1, dynamicObjects)) {
                 System.out.printf("Class: %s, UserObj: %s, CollisionGroup: %d %n", 
                         pco.getClass().getSimpleName(), 
