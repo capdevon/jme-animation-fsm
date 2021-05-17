@@ -82,10 +82,10 @@ public class AnimatorCondition {
     }
     
     private boolean evaluateTrigger(AnimatorControllerParameter param) {
-    	boolean triggered = param.defaultBool;
-    	if (triggered) {
-    		param.defaultBool = false;
-    	}
+        boolean triggered = param.defaultBool;
+        if (triggered) {
+            param.defaultBool = false;
+        }
         return triggered;
     }
 
