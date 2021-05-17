@@ -5,116 +5,151 @@
  */
 package com.capdevon.anim.fsm;
 
-import com.jme3.math.FastMath;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * States are the basic building blocks of a state machine. Each state contains
- * a Motion (AnimClip or BlendTree) which will play while the character is
- * in that state. When an event in the game triggers a state transition, the
- * character will be left in a new state whose animation sequence will then take
- * over.
- *
+ * A graph controlling the interaction of states. Each state references a motion.
+ * 
  * @author capdevon
  */
-public class AnimatorState {
+public class AnimatorStateMachine {
+
+    private static final Logger logger = Logger.getLogger(AnimatorStateMachine.class.getName());
 
     private AnimatorController animator;
-    
-    //The animation clip assigned to this state
-    protected String action;
-    //A name can be used to identify a state.
-    protected String name;
-    //The default speed of the motion.
-    protected float speed = 1f;
-    //The transitions that are going out of the state.
-    protected List<AnimatorStateTransition> transitions = new ArrayList<>();
-    //The behaviour list assigned to this state.
-    protected List<StateMachineBehaviour> behaviours = new ArrayList<>();
-        
+
+    //The any state name
+    public static final String ANY_STATE = "Any State";
+    //The anyState, not a proper state but used as dummy
+    protected AnimatorState anyState = new AnimatorState(ANY_STATE, null);
+    //The state that the state machine will be in when it starts
+    protected AnimatorState currentState = anyState;
+    //The list of states
+    protected Map<String, AnimatorState> states = new HashMap<>();
+    //The list of listeners
+    protected List<StateMachineListener> listeners = new ArrayList<>();
+
     /**
      * Constructor.
      * @param animator
      */
-    protected AnimatorState(String name, AnimatorController animator) {
-    	this.name = name;
+    protected AnimatorStateMachine(AnimatorController animator) {
         this.animator = animator;
     }
-    
+
     /**
-     * Adds a state machine behaviour class to the AnimatorState.
-     * @param behaviour The state machine behaviour to add.
+     * Adds a new listener.
+     * @param listener The listener to add.
      */
-    public void addStateMachineBehaviour(StateMachineBehaviour behaviour) {
-    	behaviours.add(behaviour);
-    }
-    
-    /**
-     * Utility function to remove a transition from the state.
-     * @param transition Transition to remove.
-     */
-    public void removeTransition(AnimatorStateTransition transition) {
-        transitions.remove(transition);
-    }
-    
-    /**
-     * Utility function to add an outgoing transition to the destination state.
-     * @param destinationState The destination state.
-     * @return 
-     */
-    public AnimatorStateTransition addTransition(AnimatorState destinationState) {
-        return addTransition(destinationState, 0);
+    public void addListener(StateMachineListener listener) {
+        if (listeners.contains(listener)) {
+            throw new IllegalArgumentException("The given listener is already registed at this AnimatorStateMachine");
+        }
+
+        listeners.add(listener);
     }
 
-    public AnimatorStateTransition addTransition(AnimatorState destinationState, float exitTime) {
-        AnimatorStateTransition transition = new AnimatorStateTransition(animator);
-        transition.destinationState = destinationState;
-        if (exitTime > 0) {
-            transition.hasExitTime = true;
-            transition.exitTime = FastMath.clamp(exitTime, 0, 1);
+    /**
+     * Removes the given listener from listening to events.
+     * @param listener
+     */
+    public void removeListener(StateMachineListener listener) {
+        if (!listeners.remove(listener)) {
+            throw new IllegalArgumentException("The given listener is not registed at this AnimatorStateMachine");
         }
-        
-        transitions.add(transition);
-        return transition;
     }
 
-    protected AnimatorState checkTransitions() {
-        double animPercent = getAnimPercent();
-        for (AnimatorStateTransition transition : transitions) {
-            if (transition.checkConditions(animPercent)) {
-                return transition.destinationState;
-            }
-        }
-        return this;
+    public void setDefaultState(AnimatorState state) {
+        anyState.transitions.clear();
+        anyState.addTransition(state);
     }
-    
-	private double getAnimPercent() {
-		if (animator != null) {
-			return animator.animComposer.getTime() / animator.animComposer.getAnimClip(action).getLength();
-		}
-		return 0;
-	}
-	
-	public String getAction() {
-		return action;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public float getSpeed() {
-		return speed;
-	}
-    
-    @Override
-    public String toString() {
-        return "AnimatorState{" 
-                + "action=" + action 
-                + ", name=" + name 
-                + ", speed=" + speed 
-                + '}';
+
+    /**
+     * Utility function to add a state to the state machine.
+     * @param stateName
+     * @param animName
+     * @return
+     */
+    public AnimatorState addState(String stateName, String animName) {
+        if (animator.animComposer.getAnimClip(animName) == null) {
+            throw new IllegalArgumentException("Cannot find an animation clip with name " + animName);
+        }
+
+        AnimatorState state = new AnimatorState(stateName, animator);
+        state.action = animName;
+        states.put(stateName, state);
+        return state;
+    }
+
+    /**
+     * Utility function to remove a state from the state machine.
+     * @param stateName
+     */
+    public void removeState(String stateName) {
+        states.remove(stateName);
+    }
+
+    /**
+     * Find a state with the given name. 
+     * Throws an exception if the state is not found.
+     * 
+     * @param stateName
+     * @return
+     */
+    public AnimatorState findState(String stateName) {
+        AnimatorState state = getState(stateName);
+        if (state == null) {
+            throw new IllegalArgumentException("Cannot find state with name " + stateName);
+        }
+        return state;
+    }
+
+    /**
+     * Returns the state with the given name or null if the state is not found.
+     *
+     * @param stateName the name of the state
+     * @return the state.
+     */
+    public AnimatorState getState(String stateName) {
+        if (stateName.equals(ANY_STATE)) {
+            return anyState;
+        }
+        return states.get(stateName);
+    }
+
+    /**
+     * Returns a read only collection of the states.
+     *
+     * @return the states.
+     */
+    public Collection<AnimatorState> getStates() {
+        return states.values();
+    }
+
+    protected void update(float tpf) {
+        AnimatorState nextState = currentState.checkTransitions();
+        if (currentState != nextState) {
+
+            listeners.forEach(listener -> listener.onStateChanged(currentState, nextState));
+
+            logger.log(Level.INFO, "onStateExit: {0}", currentState);
+            currentState.behaviours.forEach(behaviour -> behaviour.onStateExit(animator));
+
+            animator.animComposer.setCurrentAction(nextState.action);
+            animator.animComposer.setGlobalSpeed(nextState.speed);
+            currentState = nextState;
+
+            logger.log(Level.INFO, "onStateEnter: {0}", currentState);
+            currentState.behaviours.forEach(behaviour -> behaviour.onStateEnter(animator));
+        }
+
+        currentState.behaviours.forEach(behaviour -> behaviour.onStateUpdate(animator, tpf));
     }
 
 }
