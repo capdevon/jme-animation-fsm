@@ -16,23 +16,23 @@ import java.util.List;
  */
 public class AnimatorStateTransition {
     
-    private final AnimatorController animator;
+    private AnimatorController animator;
     
     //The duration of the transition.
-    public float duration = 0.25f;
+    protected float duration = 0.25f;
     //Determines whether the duration of the transition is reported in a fixed duration in seconds or as a normalized time.
-    public boolean hasFixedDuration = true;
-    //If AnimatorStateTransition.hasExitTime is true, exitTime represents the exact time at which the transition can take effect
-    public float exitTime = 0.75f;
+    protected boolean hasFixedDuration = true;
+    //If AnimatorStateTransition.hasExitTime is true, exitTime represents the exact time at which the transition can take effect.
+    protected float exitTime = 0.75f;
     //When active the transition will have an exit time condition.
-    public boolean hasExitTime = false;
+    protected boolean hasExitTime = false;
     //The destination state of the transition.
     protected AnimatorState destinationState;
     //AnimatorCondition conditions that need to be met for a transition to happen.
     protected List<AnimatorCondition> conditions = new ArrayList<>();
     
     /**
-     * protected constructor.
+     * Constructor.
      * @param animator
      */
     protected AnimatorStateTransition(AnimatorController animator) {
