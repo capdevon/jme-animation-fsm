@@ -4,15 +4,19 @@
  */
 package com.capdevon.control;
 
+import com.jme3.app.Application;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
+import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
+import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.input.controls.Trigger;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Spatial;
@@ -23,30 +27,38 @@ import com.jme3.scene.control.AbstractControl;
  * @author capdevon
  */
 public class PlayerBaseControl extends AbstractControl implements ActionListener {
+	
+    private interface InputMapping {
+        final String MOVE_LEFT 		= "MOVE_LEFT";
+        final String MOVE_RIGHT 	= "MOVE_RIGHT";
+        final String MOVE_FORWARD 	= "MOVE_FORWARD";
+        final String MOVE_BACKWARD 	= "MOVE_BACKWARD";
+        final String RUNNING 		= "RUNNING";
+        final String FIRE 			= "FIRE";
+    }
     
+    public float m_MoveSpeed = 4.5f;
+    public float m_TurnSpeed = 10f;
+    
+    private Camera camera;
     private InputManager inputManager;
     private BetterCharacterControl bcc;
     
-    boolean _StrafeLeft, _StrafeRight;
-    boolean _MoveForward;
-    boolean _MoveBackward;
-    boolean _TurnLeft;
-    boolean _TurnRight;
-    boolean ducked;
-    float m_MoveSpeed = 2.5f;
-    
-    Vector3f walkDirection = new Vector3f(0, 0, 0);
-    Vector3f viewDirection = new Vector3f(0, 0, 1);
-    Vector3f dz = new Vector3f();
-    Vector3f dx = new Vector3f();
-    Quaternion tempRot = new Quaternion();
+    private final Quaternion lookRotation = new Quaternion();
+    private final Vector3f cameraDir = new Vector3f();
+    private final Vector3f cameraLeft = new Vector3f();
+    private final Vector3f walkDirection = new Vector3f(0, 0, 0);
+    private final Vector3f viewDirection = new Vector3f(0, 0, 1);
+    private boolean _MoveForward, _MoveBackward, _TurnLeft, _TurnRight;
+    private boolean isRunning;
     
     /**
      * 
-     * @param inputManager 
+     * @param app
      */
-    public PlayerBaseControl(InputManager inputManager) {
-        this.inputManager = inputManager;
+    public PlayerBaseControl(Application app) {
+    	this.camera = app.getCamera();
+        this.inputManager = app.getInputManager();
     }
     
     @Override
@@ -61,56 +73,60 @@ public class PlayerBaseControl extends AbstractControl implements ActionListener
     @Override
     public void controlUpdate(float tpf) {
         
-        walkDirection.set(Vector3f.ZERO);
+        camera.getDirection(cameraDir).setY(0);
+        camera.getLeft(cameraLeft).setY(0);
 
-        if (_StrafeLeft || _StrafeRight) {
-//            float k = _StrafeLeft ? 1f : -1;
-//            spatial.getWorldRotation().mult(Vector3f.UNIT_X, dx);
-//            walkDirection.addLocal(dx.multLocal(k * m_MoveSpeed));
+        walkDirection.set(0, 0, 0);
+
+        if (_MoveForward) {
+            walkDirection.addLocal(cameraDir);
+        } else if (_MoveBackward) {
+            walkDirection.subtractLocal(cameraDir);
         }
-        if (_MoveForward || _MoveBackward) {
-            float k = _MoveForward ? 1 : -1;
-            spatial.getWorldRotation().mult(Vector3f.UNIT_Z, dz);
-            walkDirection.addLocal(dz.multLocal(k * m_MoveSpeed));
-        }
-        if (_TurnLeft || _TurnRight) {
-            float k = _TurnLeft ? FastMath.PI : -FastMath.PI;
-            tempRot.fromAngleNormalAxis(tpf * k, Vector3f.UNIT_Y).multLocal(viewDirection);
-            bcc.setViewDirection(viewDirection); //Turn!
+        if (_TurnLeft) {
+            walkDirection.addLocal(cameraLeft);
+        } else if (_TurnRight) {
+            walkDirection.subtractLocal(cameraLeft);
         }
 
-        bcc.setWalkDirection(walkDirection); //Walk!
+        walkDirection.normalizeLocal();
+        boolean isMoving = walkDirection.lengthSquared() > 0;
+
+        if (isMoving) {
+        	// smooth rotation
+        	float angle = FastMath.atan2(walkDirection.x, walkDirection.z);
+            lookRotation.fromAngleNormalAxis(angle, Vector3f.UNIT_Y);
+            spatial.getWorldRotation().slerp(lookRotation, m_TurnSpeed * tpf);
+            spatial.getWorldRotation().mult(Vector3f.UNIT_Z, viewDirection);
+            bcc.setViewDirection(viewDirection);
+        }
+        
+        bcc.setWalkDirection(walkDirection.multLocal(m_MoveSpeed));
     }
 
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
-        if (name.equals("StrafeLeft")) {
-            _StrafeLeft = isPressed;
-        } else if (name.equals("StrafeRight")) {
-            _StrafeRight = isPressed;
-        } else if (name.equals("MoveForward")) {
+        //To change body of generated methods, choose Tools | Templates.
+        if (name.equals(InputMapping.MOVE_FORWARD)) {
             _MoveForward = isPressed;
-        } else if (name.equals("MoveBackward")) {
+        } else if (name.equals(InputMapping.MOVE_BACKWARD)) {
             _MoveBackward = isPressed;
-        } else if (name.equals("RotateLeft")) {
+        } else if (name.equals(InputMapping.MOVE_LEFT)) {
             _TurnLeft = isPressed;
-        } else if (name.equals("RotateRight")) {
+        } else if (name.equals(InputMapping.MOVE_RIGHT)) {
             _TurnRight = isPressed;
-        } else if (name.equals("Ducked") && isPressed) {
-            ducked = !ducked;
-            bcc.setDucked(ducked);
-        } else if (name.equals("Jump") && isPressed) {
-            bcc.jump();
+        } else if (name.equals(InputMapping.RUNNING) && isPressed) {
+        	isRunning = isPressed;
         }
     }
     
-    public void stop() {
-//        _RunForward   = false;
-        _MoveForward  = false;
-        _MoveBackward = false;
-        _TurnLeft     = false;
-        _TurnRight    = false;
-    }
+	public void stop() {
+		isRunning 		= false;
+		_MoveForward 	= false;
+		_MoveBackward 	= false;
+		_TurnLeft 		= false;
+		_TurnRight 		= false;
+	}
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
@@ -121,14 +137,12 @@ public class PlayerBaseControl extends AbstractControl implements ActionListener
      * Custom Keybinding: Map named actions to inputs.
      */
     private void registerInputs() {
-        addMapping("StrafeLeft",      new KeyTrigger(KeyInput.KEY_Q));
-        addMapping("StrafeRight",     new KeyTrigger(KeyInput.KEY_E));
-        addMapping("RunForward",      new KeyTrigger(KeyInput.KEY_SPACE));
-        addMapping("MoveForward",     new KeyTrigger(KeyInput.KEY_W));
-        addMapping("MoveBackward",    new KeyTrigger(KeyInput.KEY_S));
-        addMapping("RotateLeft",      new KeyTrigger(KeyInput.KEY_A));
-        addMapping("RotateRight",     new KeyTrigger(KeyInput.KEY_D));
-        addMapping("Ducked",          new KeyTrigger(KeyInput.KEY_Z));
+    	addMapping(InputMapping.MOVE_FORWARD, 	new KeyTrigger(KeyInput.KEY_W));
+        addMapping(InputMapping.MOVE_BACKWARD, 	new KeyTrigger(KeyInput.KEY_S));
+        addMapping(InputMapping.MOVE_LEFT, 		new KeyTrigger(KeyInput.KEY_A));
+        addMapping(InputMapping.MOVE_RIGHT, 	new KeyTrigger(KeyInput.KEY_D));
+        addMapping(InputMapping.RUNNING, 		new KeyTrigger(KeyInput.KEY_SPACE));
+        addMapping(InputMapping.FIRE, 			new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
     }
     
     private void addMapping(String mapping, Trigger... triggers) {
