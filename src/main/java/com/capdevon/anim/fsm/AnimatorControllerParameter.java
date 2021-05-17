@@ -7,6 +7,7 @@ package com.capdevon.anim.fsm;
 
 /**
  * Used to communicate between scripting and the controller.
+ * They are used to drive transitions.
  *
  * @author capdevon
  */
