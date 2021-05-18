@@ -80,6 +80,11 @@ public class AnimatorStateMachine {
         if (animator.animComposer.getAnimClip(animName) == null) {
             throw new IllegalArgumentException("Cannot find an animation clip with name " + animName);
         }
+        
+        if (states.containsKey(stateName)) {
+			String error = String.format("State '{0}' already exists in state machine", stateName);
+			throw new IllegalArgumentException(error);
+		}
 
         AnimatorState state = new AnimatorState(stateName, animator);
         state.action = animName;
