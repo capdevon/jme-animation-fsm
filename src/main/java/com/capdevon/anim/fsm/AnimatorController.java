@@ -29,6 +29,9 @@ public class AnimatorController extends AdapterControl {
     protected AnimatorStateMachine stateMachine;
     protected List<AnimatorControllerParameter> parameters = new ArrayList<>();
     
+    /**
+     * Constructor.
+     */
     public AnimatorController() {
         stateMachine = new AnimatorStateMachine(this);
     }
@@ -43,7 +46,7 @@ public class AnimatorController extends AdapterControl {
         if (spatial != null) {
             animComposer = getComponentInChild(AnimComposer.class);
             Objects.requireNonNull(animComposer, "AnimComposer not found in subtree: " + spatial);
-            logger.log(Level.INFO, "AnimatorController initialized.");
+            logger.log(Level.INFO, "AnimatorController initialized for " + spatial);
         }
     }
         
@@ -72,10 +75,24 @@ public class AnimatorController extends AdapterControl {
         param.nameHash = name.hashCode();
         parameters.add(param);
     }
+    
+    public AnimatorControllerParameter getParameter(String paramName) {
+    	for (AnimatorControllerParameter param : parameters) {
+    		if (param.nameHash == paramName.hashCode()) {
+    			return param;
+    		}
+    	}
+    	return null;
+    }
 
     //--------------------------------------------------------------------------
     // Boolean
     //--------------------------------------------------------------------------
+
+    public boolean getBool(String paramName) {
+    	return getBool(paramName.hashCode());
+    }
+    
     public boolean getBool(int id) {
         for (AnimatorControllerParameter param : parameters) {
             if (param.nameHash == id && param.type == AnimatorControllerParameterType.Bool) {
@@ -83,15 +100,6 @@ public class AnimatorController extends AdapterControl {
             }
         }
         throw new IllegalArgumentException("AnimatorControllerParameter not found: " + id);
-    }
-
-    public boolean getBool(String paramName) {
-        for (AnimatorControllerParameter param : parameters) {
-            if (param.name.equals(paramName) && param.type == AnimatorControllerParameterType.Bool) {
-                return param.defaultBool;
-            }
-        }
-        throw new IllegalArgumentException("AnimatorControllerParameter not found: " + paramName);
     }
 
     public void setBool(String paramName, boolean value) {
@@ -107,6 +115,10 @@ public class AnimatorController extends AdapterControl {
     //--------------------------------------------------------------------------
     // Float
     //--------------------------------------------------------------------------
+    public float getFloat(String paramName) {
+    	return getFloat(paramName.hashCode());
+    }
+    
     public float getFloat(int id) {
         for (AnimatorControllerParameter param : parameters) {
             if (param.nameHash == id && param.type == AnimatorControllerParameterType.Float) {
@@ -114,15 +126,6 @@ public class AnimatorController extends AdapterControl {
             }
         }
         throw new IllegalArgumentException("AnimatorControllerParameter not found: " + id);
-    }
-
-    public float getFloat(String paramName) {
-        for (AnimatorControllerParameter param : parameters) {
-            if (param.name.equals(paramName) && param.type == AnimatorControllerParameterType.Float) {
-                return param.defaultFloat;
-            }
-        }
-        throw new IllegalArgumentException("AnimatorControllerParameter not found: " + paramName);
     }
 
     public void setFloat(String paramName, float value) {
@@ -138,6 +141,10 @@ public class AnimatorController extends AdapterControl {
     //--------------------------------------------------------------------------
     // Integer
     //--------------------------------------------------------------------------
+    public int getInt(String paramName) {
+    	return getInt(paramName.hashCode());
+    }
+    
     public int getInt(int id) {
         for (AnimatorControllerParameter param : parameters) {
             if (param.nameHash == id && param.type == AnimatorControllerParameterType.Int) {
@@ -145,15 +152,6 @@ public class AnimatorController extends AdapterControl {
             }
         }
         throw new IllegalArgumentException("AnimatorControllerParameter not found: " + id);
-    }
-
-    public int getInt(String paramName) {
-        for (AnimatorControllerParameter param : parameters) {
-            if (param.name.equals(paramName) && param.type == AnimatorControllerParameterType.Int) {
-                return param.defaultInt;
-            }
-        }
-        throw new IllegalArgumentException("AnimatorControllerParameter not found: " + paramName);
     }
 
     public void setInt(String paramName, int value) {
