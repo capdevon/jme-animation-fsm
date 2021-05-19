@@ -77,12 +77,12 @@ public class AnimatorController extends AdapterControl {
     }
     
     public AnimatorControllerParameter getParameter(String paramName) {
-    	for (AnimatorControllerParameter param : parameters) {
-    		if (param.nameHash == paramName.hashCode()) {
-    			return param;
-    		}
-    	}
-    	return null;
+        for (AnimatorControllerParameter param: parameters) {
+            if (param.nameHash == paramName.hashCode()) {
+                return param;
+            }
+        }
+        return null;
     }
 
     //--------------------------------------------------------------------------
