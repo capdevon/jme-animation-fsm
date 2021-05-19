@@ -91,7 +91,7 @@ public class AnimatorState {
 	
     private double getAnimPercent() {
         if (animator != null) {
-            return animator.animComposer.getTime() / animator.animComposer.getAnimClip(action).getLength();
+            return animator.animComposer.getTime() / animator.animComposer.getAction(action).getLength();
         }
         return 0;
     }
