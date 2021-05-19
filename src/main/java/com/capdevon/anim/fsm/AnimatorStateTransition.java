@@ -55,17 +55,17 @@ public class AnimatorStateTransition {
      * @param threshold
      * @param parameter 
      */
-	public void addCondition(AnimatorConditionMode mode, float threshold, String parameter) {
-		if (animator.getParameter(parameter) == null) {
-			throw new IllegalArgumentException("AnimatorControllerParameter not found: " + parameter);
-		}
+    public void addCondition(AnimatorConditionMode mode, float threshold, String parameter) {
+        if (animator.getParameter(parameter) == null) {
+            throw new IllegalArgumentException("AnimatorControllerParameter not found: " + parameter);
+        }
 
-		AnimatorCondition condition = new AnimatorCondition();
-		condition.mode = mode;
-		condition.threshold = threshold;
-		condition.parameter = parameter;
-		conditions.add(condition);
-	}
+        AnimatorCondition condition = new AnimatorCondition();
+        condition.mode = mode;
+        condition.threshold = threshold;
+        condition.parameter = parameter;
+        conditions.add(condition);
+    }
 
     protected boolean checkConditions(double animPercent) {
         if (hasExitTime) {
