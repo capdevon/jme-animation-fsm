@@ -88,25 +88,25 @@ public class AnimatorState {
         }
         return this;
     }
-    
-	private double getAnimPercent() {
-		if (animator != null) {
-			return animator.animComposer.getTime() / animator.animComposer.getAnimClip(action).getLength();
-		}
-		return 0;
-	}
 	
-	public String getAction() {
-		return action;
-	}
-	
-	public String getName() {
-		return name;
-	}
-	
-	public float getSpeed() {
-		return speed;
-	}
+    private double getAnimPercent() {
+        if (animator != null) {
+            return animator.animComposer.getTime() / animator.animComposer.getAnimClip(action).getLength();
+        }
+        return 0;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
     
     @Override
     public String toString() {
