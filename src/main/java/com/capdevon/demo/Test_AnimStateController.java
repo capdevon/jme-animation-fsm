@@ -29,7 +29,6 @@ import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
-import com.jme3.material.Materials;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
@@ -179,16 +178,18 @@ public class Test_AnimStateController extends SimpleApplication {
         bcc.getRigidBody().setCollisionGroup(RigidBodyControl.COLLISION_GROUP_02);
         bcc.getRigidBody().setCollideWithGroups(RigidBodyControl.COLLISION_GROUP_01);
         
-        // setup AnimState
+        // Create the controller and the parameters
         AnimatorController animator = new AnimatorController();
         animator.addParameter("moveSpeed", AnimatorControllerParameterType.Float);
         animator.addParameter("isRunning", AnimatorControllerParameterType.Bool);
-        animator.addParameter("isJumping", AnimatorControllerParameterType.Trigger);
+        animator.addParameter("isReloading", AnimatorControllerParameterType.Trigger);
         player.addControl(animator);
         
+        // Define states for animations.
         AnimatorStateMachine sm = animator.getStateMachine();
-        AnimatorState idle = sm.addState("Idle", AnimDefs.rifleIdle);
-        AnimatorState walk = sm.addState("Run", AnimDefs.rifleRun);
+        AnimatorState idle = sm.addState("Idle", AnimDefs.RifleIdle);
+        AnimatorState walk = sm.addState("Run", AnimDefs.RifleRun);
+        AnimatorState reload = sm.addState("Reload", AnimDefs.Reloading);
         
         // 1. example
 //        AnimatorStateTransition idleToWalk = idle.addTransition(walk);
@@ -205,11 +206,12 @@ public class Test_AnimStateController extends SimpleApplication {
         walkToIdle.addCondition(AnimatorConditionMode.IfNot, 0f, "isRunning");
         
         // 3. example
-//        AnimatorStateTransition idleToWalk = idle.addTransition(walk);
-//        idleToWalk.addCondition(AnimatorConditionMode.If, 0f, "isJumping");
-//        
-//        AnimatorStateTransition walkToIdle = walk.addTransition(idle, 0.9f);
+        AnimatorStateTransition idleToReload = idle.addTransition(reload);
+        idleToReload.addCondition(AnimatorConditionMode.If, 0f, "isReloading");
         
+        AnimatorStateTransition reloadToIdle = reload.addTransition(idle, 0.9f);
+        
+        // set the initial state.
         sm.setDefaultState(idle);
         
         // setup Player Movement Control
@@ -234,12 +236,23 @@ public class Test_AnimStateController extends SimpleApplication {
         chaseCam.setDefaultDistance(chaseCam.getMinDistance());
     }
     
-    private interface AnimDefs {
+	private interface AnimDefs {
 
-        final String MODEL 	= "Models/Rifle/soldier.gltf";
-        final String rifleIdle 	= "RifleIdle";
-        final String rifleRun 	= "RifleRun";
-    }
+		final String MODEL = "Models/Rifle/rifle.glb";
+		final String RifleIdle = "RifleIdle";
+		final String RifleWalk = "RifleWalk";
+		final String RifleRun = "RifleRun";
+		final String WalkWithRifle = "WalkWithRifle";
+		final String ThrowGrenade = "ThrowGrenade";
+		final String Reloading = "Reloading";
+		final String RifleAimingIdle = "RifleAimingIdle";
+		final String FiringRifleSingle = "FiringRifleSingle";
+		final String FiringRifleAuto = "FiringRifleAuto";
+		final String DeathFromRight = "DeathFromRight";
+		final String DeathFromHeadshot = "DeathFromHeadshot";
+		final String TPose = "TPose";
+
+	}
     
     private class PlayerMovementControl extends AbstractControl implements ActionListener, AnalogListener {
 
@@ -269,10 +282,10 @@ public class Test_AnimStateController extends SimpleApplication {
             }
         }
 
-	@Override
-	public void onAnalog(String name, float value, float tpf) {
-		// TODO Auto-generated method stub
-	}
+		@Override
+		public void onAnalog(String name, float value, float tpf) {
+			// TODO Auto-generated method stub
+		}
 
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
@@ -285,8 +298,8 @@ public class Test_AnimStateController extends SimpleApplication {
                 _TurnLeft = isPressed;
             } else if (name.equals(InputMapping.MOVE_RIGHT)) {
                 _TurnRight = isPressed;
-            } else if (name.equals(InputMapping.RUNNING) && isPressed) {
-                animator.setTrigger("isJumping");
+            } else if (name.equals(InputMapping.RELOAD) && isPressed) {
+                animator.setTrigger("isReloading");
             }
         }
 
@@ -340,6 +353,7 @@ public class Test_AnimStateController extends SimpleApplication {
         final String MOVE_FORWARD 	= "MOVE_FORWARD";
         final String MOVE_BACKWARD 	= "MOVE_BACKWARD";
         final String RUNNING 		= "RUNNING";
+        final String RELOAD		= "RELOAD";
         final String FIRE 		= "FIRE";
     }
 	
@@ -374,6 +388,7 @@ public class Test_AnimStateController extends SimpleApplication {
             addMapping(InputMapping.MOVE_RIGHT, 	new KeyTrigger(KeyInput.KEY_D));
             addMapping(InputMapping.RUNNING, 		new KeyTrigger(KeyInput.KEY_SPACE));
             addMapping(InputMapping.FIRE, 		new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+            addMapping(InputMapping.RELOAD, 		new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         }
 
         private void addMapping(String bindingName, Trigger...triggers) {
