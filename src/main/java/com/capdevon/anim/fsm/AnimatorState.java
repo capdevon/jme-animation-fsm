@@ -1,13 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.capdevon.anim.fsm;
 
-import com.jme3.math.FastMath;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.logging.Logger;
+
+import com.jme3.anim.tween.action.BlendAction;
+import com.jme3.anim.tween.action.BlendableAction;
+import com.jme3.math.FastMath;
 
 /**
  * States are the basic building blocks of a state machine. Each state contains
@@ -20,10 +20,12 @@ import java.util.List;
  */
 public class AnimatorState {
 
+    private static final Logger logger = Logger.getLogger(AnimatorState.class.getName());
+
     private AnimatorController animator;
-    
-    //The animation clip assigned to this state.
-    protected String action;
+
+    //The motion assigned to this state.
+    protected Motion motion;
     //A name can be used to identify a state.
     protected String name;
     //The default speed of the motion.
@@ -32,24 +34,24 @@ public class AnimatorState {
     protected List<AnimatorStateTransition> transitions = new ArrayList<>();
     //The behaviour list assigned to this state.
     protected List<StateMachineBehaviour> behaviours = new ArrayList<>();
-        
+
     /**
      * Constructor.
      * @param animator
      */
     protected AnimatorState(String name, AnimatorController animator) {
-    	this.name = name;
+        this.name = name;
         this.animator = animator;
     }
-    
+
     /**
      * Adds a state machine behaviour class to the AnimatorState.
      * @param behaviour The state machine behaviour to add.
      */
     public void addStateMachineBehaviour(StateMachineBehaviour behaviour) {
-    	behaviours.add(behaviour);
+        behaviours.add(behaviour);
     }
-    
+
     /**
      * Utility function to remove a transition from the state.
      * @param transition Transition to remove.
@@ -57,7 +59,7 @@ public class AnimatorState {
     public void removeTransition(AnimatorStateTransition transition) {
         transitions.remove(transition);
     }
-    
+
     /**
      * Utility function to add an outgoing transition to the destination state.
      * @param destinationState The destination state.
@@ -74,30 +76,61 @@ public class AnimatorState {
             transition.hasExitTime = true;
             transition.exitTime = FastMath.clamp(exitTime, 0, 1);
         }
-        
+
         transitions.add(transition);
         return transition;
     }
 
+//    protected AnimatorStateTransition getTransitionState() {
+//        for (AnimatorStateTransition transition: transitions) {
+//            if (!transition.mute && transition.checkConditions(this)) {
+//                return transition;
+//            }
+//        }
+//        return null;
+//    }
+
     protected AnimatorState checkTransitions() {
-        double animPercent = getAnimPercent();
-        for (AnimatorStateTransition transition : transitions) {
-            if (transition.checkConditions(animPercent)) {
-                return transition.destinationState;
+        for (AnimatorStateTransition transition: transitions) {
+            if (!transition.mute && transition.checkConditions(this)) {
+
+                // do transition
+                AnimatorState nextState = transition.destinationState;
+                String animName = nextState.motion.name;
+                BlendableAction action = (BlendableAction) animator.animComposer.getAction(animName);
+                action.setSpeed(nextState.speed);
+                action.setTransitionLength(transition.duration);
+                animator.animComposer.setCurrentAction(animName);
+                animator.animComposer.setTime(transition.offset);
+
+                return nextState;
             }
         }
         return this;
     }
-	
-    private double getAnimPercent() {
-        if (animator != null) {
-            return animator.animComposer.getTime() / animator.animComposer.getAction(action).getLength();
+
+    protected void update(float tpf) {
+
+        if (motion instanceof BlendTree) {
+            // Update blend value
+            BlendTree blendTree = (BlendTree) motion;
+            BlendAction action = (BlendAction) animator.animComposer.getAction(blendTree.name);
+            float value = animator.getFloat(blendTree.blendParameter);
+            action.getBlendSpace().setValue(value);
+
+            // The order of the children is important.
+            // They are supposed to be sorted in ascending order by threshold.
+            for (ChildMotion childMotion: blendTree.motions) {
+                if (value < childMotion.threshold) {
+                    action.setSpeed(childMotion.timeScale);
+                    break;
+                }
+            }
         }
-        return 0;
     }
 
-    public String getAction() {
-        return action;
+    public Motion getMotion() {
+        return motion;
     }
 
     public String getName() {
@@ -107,14 +140,14 @@ public class AnimatorState {
     public float getSpeed() {
         return speed;
     }
-    
+
     @Override
     public String toString() {
-        return "AnimatorState{" 
-                + "action=" + action 
-                + ", name=" + name 
-                + ", speed=" + speed 
-                + '}';
+        return "AnimatorState{" +
+            "motion=" + motion.name +
+            ", name=" + name +
+            ", speed=" + speed +
+            '}';
     }
 
 }
