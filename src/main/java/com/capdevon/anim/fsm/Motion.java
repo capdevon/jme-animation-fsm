@@ -6,16 +6,20 @@ package com.capdevon.anim.fsm;
  * @author capdevon
  */
 public class Motion {
-	
-	//The name of the object.
-	protected String name;
-	
-	public Motion(String name) {
-		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
-	}
+
+    //The name of the object.
+    protected String name;
+
+    /**
+     * Constructor.
+     * @param name
+     */
+    public Motion(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
 
 }
