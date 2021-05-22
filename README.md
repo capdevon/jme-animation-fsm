@@ -13,3 +13,5 @@ Resource Used:
     
 - Example List:
     - [Rewind time - video demo](https://www.youtube.com/watch?v=124yx2i7KZc)
+    - [AnimatorStateMachine: BlendTree - video demo](https://youtu.be/rVFFjLQMysQ)
+    - [AnimatorStateMachine: StateMachineBehaviour - video demo](https://youtu.be/AQkUT5U48co)
