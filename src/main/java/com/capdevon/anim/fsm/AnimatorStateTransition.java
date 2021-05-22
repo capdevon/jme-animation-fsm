@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.capdevon.anim.fsm;
 
 import java.util.ArrayList;
@@ -15,9 +10,11 @@ import java.util.List;
  * @author capdevon
  */
 public class AnimatorStateTransition {
-    
+
     private AnimatorController animator;
-    
+
+    //The time at which the destination state will start.
+    protected float offset = 0;
     //The duration of the transition.
     protected float duration = 0.25f;
     //Determines whether the duration of the transition is reported in a fixed duration in seconds or as a normalized time.
@@ -26,11 +23,13 @@ public class AnimatorStateTransition {
     protected float exitTime = 0.75f;
     //When active the transition will have an exit time condition.
     protected boolean hasExitTime = false;
+    //Mutes the transition. The transition will never occur.
+    protected boolean mute = false;
     //The destination state of the transition.
     protected AnimatorState destinationState;
     //AnimatorCondition conditions that need to be met for a transition to happen.
     protected List<AnimatorCondition> conditions = new ArrayList<>();
-    
+
     /**
      * Constructor.
      * @param animator
@@ -38,7 +37,7 @@ public class AnimatorStateTransition {
     protected AnimatorStateTransition(AnimatorController animator) {
         this.animator = animator;
     }
-    
+
     /**
      * Utility function to remove a condition from the transition.
      * 
@@ -67,17 +66,25 @@ public class AnimatorStateTransition {
         conditions.add(condition);
     }
 
-    protected boolean checkConditions(double animPercent) {
-        if (hasExitTime) {
-            return animPercent >= exitTime;
-        }
-        
-        for (AnimatorCondition condition : conditions) {
+    protected boolean checkConditions(AnimatorState sourceState) {
+
+        boolean doTransition = true;
+
+        for (AnimatorCondition condition: conditions) {
             if (!condition.evalute(animator.parameters)) {
-                return false;
+                doTransition = false;
             }
         }
-        return true;
+
+        if (doTransition && hasExitTime) {
+            return getAnimPercent(sourceState) > exitTime;
+        }
+
+        return doTransition;
+    }
+
+    private double getAnimPercent(AnimatorState state) {
+        return animator.animComposer.getTime() / animator.animComposer.getAction(state.motion.name).getLength();
     }
 
 }
