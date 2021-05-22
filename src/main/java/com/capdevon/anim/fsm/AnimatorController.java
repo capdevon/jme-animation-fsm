@@ -22,24 +22,27 @@ import com.jme3.scene.Spatial;
  * @author capdevon
  */
 public class AnimatorController extends AdapterControl {
-    
+
     private static final Logger logger = Logger.getLogger(AnimatorController.class.getName());
 
     protected AnimComposer animComposer;
     protected AnimatorStateMachine stateMachine;
     protected List<AnimatorControllerParameter> parameters = new ArrayList<>();
-    
+
     /**
      * Constructor.
      */
     public AnimatorController() {
-        stateMachine = new AnimatorStateMachine(this);
+        //stateMachine = new AnimatorStateMachine(this);
     }
-    
+
     public AnimatorStateMachine getStateMachine() {
+        if (spatial == null) {
+            throw new IllegalStateException("The Control is not attached to any Spatial");
+        }
         return stateMachine;
     }
-    	
+
     @Override
     public void setSpatial(Spatial sp) {
         super.setSpatial(sp);
@@ -47,20 +50,22 @@ public class AnimatorController extends AdapterControl {
             animComposer = getComponentInChild(AnimComposer.class);
             Objects.requireNonNull(animComposer, "AnimComposer not found in subtree: " + spatial);
             logger.log(Level.INFO, "AnimatorController initialized for " + spatial);
+
+            stateMachine = new AnimatorStateMachine(this);
         }
     }
-        
+
     @Override
     protected void controlUpdate(float tpf) {
         stateMachine.update(tpf);
     }
-    
+
     /**
      * Utility function to remove a parameter from the controller.
      * @param param
      */
     public void removeParameter(AnimatorControllerParameter param) {
-    	parameters.remove(param);
+        parameters.remove(param);
     }
 
     /**
@@ -75,87 +80,87 @@ public class AnimatorController extends AdapterControl {
         param.nameHash = name.hashCode();
         parameters.add(param);
     }
-    
+
     /**
      * Returns the parameter with the given name or null if the parameter is not found.
      * @param name
      * @return the parameter
      */
-	public AnimatorControllerParameter getParameter(String name) {
-		for (AnimatorControllerParameter param : parameters) {
-			if (param.nameHash == name.hashCode()) {
-				return param;
-			}
-		}
-		return null;
-	}
-    
+    public AnimatorControllerParameter getParameter(String name) {
+        for (AnimatorControllerParameter param: parameters) {
+            if (param.nameHash == name.hashCode()) {
+                return param;
+            }
+        }
+        return null;
+    }
+
     //--------------------------------------------------------------------------
     // Float
     //--------------------------------------------------------------------------
     public float getFloat(String name) {
-    	AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Float);
-    	return param.defaultFloat;
+        AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Float);
+        return param.defaultFloat;
     }
 
     public void setFloat(String name, float value) {
-    	AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Float);
-    	param.defaultFloat = value;
+        AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Float);
+        param.defaultFloat = value;
     }
- 
+
     //--------------------------------------------------------------------------
     // Integer
     //--------------------------------------------------------------------------
     public int getInt(String name) {
-    	AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Int);
-    	return param.defaultInt;
+        AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Int);
+        return param.defaultInt;
     }
 
     public void setInt(String name, int value) {
-    	AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Int);
-    	param.defaultInt = value;
+        AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Int);
+        param.defaultInt = value;
     }
-    
+
     //--------------------------------------------------------------------------
     // Boolean
     //--------------------------------------------------------------------------
     public boolean getBool(String name) {
-    	AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Bool);
-    	return param.defaultBool;
+        AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Bool);
+        return param.defaultBool;
     }
-    
+
     public void setBool(String name, boolean value) {
-    	AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Bool);
-    	param.defaultBool = value;
+        AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Bool);
+        param.defaultBool = value;
     }
-    
+
     //--------------------------------------------------------------------------
     // Trigger
     //--------------------------------------------------------------------------
     public void setTrigger(String name) {
-    	AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Trigger);
-    	param.defaultBool = true;
+        AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Trigger);
+        param.defaultBool = true;
     }
-    
+
     /**
      * Find a parameter with the given name. 
      * Throws an exception if the parameter is not found.
      */
     private AnimatorControllerParameter findParameter(String name, AnimatorControllerParameterType type) {
-    	return findParameter(name.hashCode(), type);
+        return findParameter(name.hashCode(), type);
     }
-    
+
     /**
      * Find a parameter with the given id. 
      * Throws an exception if the parameter is not found.
      */
     private AnimatorControllerParameter findParameter(int id, AnimatorControllerParameterType type) {
-    	for (AnimatorControllerParameter param : parameters) {
+        for (AnimatorControllerParameter param: parameters) {
             if (param.nameHash == id && param.type == type) {
                 return param;
             }
         }
         throw new IllegalArgumentException("AnimatorControllerParameter not found: " + id);
     }
-    
+
 }
