@@ -136,22 +136,6 @@ public class Test_BlendTree extends SimpleApplication {
         fpp.addFilter(shadowFilter);
     }
     
-//    private Material getUnshadedMaterial(ColorRGBA color) {
-//        Material mat = new Material(assetManager, Materials.UNSHADED);
-//        mat.setColor("Color", color);
-//        return mat;
-//    }
-//    
-//    private Material getShinyMat() {
-//        Material mat = new Material(assetManager, Materials.LIGHTING);
-//        mat.setColor("Diffuse", ColorRGBA.Green);
-//        mat.setColor("Specular", ColorRGBA.White);
-//        mat.setColor("Ambient", ColorRGBA.Black);
-//        mat.setFloat("Shininess", 0);
-//        mat.setBoolean("UseMaterialColors", true);
-//        return mat;
-//    }
-    
     /**
      * a sky as background
      */
@@ -215,10 +199,11 @@ public class Test_BlendTree extends SimpleApplication {
         // Sets the minimum and maximum threshold for the LinearBlendSpace class
         tree.minThreshold = 0;
         tree.maxThreshold = 1;
-        // set the animation speed to 1 until the moveSpeed ​​parameter is less than 0.5
+        // set the animation speed to 1 until the moveSpeed parameter is less than 0.5
         tree.addChild(AnimDefs.RifleWalk, 0.5f).timeScale = 1f;
-        // set the animation speed to 2 until the moveSpeed ​​parameter is between 0.5f and 1
+        // set the animation speed to 2 until the moveSpeed parameter is between 0.5f and 1
         tree.addChild(AnimDefs.RifleRun, 1f).timeScale = 2f;
+	// Create the state from the blend tree
         AnimatorState walk = sm.createBlendTree(tree);
 
         // Define the transitions and conditions for each state
@@ -253,23 +238,23 @@ public class Test_BlendTree extends SimpleApplication {
         chaseCam.setDefaultDistance(chaseCam.getMinDistance());
     }
     
-	private interface AnimDefs {
+    private interface AnimDefs {
 
-		final String MODEL = "Models/Rifle/rifle.glb";
-		final String RifleIdle = "RifleIdle";
-		final String RifleWalk = "RifleWalk";
-		final String RifleRun = "RifleRun";
-		final String WalkWithRifle = "WalkWithRifle";
-		final String ThrowGrenade = "ThrowGrenade";
-		final String Reloading = "Reloading";
-		final String RifleAimingIdle = "RifleAimingIdle";
-		final String FiringRifleSingle = "FiringRifleSingle";
-		final String FiringRifleAuto = "FiringRifleAuto";
-		final String DeathFromRight = "DeathFromRight";
-		final String DeathFromHeadshot = "DeathFromHeadshot";
-		final String TPose = "TPose";
+        final String MODEL = "Models/Rifle/rifle.glb";
+        final String RifleIdle = "RifleIdle";
+        final String RifleWalk = "RifleWalk";
+        final String RifleRun = "RifleRun";
+        final String WalkWithRifle = "WalkWithRifle";
+        final String ThrowGrenade = "ThrowGrenade";
+        final String Reloading = "Reloading";
+        final String RifleAimingIdle = "RifleAimingIdle";
+        final String FiringRifleSingle = "FiringRifleSingle";
+        final String FiringRifleAuto = "FiringRifleAuto";
+        final String DeathFromRight = "DeathFromRight";
+        final String DeathFromHeadshot = "DeathFromHeadshot";
+        final String TPose = "TPose";
 
-	}
+    }
     
     private class PlayerMovementControl extends AbstractControl implements ActionListener, AnalogListener {
 
@@ -301,11 +286,11 @@ public class Test_BlendTree extends SimpleApplication {
                 this.bcc = spatial.getControl(BetterCharacterControl.class);
             }
         }
-
-		@Override
-		public void onAnalog(String name, float value, float tpf) {
-			// TODO Auto-generated method stub
-		}
+        
+        @Override
+        public void onAnalog(String name, float value, float tpf) {
+            // TODO Auto-generated method stub
+        }
 
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
@@ -378,8 +363,8 @@ public class Test_BlendTree extends SimpleApplication {
         final String MOVE_FORWARD 	= "MOVE_FORWARD";
         final String MOVE_BACKWARD 	= "MOVE_BACKWARD";
         final String RUNNING 		= "RUNNING";
-        final String RELOAD			= "RELOAD";
-        final String FIRE 			= "FIRE";
+        final String RELOAD		= "RELOAD";
+        final String FIRE 		= "FIRE";
     }
 	
     private class TPSInputAppState extends BaseAppState implements AnalogListener, ActionListener {
@@ -412,7 +397,7 @@ public class Test_BlendTree extends SimpleApplication {
             addMapping(InputMapping.MOVE_LEFT, 		new KeyTrigger(KeyInput.KEY_A));
             addMapping(InputMapping.MOVE_RIGHT, 	new KeyTrigger(KeyInput.KEY_D));
             addMapping(InputMapping.RUNNING, 		new KeyTrigger(KeyInput.KEY_SPACE));
-            addMapping(InputMapping.FIRE, 			new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+            addMapping(InputMapping.FIRE, 		new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
             addMapping(InputMapping.RELOAD, 		new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         }
 
