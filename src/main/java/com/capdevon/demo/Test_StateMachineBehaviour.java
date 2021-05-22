@@ -2,9 +2,6 @@ package com.capdevon.demo;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import com.capdevon.anim.fsm.AnimatorConditionMode;
 import com.capdevon.anim.fsm.AnimatorController;
@@ -32,7 +29,6 @@ import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
 import com.jme3.light.PointLight;
 import com.jme3.material.Material;
-import com.jme3.material.Materials;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
@@ -50,8 +46,6 @@ import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.BillboardControl;
 import com.jme3.scene.control.LightControl;
 import com.jme3.scene.shape.Box;
-import com.jme3.scene.shape.Cylinder;
-import com.jme3.scene.shape.Sphere;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
@@ -118,7 +112,7 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
 //        physics.getPhysicsSpace().setAccuracy(0.01f); // 10-msec timestep
 //        physics.getPhysicsSpace().getSolverInfo().setNumIterations(15);
         physics.setDebugAxisLength(1);
-        physics.setDebugEnabled(true);
+        physics.setDebugEnabled(false);
     }
     
     /**
@@ -250,62 +244,62 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         return bmp;
     }
     
-	private void setupPlayer() {
-		player = new Node("Player");
-		player.attachChild(PrimitiveUtils.createCapsule(ColorRGBA.Green, .5f, 1.4f));
-		player.attachChild(PrimitiveUtils.createAxes("MyAxes"));
-		player.setLocalTranslation(0, 0, -10f);
-		rootNode.attachChild(player);
+    private void setupPlayer() {
+        player = new Node("Player");
+        player.attachChild(PrimitiveUtils.createCapsule(ColorRGBA.Green, .5f, 1.4f));
+        player.attachChild(PrimitiveUtils.createAxes("MyAxes"));
+        player.setLocalTranslation(0, 0, -10f);
+        rootNode.attachChild(player);
 
-		BetterCharacterControl bcc = new BetterCharacterControl(.5f, 1.6f, 40f);
-		player.addControl(bcc);
-		physics.getPhysicsSpace().add(bcc);
-//		bcc.getRigidBody().setDebugMaterial(getUnshadedMaterial(ColorRGBA.Green));
+        BetterCharacterControl bcc = new BetterCharacterControl(.5f, 1.6f, 40f);
+        player.addControl(bcc);
+        physics.getPhysicsSpace().add(bcc);
+        //bcc.getRigidBody().setDebugMaterial(getUnshadedMaterial(ColorRGBA.Green));
 
-		PlayerBaseControl baseControl = new PlayerBaseControl(this);
-		player.addControl(baseControl);
-	}
+        PlayerBaseControl baseControl = new PlayerBaseControl(this);
+        player.addControl(baseControl);
+    }
 
-//	private Material getUnshadedMaterial(ColorRGBA color) {
-//		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-//		mat.setColor("Color", color);
-//		return mat;
-//	}
+//    	private Material getUnshadedMaterial(ColorRGBA color) {
+//    		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+//    		mat.setColor("Color", color);
+//    		return mat;
+//    	}
 
-	private void setupChaseCamera() {
-		// disable the default 1st-person flyCam!
-		stateManager.detach(stateManager.getState(FlyCamAppState.class));
-		flyCam.setEnabled(false);
+    private void setupChaseCamera() {
+        // disable the default 1st-person flyCam!
+        stateManager.detach(stateManager.getState(FlyCamAppState.class));
+        flyCam.setEnabled(false);
 
-		ChaseCamera chaseCam = new ChaseCamera(cam, player, inputManager);
-		chaseCam.setLookAtOffset(Vector3f.UNIT_Y.mult(1.5f));
-		chaseCam.setMinDistance(15);
-		chaseCam.setMaxDistance(18);
-		chaseCam.setRotationSpeed(2f);
-		chaseCam.setMinVerticalRotation(-FastMath.QUARTER_PI);
-		chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
-		chaseCam.setDownRotateOnCloseViewOnly(false);
+        ChaseCamera chaseCam = new ChaseCamera(cam, player, inputManager);
+        chaseCam.setLookAtOffset(Vector3f.UNIT_Y.mult(1.5f));
+        chaseCam.setMinDistance(15);
+        chaseCam.setMaxDistance(18);
+        chaseCam.setRotationSpeed(2);
+        chaseCam.setMinVerticalRotation(-FastMath.QUARTER_PI);
+        chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
+        chaseCam.setDownRotateOnCloseViewOnly(false);
 
-		chaseCam.setDefaultDistance(chaseCam.getMinDistance());
-	}
-    
-	private interface AnimDefs {
+        chaseCam.setDefaultDistance(chaseCam.getMinDistance());
+    }
 
-		final String MODEL = "Models/Rifle/rifle.glb";
-		final String RifleIdle = "RifleIdle";
-		final String RifleWalk = "RifleWalk";
-		final String RifleRun = "RifleRun";
-		final String WalkWithRifle = "WalkWithRifle";
-		final String ThrowGrenade = "ThrowGrenade";
-		final String Reloading = "Reloading";
-		final String RifleAimingIdle = "RifleAimingIdle";
-		final String FiringRifleSingle = "FiringRifleSingle";
-		final String FiringRifleAuto = "FiringRifleAuto";
-		final String DeathFromRight = "DeathFromRight";
-		final String DeathFromHeadshot = "DeathFromHeadshot";
-		final String TPose = "TPose";
+    private interface AnimDefs {
 
-	}
+        final String MODEL = "Models/Rifle/rifle.glb";
+        final String RifleIdle = "RifleIdle";
+        final String RifleWalk = "RifleWalk";
+        final String RifleRun = "RifleRun";
+        final String WalkWithRifle = "WalkWithRifle";
+        final String ThrowGrenade = "ThrowGrenade";
+        final String Reloading = "Reloading";
+        final String RifleAimingIdle = "RifleAimingIdle";
+        final String FiringRifleSingle = "FiringRifleSingle";
+        final String FiringRifleAuto = "FiringRifleAuto";
+        final String DeathFromRight = "DeathFromRight";
+        final String DeathFromHeadshot = "DeathFromHeadshot";
+        final String TPose = "TPose";
+
+    }
     
     /**
      * -----------------------------------------------
@@ -313,63 +307,62 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
      * -----------------------------------------------
      */
     private class SoldierAI extends AbstractControl implements StateMachineListener {
-    	
-    	public Spatial player;
-    	public BitmapText bmp;
-    	
-    	AnimatorController animator;
-    	BetterCharacterControl bcc;
-    	Timer fireTimer;
-    	
+
+        public Spatial player;
+        public BitmapText bmp;
+
+        AnimatorController animator;
+        BetterCharacterControl bcc;
+        Timer fireTimer; //TODO: find a more efficient way to handle the timer cancellation
+
         @Override
         public void setSpatial(Spatial sp) {
             super.setSpatial(sp);
             if (spatial != null) {
-                this.animator 	= spatial.getControl(AnimatorController.class);
-                this.bcc 		= spatial.getControl(BetterCharacterControl.class);
+                this.animator = spatial.getControl(AnimatorController.class);
+                this.bcc = spatial.getControl(BetterCharacterControl.class);
             }
         }
 
-		@Override
-		protected void controlUpdate(float tpf) {
-			float distance = player.getWorldTranslation().distance(spatial.getWorldTranslation());
-			animator.setFloat("distance", distance);
-		}
+        @Override
+        protected void controlUpdate(float tpf) {
+            float distance = player.getWorldTranslation().distance(spatial.getWorldTranslation());
+            animator.setFloat("distance", distance);
+        }
 
-		@Override
-		protected void controlRender(RenderManager rm, ViewPort vp) {
-		}
-		
-		public void rotateTo(Vector3f direction, float angularSpeed) {
-			float angle = FastMath.atan2(direction.x, direction.z);
-			Quaternion lookRotation = new Quaternion().fromAngleNormalAxis(angle, Vector3f.UNIT_Y);
-			spatial.getWorldRotation().slerp(lookRotation, angularSpeed);
-			bcc.setViewDirection(spatial.getWorldRotation().mult(Vector3f.UNIT_Z));
-		}
+        @Override
+        protected void controlRender(RenderManager rm, ViewPort vp) {}
 
-		public void startFiring() {
-			fireTimer = new Timer();
-			fireTimer.scheduleAtFixedRate(new FireTask(), 500, 500);
-			System.out.println("FireTimer schedule");
-		}
+        public void rotateTo(Vector3f direction, float angularSpeed) {
+            float angle = FastMath.atan2(direction.x, direction.z);
+            Quaternion lookRotation = new Quaternion().fromAngleNormalAxis(angle, Vector3f.UNIT_Y);
+            spatial.getWorldRotation().slerp(lookRotation, angularSpeed);
+            bcc.setViewDirection(spatial.getWorldRotation().mult(Vector3f.UNIT_Z));
+        }
 
-		public void stopFiring() {
-			fireTimer.cancel();
-			System.out.println("FireTimer cancel");
-		}
-		
-		class FireTask extends TimerTask {
-			@Override
-			public void run() {
-				System.out.println("Firing");
-			}
-		}
+        public void startFiring() {
+//            fireTimer = new Timer();
+//            fireTimer.scheduleAtFixedRate(new FireTask(), 500, 500);
+            System.out.println("FireTimer schedule");
+        }
 
-		@Override
-		public void onStateChanged(AnimatorState from, AnimatorState to) {
-			bmp.setText(to.getName());
-		}
-    	
+        public void stopFiring() {
+//            fireTimer.cancel();
+            System.out.println("FireTimer cancel");
+        }
+
+        class FireTask extends TimerTask {
+            @Override
+            public void run() {
+                System.out.println("Firing");
+            }
+        }
+
+        @Override
+        public void onStateChanged(AnimatorState from, AnimatorState to) {
+            bmp.setText(to.getName());
+        }
+
     }
     
     /**
@@ -378,19 +371,19 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
      * -----------------------------------------------
      */
     private abstract class SoldierBaseFSM implements StateMachineBehaviour {
-    	
-    	public SoldierAI aiControl;
-    	public Spatial spatial;
+
+        public SoldierAI aiControl;
+        public Spatial spatial;
         public float moveSpeed = 2f;
         public float runSpeed = 3f;
         public float rotSpeed = 10f;
         public float accuracy = 0.5f;
-        
+
         @Override
-		public void onStateEnter(AnimatorController animator) {
-        	spatial = animator.getSpatial();
-        	aiControl = spatial.getControl(SoldierAI.class);
-		}
+        public void onStateEnter(AnimatorController animator) {
+            spatial = animator.getSpatial();
+            aiControl = spatial.getControl(SoldierAI.class);
+        }
     }
 
     /**
@@ -398,98 +391,101 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
      * @PatrolState
      * -----------------------------------------------
      */
-	private class PatrolState extends SoldierBaseFSM {
+    private class PatrolState extends SoldierBaseFSM {
 
-		private int currentWP;
-		private Vector3f[] waypoints = { new Vector3f(5,0,5), new Vector3f(-5,0,5), new Vector3f(-5,0,-5), new Vector3f(5,0,-5) };
+        private int currentWP;
+        private Vector3f[] waypoints = {
+            new Vector3f(5, 0, 5),
+            new Vector3f(-5, 0, 5),
+            new Vector3f(-5, 0, -5),
+            new Vector3f(5, 0, -5)
+        };
 
-		@Override
-		public void onStateEnter(AnimatorController animator) {
-			super.onStateEnter(animator);
-			currentWP = 0;
-		}
+        @Override
+        public void onStateEnter(AnimatorController animator) {
+            super.onStateEnter(animator);
+            currentWP = 0;
+        }
 
-		@Override
-		public void onStateUpdate(AnimatorController animator, float tpf) {
-			if (waypoints.length == 0)
-				return;
+        @Override
+        public void onStateUpdate(AnimatorController animator, float tpf) {
+            if (waypoints.length == 0)
+                return;
 
-			if (waypoints[currentWP].distance(spatial.getWorldTranslation()) < accuracy) {
-				currentWP++;
-				if (currentWP >= waypoints.length) {
-					currentWP = 0;
-				}
-			}
+            if (waypoints[currentWP].distance(spatial.getWorldTranslation()) < accuracy) {
+                currentWP++;
+                if (currentWP >= waypoints.length) {
+                    currentWP = 0;
+                }
+            }
 
-			// rotate towards target
-			Vector3f walkDirection = waypoints[currentWP].subtract(spatial.getWorldTranslation());
-			walkDirection.y = 0;
-			walkDirection.normalizeLocal();
-			aiControl.rotateTo(walkDirection, rotSpeed * tpf);
-			aiControl.bcc.setWalkDirection(walkDirection.multLocal(moveSpeed));
-		}
+            // rotate towards target
+            Vector3f walkDirection = waypoints[currentWP].subtract(spatial.getWorldTranslation());
+            walkDirection.y = 0;
+            walkDirection.normalizeLocal();
+            aiControl.rotateTo(walkDirection, rotSpeed * tpf);
+            aiControl.bcc.setWalkDirection(walkDirection.multLocal(moveSpeed));
+        }
 
-		@Override
-		public void onStateExit(AnimatorController animator) {
-		}
+        @Override
+        public void onStateExit(AnimatorController animator) {}
 
-	}
+    }
 
     /**
      * -----------------------------------------------
      * @ChaseState
      * -----------------------------------------------
      */
-	private class ChaseState extends SoldierBaseFSM {
+    private class ChaseState extends SoldierBaseFSM {
 
-		@Override
-		public void onStateEnter(AnimatorController animator) {
-			super.onStateEnter(animator);
-		}
+        @Override
+        public void onStateEnter(AnimatorController animator) {
+            super.onStateEnter(animator);
+        }
 
-		@Override
-		public void onStateUpdate(AnimatorController animator, float tpf) {
-			// rotate towards target
-			Vector3f walkDirection = aiControl.player.getWorldTranslation().subtract(spatial.getWorldTranslation());
-			walkDirection.y = 0;
-			walkDirection.normalizeLocal();
-			aiControl.rotateTo(walkDirection, rotSpeed * tpf);
-			aiControl.bcc.setWalkDirection(walkDirection.multLocal(runSpeed));
-		}
+        @Override
+        public void onStateUpdate(AnimatorController animator, float tpf) {
+            // rotate towards target
+            Vector3f walkDirection = aiControl.player.getWorldTranslation().subtract(spatial.getWorldTranslation());
+            walkDirection.y = 0;
+            walkDirection.normalizeLocal();
+            aiControl.rotateTo(walkDirection, rotSpeed * tpf);
+            aiControl.bcc.setWalkDirection(walkDirection.multLocal(runSpeed));
+        }
 
-		@Override
-		public void onStateExit(AnimatorController animator) {
-		}
+        @Override
+        public void onStateExit(AnimatorController animator) {}
 
-	}
+    }
 
     /**
      * -----------------------------------------------
      * @AttackState
      * -----------------------------------------------
      */
-	private class AttackState extends SoldierBaseFSM {
+    private class AttackState extends SoldierBaseFSM {
 
-		@Override
-		public void onStateEnter(AnimatorController animator) {
-			super.onStateEnter(animator);
-			aiControl.startFiring();
-		}
+        @Override
+        public void onStateEnter(AnimatorController animator) {
+            super.onStateEnter(animator);
+            aiControl.startFiring();
+        }
 
-		@Override
-		public void onStateUpdate(AnimatorController animator, float tpf) {
-			Vector3f walkDirection = aiControl.player.getWorldTranslation().subtract(spatial.getWorldTranslation());
-			walkDirection.y = 0;
-			walkDirection.normalizeLocal();
-			aiControl.rotateTo(walkDirection, rotSpeed * tpf);
-			aiControl.bcc.setWalkDirection(Vector3f.ZERO);
-		}
+        @Override
+        public void onStateUpdate(AnimatorController animator, float tpf) {
+            Vector3f walkDirection = aiControl.player.getWorldTranslation().subtract(spatial.getWorldTranslation());
+            walkDirection.y = 0;
+            walkDirection.normalizeLocal();
+            aiControl.rotateTo(walkDirection, rotSpeed * tpf);
+            aiControl.bcc.setWalkDirection(Vector3f.ZERO);
+        }
 
-		@Override
-		public void onStateExit(AnimatorController animator) {
-			aiControl.stopFiring();
-		}
+        @Override
+        public void onStateExit(AnimatorController animator) {
+            aiControl.stopFiring();
+        }
 
-	}
+    }
 
 }
