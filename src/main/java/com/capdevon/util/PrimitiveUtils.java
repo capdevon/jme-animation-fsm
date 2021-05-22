@@ -19,15 +19,15 @@ import com.jme3.scene.shape.Sphere;
  */
 public class PrimitiveUtils {
 	
-	private static AssetManager assetManager;
-	
-	private PrimitiveUtils() {
-		//private constructor.
-	}
-	
-	public static void init(AssetManager assetManager) {
-		PrimitiveUtils.assetManager = assetManager;
-	}
+    private static AssetManager assetManager;
+
+    private PrimitiveUtils() {
+        //private constructor.
+    }
+
+    public static void init(AssetManager assetManager) {
+        PrimitiveUtils.assetManager = assetManager;
+    }
 	
     /**
      * Get default axes.
