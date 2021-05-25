@@ -20,10 +20,10 @@ public class BlendTree extends Motion {
 
     public enum BlendTreeType {
         Simple1D,
-//        SimpleDirectional2D, 	 //not yet supported
+//        SimpleDirectional2D,	 //not yet supported
 //        FreeformDirectional2D, //not yet supported
-//        FreeformCartesian2D, 	 //not yet supported
-//        Direct 		 //not yet supported
+//        FreeformCartesian2D,	 //not yet supported
+//        Direct				 //not yet supported
     }
 
     //Parameter that is used to compute the blending weight of the childs in 1D blend trees or on the X axis of a 2D blend tree.
@@ -41,10 +41,9 @@ public class BlendTree extends Motion {
 
     /**
      * Constructor.
-     * @param name
      */
-    public BlendTree(String name) {
-        super(name);
+    public BlendTree() {
+    	//default empty.
     }
 
     /**
