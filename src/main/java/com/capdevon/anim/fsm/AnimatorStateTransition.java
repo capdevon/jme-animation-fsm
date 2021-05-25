@@ -40,7 +40,6 @@ public class AnimatorStateTransition {
 
     /**
      * Utility function to remove a condition from the transition.
-     * 
      * @param condition 
      */
     public void removeCondition(AnimatorCondition condition) {
@@ -49,7 +48,6 @@ public class AnimatorStateTransition {
 
     /**
      * Utility function to add a condition to a transition.
-     * 
      * @param mode
      * @param threshold
      * @param parameter 
@@ -66,7 +64,7 @@ public class AnimatorStateTransition {
         conditions.add(condition);
     }
 
-    protected boolean checkConditions(AnimatorState sourceState) {
+    protected boolean checkConditions(AnimatorState sourceState, String layerName) {
 
         boolean doTransition = true;
 
@@ -77,14 +75,11 @@ public class AnimatorStateTransition {
         }
 
         if (doTransition && hasExitTime) {
-            return getAnimPercent(sourceState) > exitTime;
+        	double animPercent = animator.animComposer.getTime(layerName) / animator.animComposer.getAction(sourceState.motion.name).getLength();
+            return animPercent > exitTime;
         }
 
         return doTransition;
-    }
-
-    private double getAnimPercent(AnimatorState state) {
-        return animator.animComposer.getTime() / animator.animComposer.getAction(state.motion.name).getLength();
     }
 
 }
