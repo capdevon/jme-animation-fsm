@@ -22,23 +22,27 @@ public class BlendTree extends Motion {
     }
 
     //Parameter that is used to compute the blending weight of the childs in 1D blend trees or on the X axis of a 2D blend tree.
-    public String blendParameter;
+    protected String blendParameter;
     //Parameter that is used to compute the blending weight of the childs on the Y axis of a 2D blend tree. (not yet supported)
-    public String blendParameterY;
+    protected String blendParameterY;
     //The Blending type can be either 1D or different types of 2D.
-    public BlendTreeType blendType = BlendTreeType.Simple1D;
+    protected BlendTreeType blendType = BlendTreeType.Simple1D;
     //Sets the maximum threshold that will be used by the ChildMotion.
-    public float maxThreshold = 1f;
+    protected float maxThreshold = 1f;
     //Sets the minimum threshold that will be used by the ChildMotion.
-    public float minThreshold = 0f;
+    protected float minThreshold = 0f;
     //The list of the blend tree child motions.
     protected List<ChildMotion> motions = new ArrayList<>();
 
     /**
-     * Constructor.
+     * Create blend tree with the minimum and maximum threshold for the LinearBlendSpace.
+     * 
+     * @param minThreshold
+     * @param maxThreshold
      */
-    public BlendTree() {
-        //default empty.
+    public BlendTree(int minThreshold, int maxThreshold) {
+        this.minThreshold = minThreshold;
+        this.maxThreshold = maxThreshold;
     }
 
     /**
@@ -86,6 +90,22 @@ public class BlendTree extends Motion {
             clips[i] = animName;
         }
         return clips;
+    }
+
+    public String getBlendParameter() {
+        return blendParameter;
+    }
+
+    public void setBlendParameter(String blendParameter) {
+        this.blendParameter = blendParameter;
+    }
+
+    public float getMaxThreshold() {
+        return maxThreshold;
+    }
+
+    public float getMinThreshold() {
+        return minThreshold;
     }
 
 }
