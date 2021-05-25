@@ -37,6 +37,8 @@ public class AnimatorState {
 
     /**
      * Constructor.
+     * 
+     * @param name
      * @param animator
      */
     protected AnimatorState(String name, AnimatorController animator) {
@@ -50,6 +52,14 @@ public class AnimatorState {
      */
     public void addStateMachineBehaviour(StateMachineBehaviour behaviour) {
         behaviours.add(behaviour);
+    }
+    
+    /**
+     * Removes a state machine behaviour class from the AnimatorState.
+     * @param behaviour The state machine behaviour to remove.
+     */
+    public void removeStateMachineBehaviour(StateMachineBehaviour behaviour) {
+    	behaviours.remove(behaviour);
     }
 
     /**
@@ -81,34 +91,41 @@ public class AnimatorState {
         return transition;
     }
 
-//    protected AnimatorStateTransition getTransitionState() {
-//        for (AnimatorStateTransition transition: transitions) {
-//            if (!transition.mute && transition.checkConditions(this)) {
-//                return transition;
-//            }
-//        }
-//        return null;
-//    }
+    /**
+     * InternalCall.
+     * @param layerName
+     * @return
+     */
+	protected AnimatorState checkTransitions(String layerName) {
+		for (AnimatorStateTransition transition : transitions) {
+			if (!transition.mute && transition.checkConditions(this, layerName)) {
 
-    protected AnimatorState checkTransitions() {
-        for (AnimatorStateTransition transition: transitions) {
-            if (!transition.mute && transition.checkConditions(this)) {
+				// do transition
+				AnimatorState nextState = transition.destinationState;
+				String animName = nextState.motion.name;
+				
+				// Some states may not have an associated animation.
+				if (animName != null) {
+					BlendableAction action = (BlendableAction) animator.animComposer.getAction(animName);
+					action.setSpeed(nextState.speed);
+					action.setTransitionLength(transition.duration);
+					animator.animComposer.setCurrentAction(animName, layerName);
+					animator.animComposer.setTime(transition.offset);
+				} else {
+					// In this case, remove the previous state animation from the layer.
+					animator.animComposer.removeCurrentAction(layerName);
+				}
 
-                // do transition
-                AnimatorState nextState = transition.destinationState;
-                String animName = nextState.motion.name;
-                BlendableAction action = (BlendableAction) animator.animComposer.getAction(animName);
-                action.setSpeed(nextState.speed);
-                action.setTransitionLength(transition.duration);
-                animator.animComposer.setCurrentAction(animName);
-                animator.animComposer.setTime(transition.offset);
+				return nextState;
+			}
+		}
+		return this;
+	}
 
-                return nextState;
-            }
-        }
-        return this;
-    }
-
+	/**
+	 * InternalCall
+	 * @param tpf
+	 */
     protected void update(float tpf) {
 
         if (motion instanceof BlendTree) {
