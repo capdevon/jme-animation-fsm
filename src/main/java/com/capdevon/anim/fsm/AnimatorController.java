@@ -135,41 +135,79 @@ public class AnimatorController extends AbstractControl {
     	return Collections.unmodifiableCollection(parameters);
     }
 
+    /**
+     * Returns the value of the given float parameter.
+     * @param name
+     * @return
+     */
     public float getFloat(String name) {
         AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Float);
         return param.defaultFloat;
     }
 
+    /**
+     * Send float values to the Animator to affect transitions.
+     * @param name
+     * @param value
+     */
     public void setFloat(String name, float value) {
         AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Float);
         param.defaultFloat = value;
     }
 
+    /**
+     * Returns the value of the given integer parameter.
+     * @param name
+     * @return
+     */
     public int getInt(String name) {
         AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Int);
         return param.defaultInt;
     }
 
+    /**
+     * Sets the value of the given integer parameter.
+     * @param name
+     * @param value
+     */
     public void setInt(String name, int value) {
         AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Int);
         param.defaultInt = value;
     }
 
+    /**
+     * Returns the value of the given boolean parameter.
+     * @param name
+     * @return
+     */
     public boolean getBool(String name) {
         AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Bool);
         return param.defaultBool;
     }
 
+    /**
+     * Sets the value of the given boolean parameter.
+     * @param name
+     * @param value
+     */
     public void setBool(String name, boolean value) {
         AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Bool);
         param.defaultBool = value;
     }
 
+    /**
+     * Sets the value of the given trigger parameter.
+     * @param name
+     */
     public void setTrigger(String name) {
         AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Trigger);
         param.defaultBool = true;
     }
     
+    /**
+     * Resets the value of the given trigger parameter.
+     * @param name
+     */
     public void resetTrigger(String name) {
     	AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Trigger);
         param.defaultBool = false;
