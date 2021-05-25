@@ -109,8 +109,6 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         stateManager.attach(physics);
         stateManager.attach(new PhysxDebugAppState());
 
-        physics.getPhysicsSpace().setAccuracy(0.01f); // 10-msec timestep
-        physics.getPhysicsSpace().getSolverInfo().setNumIterations(15);
         physics.setDebugAxisLength(1);
         physics.setDebugEnabled(false);
     }
@@ -136,22 +134,6 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         shadowFilter.setShadowZExtend(256);
         fpp.addFilter(shadowFilter);
     }
-    
-//    private Material getUnshadedMaterial(ColorRGBA color) {
-//        Material mat = new Material(assetManager, Materials.UNSHADED);
-//        mat.setColor("Color", color);
-//        return mat;
-//    }
-//    
-//    private Material getShinyMat() {
-//        Material mat = new Material(assetManager, Materials.LIGHTING);
-//        mat.setColor("Diffuse", ColorRGBA.Green);
-//        mat.setColor("Specular", ColorRGBA.White);
-//        mat.setColor("Ambient", ColorRGBA.Black);
-//        mat.setFloat("Shininess", 0);
-//        mat.setBoolean("UseMaterialColors", true);
-//        return mat;
-//    }
     
     /**
      * a sky as background
@@ -196,8 +178,6 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         BetterCharacterControl bcc = new BetterCharacterControl(.4f, 1.8f, 10f);
         player.addControl(bcc);
         physics.getPhysicsSpace().add(bcc);
-        bcc.getRigidBody().setCollisionGroup(RigidBodyControl.COLLISION_GROUP_02);
-        bcc.getRigidBody().setCollideWithGroups(RigidBodyControl.COLLISION_GROUP_01);
         
         AnimComposer animComposer = AnimUtils.getAnimControl(player);
         SkinningControl skeleton = AnimUtils.getSkeletonControl(player);
@@ -215,7 +195,7 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         AnimatorControllerLayer layer0 = animator.getLayer(AnimComposer.DEFAULT_LAYER);
         AnimatorStateMachine sm = layer0.getStateMachine();
         AnimatorState idle = sm.addState("Idle", AnimDefs.RifleAimingIdle);
-        AnimatorState walk = sm.addState("Run", AnimDefs.WalkWithRifle);
+        AnimatorState walk = sm.addState("Walk", AnimDefs.WalkWithRifle);
         
         AnimatorStateTransition idleToWalk = idle.addTransition(walk);
         idleToWalk.addCondition(AnimatorConditionMode.If, 0f, "isRunning");
@@ -231,6 +211,7 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         AnimMaskBuilder avatarMask = new AnimMaskBuilder(skeleton.getArmature());
         avatarMask.addFromJoint("Armature_mixamorig:" + MixamoBodyBones.Spine);
         
+	// Define a layer that acts on an AnimationMask
         AnimatorControllerLayer layer1 = animator.addLayer("Torso", avatarMask);
         AnimatorStateMachine sm1 = layer1.getStateMachine();
         AnimatorState empty = sm1.addState("Empty");
@@ -266,23 +247,23 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         chaseCam.setDefaultDistance(chaseCam.getMinDistance());
     }
     
-	private interface AnimDefs {
+    private interface AnimDefs {
 
-		final String MODEL = "Models/Rifle/rifle.glb";
-		final String RifleIdle = "RifleIdle";
-		final String RifleWalk = "RifleWalk";
-		final String RifleRun = "RifleRun";
-		final String WalkWithRifle = "WalkWithRifle";
-		final String ThrowGrenade = "ThrowGrenade";
-		final String Reloading = "Reloading";
-		final String RifleAimingIdle = "RifleAimingIdle";
-		final String FiringRifleSingle = "FiringRifleSingle";
-		final String FiringRifleAuto = "FiringRifleAuto";
-		final String DeathFromRight = "DeathFromRight";
-		final String DeathFromHeadshot = "DeathFromHeadshot";
-		final String TPose = "TPose";
+        final String MODEL = "Models/Rifle/rifle.glb";
+        final String RifleIdle = "RifleIdle";
+        final String RifleWalk = "RifleWalk";
+        final String RifleRun = "RifleRun";
+        final String WalkWithRifle = "WalkWithRifle";
+        final String ThrowGrenade = "ThrowGrenade";
+        final String Reloading = "Reloading";
+        final String RifleAimingIdle = "RifleAimingIdle";
+        final String FiringRifleSingle = "FiringRifleSingle";
+        final String FiringRifleAuto = "FiringRifleAuto";
+        final String DeathFromRight = "DeathFromRight";
+        final String DeathFromHeadshot = "DeathFromHeadshot";
+        final String TPose = "TPose";
 
-	}
+    }
     
     private class PlayerMovementControl extends AbstractControl implements ActionListener, AnalogListener {
 
@@ -312,10 +293,10 @@ public class Test_AnimControllerLayer extends SimpleApplication {
             }
         }
 
-		@Override
-		public void onAnalog(String name, float value, float tpf) {
-			// TODO Auto-generated method stub
-		}
+        @Override
+        public void onAnalog(String name, float value, float tpf) {
+            // TODO Auto-generated method stub
+        }
 
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
@@ -366,7 +347,6 @@ public class Test_AnimControllerLayer extends SimpleApplication {
             bcc.setWalkDirection(walkDirection.multLocal(m_MoveSpeed));
             
             animator.setBool("isRunning", isMoving);
-//            animator.setFloat("moveSpeed", bcc.getVelocity().length());
         }
 
         @Override
@@ -383,8 +363,8 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         final String MOVE_FORWARD 	= "MOVE_FORWARD";
         final String MOVE_BACKWARD 	= "MOVE_BACKWARD";
         final String RUNNING 		= "RUNNING";
-        final String RELOAD			= "RELOAD";
-        final String FIRE 			= "FIRE";
+        final String RELOAD		= "RELOAD";
+        final String FIRE 		= "FIRE";
     }
 	
     private class PlayerInputAppState extends BaseAppState implements AnalogListener, ActionListener {
@@ -413,12 +393,12 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         }
         
         public Node getRootNode() {
-        	return ((SimpleApplication) getApplication()).getRootNode();
+            return ((SimpleApplication) getApplication()).getRootNode();
         }
-        
+
         public Node getGuiNode() {
-        	return ((SimpleApplication) getApplication()).getGuiNode();
-        } 
+            return ((SimpleApplication) getApplication()).getGuiNode();
+        }
 
         private void addInputMappings() {
 
@@ -427,7 +407,7 @@ public class Test_AnimControllerLayer extends SimpleApplication {
             addMapping(InputMapping.MOVE_LEFT, 		new KeyTrigger(KeyInput.KEY_A));
             addMapping(InputMapping.MOVE_RIGHT, 	new KeyTrigger(KeyInput.KEY_D));
             addMapping(InputMapping.RUNNING, 		new KeyTrigger(KeyInput.KEY_SPACE));
-            addMapping(InputMapping.FIRE, 			new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+            addMapping(InputMapping.FIRE, 		new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
             addMapping(InputMapping.RELOAD, 		new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         }
 
