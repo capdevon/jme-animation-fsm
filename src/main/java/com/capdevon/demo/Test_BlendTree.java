@@ -3,6 +3,7 @@ package com.capdevon.demo;
 import com.capdevon.anim.AnimUtils;
 import com.capdevon.anim.fsm.AnimatorConditionMode;
 import com.capdevon.anim.fsm.AnimatorController;
+import com.capdevon.anim.fsm.AnimatorControllerLayer;
 import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParameterType;
 import com.capdevon.animation.MixamoBodyBones;
 import com.capdevon.anim.fsm.AnimatorState;
@@ -10,6 +11,7 @@ import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;
 import com.capdevon.anim.fsm.BlendTree;
 import com.capdevon.physx.PhysxDebugAppState;
+import com.jme3.anim.AnimComposer;
 import com.jme3.app.Application;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
@@ -136,6 +138,22 @@ public class Test_BlendTree extends SimpleApplication {
         fpp.addFilter(shadowFilter);
     }
     
+//    private Material getUnshadedMaterial(ColorRGBA color) {
+//        Material mat = new Material(assetManager, Materials.UNSHADED);
+//        mat.setColor("Color", color);
+//        return mat;
+//    }
+//    
+//    private Material getShinyMat() {
+//        Material mat = new Material(assetManager, Materials.LIGHTING);
+//        mat.setColor("Diffuse", ColorRGBA.Green);
+//        mat.setColor("Specular", ColorRGBA.White);
+//        mat.setColor("Ambient", ColorRGBA.Black);
+//        mat.setFloat("Shininess", 0);
+//        mat.setBoolean("UseMaterialColors", true);
+//        return mat;
+//    }
+    
     /**
      * a sky as background
      */
@@ -184,27 +202,28 @@ public class Test_BlendTree extends SimpleApplication {
         physics.getPhysicsSpace().add(bcc);
 
         // Create the controller and the parameters
-        AnimatorController animator = new AnimatorController();
+        AnimatorController animator = new AnimatorController(AnimUtils.getAnimControl(player));
         animator.addParameter("moveSpeed", AnimatorControllerParameterType.Float);
         player.addControl(animator);
 
         // Define states for animations.
-        AnimatorStateMachine sm = animator.getStateMachine();
+        AnimatorControllerLayer layer0 = animator.getLayer(AnimComposer.DEFAULT_LAYER);
+        AnimatorStateMachine sm = layer0.getStateMachine();
         AnimatorState idle = sm.addState("Idle", AnimDefs.RifleIdle);
 
         // Create blend tree
-        BlendTree tree = new BlendTree("Walk");
+        BlendTree tree = new BlendTree();
         // Configure the name of the parameter that controls the mixing of animations.
         tree.blendParameter = "moveSpeed";
         // Sets the minimum and maximum threshold for the LinearBlendSpace class
         tree.minThreshold = 0;
         tree.maxThreshold = 1;
-        // set the animation speed to 1 until the moveSpeed parameter is less than 0.5
+        // set the animation speed to 1 if the moveSpeed parameter is less than 0.5
         tree.addChild(AnimDefs.RifleWalk, 0.5f).timeScale = 1f;
-        // set the animation speed to 2 until the moveSpeed parameter is between 0.5f and 1
+        // set the animation speed to 2 if the moveSpeed parameter is between 0.5f and 1
         tree.addChild(AnimDefs.RifleRun, 1f).timeScale = 2f;
-	// Create the state from the blend tree
-        AnimatorState walk = sm.createBlendTree(tree);
+        // Create the state from the blend tree
+        AnimatorState walk = sm.createBlendTree("Walk", tree);
 
         // Define the transitions and conditions for each state
         AnimatorStateTransition idleToWalk = idle.addTransition(walk);
