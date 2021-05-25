@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.capdevon.anim.fsm;
 
 import java.util.ArrayList;
@@ -23,6 +28,8 @@ public class AnimatorStateMachine {
 
     private AnimatorController animator;
 
+    //The name of the state machine.
+    protected String name;
     //The anyState, not a proper state but used as dummy.
     protected AnimatorState anyState;
     //The state that the state machine will be in when it starts.
@@ -38,7 +45,7 @@ public class AnimatorStateMachine {
      */
     protected AnimatorStateMachine(AnimatorController animator) {
         this.animator = animator;
-        anyState = new AnimatorState("Any State", animator);
+        anyState = new AnimatorState("AnyState", animator);
         currentState = anyState;
     }
 
@@ -64,6 +71,10 @@ public class AnimatorStateMachine {
         }
     }
 
+	/**
+	 * Sets the initial state of this StateMachine.
+	 * @param state the initial state
+	 */
     public void setDefaultState(AnimatorState state) {
         anyState.transitions.clear();
         anyState.addTransition(state);
@@ -71,15 +82,11 @@ public class AnimatorStateMachine {
 
     /**
      * Creates a BlendTree in a new AnimatorState.
-     * 
+     * @param stateName
      * @param blendTree
      * @return
      */
-    public AnimatorState createBlendTree(BlendTree blendTree) {
-        if (states.containsKey(blendTree.name)) {
-            String error = String.format("State '{0}' already exists in state machine", blendTree.name);
-            throw new IllegalArgumentException(error);
-        }
+    public AnimatorState createBlendTree(String stateName, BlendTree blendTree) {
 
         if (blendTree.motions.size() < 2) {
             throw new IllegalArgumentException("BlendTree requires at least 2 animations");
@@ -87,13 +94,11 @@ public class AnimatorStateMachine {
 
         LinearBlendSpace blendSpace = new LinearBlendSpace(blendTree.minThreshold, blendTree.maxThreshold);
         String[] clips = blendTree.getAnimMotionsNames();
-        BlendAction action = animator.animComposer.actionBlended(blendTree.name, blendSpace, clips);
-        logger.log(Level.INFO, "BlendAction created: " + blendTree.name);
+        BlendAction action = animator.animComposer.actionBlended(stateName, blendSpace, clips);
+        logger.log(Level.INFO, "BlendAction created: " + stateName);
 
-        AnimatorState state = new AnimatorState(blendTree.name, animator);
-        state.motion = blendTree;
-        states.put(blendTree.name, state);
-        return state;
+        blendTree.name = stateName;
+        return addState(stateName, blendTree);
     }
 
     /**
@@ -103,16 +108,38 @@ public class AnimatorStateMachine {
      * @return
      */
     public AnimatorState addState(String stateName, String animName) {
-        if (states.containsKey(stateName)) {
+        
+    	Action action = animator.animComposer.action(animName);
+        logger.log(Level.INFO, "ActionClip created: " + action);
+        
+        Motion motion = new Motion();
+        motion.name = animName;
+        return addState(stateName, motion);
+    }
+    
+    /**
+     * Utility function to add a state to the state machine.
+     * @param stateName
+     * @return
+     */
+    public AnimatorState addState(String stateName) {
+    	return addState(stateName, new Motion());
+    }
+    
+    /**
+     * InternalCall.
+     * @param stateName
+     * @param motion
+     * @return
+     */
+    private AnimatorState addState(String stateName, Motion motion) {
+    	if (states.containsKey(stateName)) {
             String error = String.format("State '{0}' already exists in state machine", stateName);
             throw new IllegalArgumentException(error);
         }
-
-        Action action = animator.animComposer.action(animName);
-        logger.log(Level.INFO, "ActionClip created: " + action);
-
-        AnimatorState state = new AnimatorState(stateName, animator);
-        state.motion = new Motion(animName);
+    	
+    	AnimatorState state = new AnimatorState(stateName, animator);
+        state.motion = motion;
         states.put(stateName, state);
         return state;
     }
@@ -121,9 +148,14 @@ public class AnimatorStateMachine {
      * Utility function to remove a state from the state machine.
      * @param stateName
      */
-    public void removeState(String stateName) {
-        states.remove(stateName);
-    }
+	public void removeState(String stateName) {
+		AnimatorState state = findState(stateName);
+		String animName = state.motion.name;
+		if (animName != null) {
+			animator.animComposer.removeAction(animName);
+		}
+		states.remove(stateName);
+	}
 
     /**
      * Find a state with the given name. 
@@ -155,12 +187,12 @@ public class AnimatorStateMachine {
      *
      * @return the states.
      */
-    public Collection <AnimatorState> getStates() {
+    public Collection<AnimatorState> getStates() {
         return states.values();
     }
 
     protected void update(float tpf) {
-        AnimatorState nextState = currentState.checkTransitions();
+        AnimatorState nextState = currentState.checkTransitions(name);
 
         if (currentState != nextState) {
 
@@ -178,15 +210,5 @@ public class AnimatorStateMachine {
         currentState.update(tpf);
         currentState.behaviours.forEach(behaviour -> behaviour.onStateUpdate(animator, tpf));
     }
-
-//    private void doTransition(AnimatorStateTransition transition) {
-//        AnimatorState nextState = transition.destinationState;
-//        String animName = nextState.motion.name;
-//        BlendableAction action = (BlendableAction) animator.animComposer.getAction(animName);
-//        action.setSpeed(nextState.speed);
-//        action.setTransitionLength(transition.duration);
-//        animator.animComposer.setCurrentAction(animName);
-//        animator.animComposer.setTime(transition.offset);
-//    }
 
 }
