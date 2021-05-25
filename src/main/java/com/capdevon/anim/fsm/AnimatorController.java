@@ -7,16 +7,18 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParameterType;
-import com.capdevon.control.AdapterControl;
 import com.jme3.anim.AnimComposer;
 import com.jme3.anim.AnimationMask;
+import com.jme3.renderer.RenderManager;
+import com.jme3.renderer.ViewPort;
+import com.jme3.scene.control.AbstractControl;
 
 /**
  * The Animator Controller controls animation with state machine, controlled by parameters.
  * 
  * @author capdevon
  */
-public class AnimatorController extends AdapterControl {
+public class AnimatorController extends AbstractControl {
 
     private static final Logger logger = Logger.getLogger(AnimatorController.class.getName());
 
@@ -39,6 +41,10 @@ public class AnimatorController extends AdapterControl {
     protected void controlUpdate(float tpf) {
         layers.forEach(layer -> layer.stateMachine.update(tpf));
     }
+
+	@Override
+	protected void controlRender(RenderManager rm, ViewPort vp) {
+	}
 
     /**
      * Utility function to add a layer to the controller.
