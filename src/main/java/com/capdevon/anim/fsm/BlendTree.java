@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.capdevon.anim.fsm;
 
 import java.util.ArrayList;
@@ -28,7 +23,7 @@ public class BlendTree extends Motion {
 
     //Parameter that is used to compute the blending weight of the childs in 1D blend trees or on the X axis of a 2D blend tree.
     public String blendParameter;
-    //Parameter that is used to compute the blending weight of the childs on the Y axis of a 2D blend tree.
+    //Parameter that is used to compute the blending weight of the childs on the Y axis of a 2D blend tree. (not yet supported)
     public String blendParameterY;
     //The Blending type can be either 1D or different types of 2D.
     public BlendTreeType blendType = BlendTreeType.Simple1D;
@@ -37,13 +32,13 @@ public class BlendTree extends Motion {
     //Sets the minimum threshold that will be used by the ChildMotion.
     public float minThreshold = 0f;
     //The list of the blend tree child motions.
-    protected List<ChildMotion> motions = new ArrayList<>();
+    protected List<ChildMotion> motions = new ArrayList <>();
 
     /**
      * Constructor.
      */
     public BlendTree() {
-    	//default empty.
+        //default empty.
     }
 
     /**
