@@ -138,22 +138,6 @@ public class Test_BlendTree extends SimpleApplication {
         fpp.addFilter(shadowFilter);
     }
     
-//    private Material getUnshadedMaterial(ColorRGBA color) {
-//        Material mat = new Material(assetManager, Materials.UNSHADED);
-//        mat.setColor("Color", color);
-//        return mat;
-//    }
-//    
-//    private Material getShinyMat() {
-//        Material mat = new Material(assetManager, Materials.LIGHTING);
-//        mat.setColor("Diffuse", ColorRGBA.Green);
-//        mat.setColor("Specular", ColorRGBA.White);
-//        mat.setColor("Ambient", ColorRGBA.Black);
-//        mat.setFloat("Shininess", 0);
-//        mat.setBoolean("UseMaterialColors", true);
-//        return mat;
-//    }
-    
     /**
      * a sky as background
      */
