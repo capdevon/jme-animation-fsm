@@ -110,8 +110,6 @@ public class Test_BlendTree extends SimpleApplication {
         stateManager.attach(physics);
         stateManager.attach(new PhysxDebugAppState());
 
-        physics.getPhysicsSpace().setAccuracy(0.01f); // 10-msec timestep
-        physics.getPhysicsSpace().getSolverInfo().setNumIterations(15);
         physics.setDebugAxisLength(1);
         physics.setDebugEnabled(false);
     }
@@ -195,17 +193,14 @@ public class Test_BlendTree extends SimpleApplication {
         AnimatorStateMachine sm = layer0.getStateMachine();
         AnimatorState idle = sm.addState("Idle", AnimDefs.RifleIdle);
 
-        // Create blend tree
-        BlendTree tree = new BlendTree();
+        // Create blend tree with the minimum and maximum threshold for the LinearBlendSpace class
+        BlendTree tree = new BlendTree(0, 1);
         // Configure the name of the parameter that controls the mixing of animations.
-        tree.blendParameter = "moveSpeed";
-        // Sets the minimum and maximum threshold for the LinearBlendSpace class
-        tree.minThreshold = 0;
-        tree.maxThreshold = 1;
+        tree.setBlendParameter("moveSpeed");
         // set the animation speed to 1 if the moveSpeed parameter is less than 0.5
-        tree.addChild(AnimDefs.RifleWalk, 0.5f).timeScale = 1f;
+        tree.addChild(AnimDefs.RifleWalk, 0.5f).setTimeScale(1f);
         // set the animation speed to 2 if the moveSpeed parameter is between 0.5f and 1
-        tree.addChild(AnimDefs.RifleRun, 1f).timeScale = 2f;
+        tree.addChild(AnimDefs.RifleRun, 1f).setTimeScale(2f);
         // Create the state from the blend tree
         AnimatorState walk = sm.createBlendTree("Walk", tree);
 
