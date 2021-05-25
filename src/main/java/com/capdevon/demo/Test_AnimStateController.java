@@ -1,12 +1,15 @@
 package com.capdevon.demo;
 
+import com.capdevon.anim.AnimUtils;
 import com.capdevon.anim.fsm.AnimatorConditionMode;
 import com.capdevon.anim.fsm.AnimatorController;
+import com.capdevon.anim.fsm.AnimatorControllerLayer;
 import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParameterType;
 import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;
 import com.capdevon.physx.PhysxDebugAppState;
+import com.jme3.anim.AnimComposer;
 import com.jme3.app.Application;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
@@ -65,10 +68,11 @@ public class Test_AnimStateController extends SimpleApplication {
         Test_AnimStateController app = new Test_AnimStateController();
         AppSettings settings = new AppSettings(true);
         settings.setResolution(1024, 768);
-        settings.setFrameRate(60);
+        settings.setFrameRate(200);
         settings.setSamples(4);
         settings.setBitsPerPixel(32);
         settings.setGammaCorrection(true);
+        settings.setVSync(false);
         app.setSettings(settings);
         app.setShowSettings(false);
         app.setPauseOnLostFocus(false);
@@ -89,9 +93,7 @@ public class Test_AnimStateController extends SimpleApplication {
         setupSky();
         setupLights();
         
-        TPSInputAppState input = new TPSInputAppState();
-        input.setPlayerControl(playerControl);
-        stateManager.attach(input);
+        stateManager.attach(new TPSInputAppState());
     }
     
     /**
@@ -104,8 +106,6 @@ public class Test_AnimStateController extends SimpleApplication {
         stateManager.attach(physics);
         stateManager.attach(new PhysxDebugAppState());
 
-        physics.getPhysicsSpace().setAccuracy(0.01f); // 10-msec timestep
-        physics.getPhysicsSpace().getSolverInfo().setNumIterations(15);
         physics.setDebugAxisLength(1);
         physics.setDebugEnabled(false);
     }
@@ -175,41 +175,31 @@ public class Test_AnimStateController extends SimpleApplication {
         BetterCharacterControl bcc = new BetterCharacterControl(.4f, 1.8f, 10f);
         player.addControl(bcc);
         physics.getPhysicsSpace().add(bcc);
-        bcc.getRigidBody().setCollisionGroup(RigidBodyControl.COLLISION_GROUP_02);
-        bcc.getRigidBody().setCollideWithGroups(RigidBodyControl.COLLISION_GROUP_01);
         
         // Create the controller and the parameters
-        AnimatorController animator = new AnimatorController();
-        animator.addParameter("moveSpeed", AnimatorControllerParameterType.Float);
+        AnimatorController animator = new AnimatorController(AnimUtils.getAnimControl(player));
         animator.addParameter("isRunning", AnimatorControllerParameterType.Bool);
         animator.addParameter("isReloading", AnimatorControllerParameterType.Trigger);
         player.addControl(animator);
         
         // Define states for animations.
-        AnimatorStateMachine sm = animator.getStateMachine();
+        AnimatorControllerLayer layer0 = animator.getLayer(AnimComposer.DEFAULT_LAYER);
+        AnimatorStateMachine sm = layer0.getStateMachine();
         AnimatorState idle = sm.addState("Idle", AnimDefs.RifleIdle);
         AnimatorState walk = sm.addState("Run", AnimDefs.RifleRun);
         AnimatorState reload = sm.addState("Reload", AnimDefs.Reloading);
         
-        // 1. example
-//        AnimatorStateTransition idleToWalk = idle.addTransition(walk);
-//        idleToWalk.addCondition(AnimatorConditionMode.Greater, 0.3f, "moveSpeed");
-//        
-//        AnimatorStateTransition walkToIdle = walk.addTransition(idle);
-//        walkToIdle.addCondition(AnimatorConditionMode.Less, 0.3f, "moveSpeed");
-        
-        // 2. example
         AnimatorStateTransition idleToWalk = idle.addTransition(walk);
         idleToWalk.addCondition(AnimatorConditionMode.If, 0f, "isRunning");
         
         AnimatorStateTransition walkToIdle = walk.addTransition(idle);
         walkToIdle.addCondition(AnimatorConditionMode.IfNot, 0f, "isRunning");
         
-        // 3. example
         AnimatorStateTransition idleToReload = idle.addTransition(reload);
         idleToReload.addCondition(AnimatorConditionMode.If, 0f, "isReloading");
         
-        AnimatorStateTransition reloadToIdle = reload.addTransition(idle, 0.9f);
+        // execute 95% of the reloading animation before returning to idle state
+        AnimatorStateTransition reloadToIdle = reload.addTransition(idle, 0.95f);
         
         // set the initial state.
         sm.setDefaultState(idle);
@@ -236,23 +226,23 @@ public class Test_AnimStateController extends SimpleApplication {
         chaseCam.setDefaultDistance(chaseCam.getMinDistance());
     }
     
-	private interface AnimDefs {
+    private interface AnimDefs {
 
-		final String MODEL = "Models/Rifle/rifle.glb";
-		final String RifleIdle = "RifleIdle";
-		final String RifleWalk = "RifleWalk";
-		final String RifleRun = "RifleRun";
-		final String WalkWithRifle = "WalkWithRifle";
-		final String ThrowGrenade = "ThrowGrenade";
-		final String Reloading = "Reloading";
-		final String RifleAimingIdle = "RifleAimingIdle";
-		final String FiringRifleSingle = "FiringRifleSingle";
-		final String FiringRifleAuto = "FiringRifleAuto";
-		final String DeathFromRight = "DeathFromRight";
-		final String DeathFromHeadshot = "DeathFromHeadshot";
-		final String TPose = "TPose";
+        final String MODEL = "Models/Rifle/rifle.glb";
+        final String RifleIdle = "RifleIdle";
+        final String RifleWalk = "RifleWalk";
+        final String RifleRun = "RifleRun";
+        final String WalkWithRifle = "WalkWithRifle";
+        final String ThrowGrenade = "ThrowGrenade";
+        final String Reloading = "Reloading";
+        final String RifleAimingIdle = "RifleAimingIdle";
+        final String FiringRifleSingle = "FiringRifleSingle";
+        final String FiringRifleAuto = "FiringRifleAuto";
+        final String DeathFromRight = "DeathFromRight";
+        final String DeathFromHeadshot = "DeathFromHeadshot";
+        final String TPose = "TPose";
 
-	}
+    }
     
     private class PlayerMovementControl extends AbstractControl implements ActionListener, AnalogListener {
 
@@ -282,10 +272,10 @@ public class Test_AnimStateController extends SimpleApplication {
             }
         }
 
-		@Override
-		public void onAnalog(String name, float value, float tpf) {
-			// TODO Auto-generated method stub
-		}
+        @Override
+        public void onAnalog(String name, float value, float tpf) {
+            // TODO Auto-generated method stub
+        }
 
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
@@ -336,7 +326,6 @@ public class Test_AnimStateController extends SimpleApplication {
             bcc.setWalkDirection(walkDirection.multLocal(m_MoveSpeed));
             
             animator.setBool("isRunning", isMoving);
-//            animator.setFloat("moveSpeed", bcc.getVelocity().length());
         }
 
         @Override
@@ -365,7 +354,17 @@ public class Test_AnimStateController extends SimpleApplication {
         @Override
         protected void initialize(Application app) {
             this.inputManager = app.getInputManager();
+            Spatial player = getRootNode().getChild("Player.Character");
+            playerControl = player.getControl(PlayerMovementControl.class);
             addInputMappings();
+        }
+        
+        public Node getRootNode() {
+            return ((SimpleApplication) getApplication()).getRootNode();
+        }
+
+        public Node getGuiNode() {
+            return ((SimpleApplication) getApplication()).getGuiNode();
         }
 
         @Override
