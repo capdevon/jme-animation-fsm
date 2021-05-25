@@ -3,8 +3,10 @@ package com.capdevon.demo;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.capdevon.anim.AnimUtils;
 import com.capdevon.anim.fsm.AnimatorConditionMode;
 import com.capdevon.anim.fsm.AnimatorController;
+import com.capdevon.anim.fsm.AnimatorControllerLayer;
 import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParameterType;
 import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
@@ -14,6 +16,7 @@ import com.capdevon.anim.fsm.StateMachineListener;
 import com.capdevon.control.PlayerBaseControl;
 import com.capdevon.physx.PhysxDebugAppState;
 import com.capdevon.util.PrimitiveUtils;
+import com.jme3.anim.AnimComposer;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
@@ -109,8 +112,6 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         stateManager.attach(physics);
         stateManager.attach(new PhysxDebugAppState());
 
-//        physics.getPhysicsSpace().setAccuracy(0.01f); // 10-msec timestep
-//        physics.getPhysicsSpace().getSolverInfo().setNumIterations(15);
         physics.setDebugAxisLength(1);
         physics.setDebugEnabled(false);
     }
@@ -185,12 +186,13 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         bcc.getRigidBody().setCollideWithGroups(RigidBodyControl.COLLISION_GROUP_01);
         
         // Create the controller and the parameters
-        AnimatorController animator = new AnimatorController();
+        AnimatorController animator = new AnimatorController(AnimUtils.getAnimControl(soldier));
         animator.addParameter("distance", AnimatorControllerParameterType.Float);
         soldier.addControl(animator);
         
         // Define states for animations.
-        AnimatorStateMachine sm = animator.getStateMachine();
+        AnimatorControllerLayer layer0 = animator.getLayer(AnimComposer.DEFAULT_LAYER);
+        AnimatorStateMachine sm = layer0.getStateMachine();
         
         AnimatorState patrol = sm.addState("Patrol", AnimDefs.WalkWithRifle);
         patrol.addStateMachineBehaviour(new PatrolState());
@@ -218,6 +220,7 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         sm.setDefaultState(patrol);
         
         BitmapText bmp = createBitmap(patrol.getName(), ColorRGBA.Red);
+        bmp.setShadowMode(ShadowMode.Off);
         Node label = new Node("Label");
         label.attachChild(bmp);
         label.setLocalTranslation(0, 2.5f, 0);
