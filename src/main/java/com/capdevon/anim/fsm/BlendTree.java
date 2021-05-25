@@ -15,10 +15,10 @@ public class BlendTree extends Motion {
 
     public enum BlendTreeType {
         Simple1D,
-//        SimpleDirectional2D,	 //not yet supported
-//        FreeformDirectional2D, //not yet supported
-//        FreeformCartesian2D,	 //not yet supported
-//        Direct				 //not yet supported
+//        SimpleDirectional2D,      //not yet supported
+//        FreeformDirectional2D,    //not yet supported
+//        FreeformCartesian2D,      //not yet supported
+//        Direct                    //not yet supported
     }
 
     //Parameter that is used to compute the blending weight of the childs in 1D blend trees or on the X axis of a 2D blend tree.
@@ -32,7 +32,7 @@ public class BlendTree extends Motion {
     //Sets the minimum threshold that will be used by the ChildMotion.
     public float minThreshold = 0f;
     //The list of the blend tree child motions.
-    protected List<ChildMotion> motions = new ArrayList <>();
+    protected List<ChildMotion> motions = new ArrayList<>();
 
     /**
      * Constructor.
