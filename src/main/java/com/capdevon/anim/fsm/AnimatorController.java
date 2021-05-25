@@ -1,20 +1,15 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.capdevon.anim.fsm;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParameterType;
 import com.capdevon.control.AdapterControl;
 import com.jme3.anim.AnimComposer;
-import com.jme3.scene.Spatial;
+import com.jme3.anim.AnimationMask;
 
 /**
  * The Animator Controller controls animation with state machine, controlled by parameters.
@@ -26,52 +21,73 @@ public class AnimatorController extends AdapterControl {
     private static final Logger logger = Logger.getLogger(AnimatorController.class.getName());
 
     protected AnimComposer animComposer;
-    protected AnimatorStateMachine stateMachine;
+    //The layers in the controller.
+    protected List<AnimatorControllerLayer> layers = new ArrayList<>();
+    //Parameters are used to communicate between scripting and the controller. They are used to drive transitions and blendtrees for example.
     protected List<AnimatorControllerParameter> parameters = new ArrayList<>();
 
     /**
      * Constructor.
+     * @param animComposer
      */
-    public AnimatorController() {
-        //stateMachine = new AnimatorStateMachine(this);
-    }
-
-    public AnimatorStateMachine getStateMachine() {
-        if (spatial == null) {
-            throw new IllegalStateException("The Control is not attached to any Spatial");
-        }
-        return stateMachine;
-    }
-
-    @Override
-    public void setSpatial(Spatial sp) {
-        super.setSpatial(sp);
-        if (spatial != null) {
-            animComposer = getComponentInChild(AnimComposer.class);
-            Objects.requireNonNull(animComposer, "AnimComposer not found in subtree: " + spatial);
-            logger.log(Level.INFO, "AnimatorController initialized for " + spatial);
-
-            stateMachine = new AnimatorStateMachine(this);
-        }
+    public AnimatorController(AnimComposer animComposer) {
+        this.animComposer = animComposer;
+        addLayer(AnimComposer.DEFAULT_LAYER, null);
     }
 
     @Override
     protected void controlUpdate(float tpf) {
-        stateMachine.update(tpf);
+        layers.forEach(layer -> layer.stateMachine.update(tpf));
     }
 
     /**
-     * Utility function to remove a parameter from the controller.
-     * @param param
+     * Utility function to add a layer to the controller.
+     * @param name - The name of the Layer.
+     * @param mask - The desired mask for the new layer (alias created)
      */
-    public void removeParameter(AnimatorControllerParameter param) {
-        parameters.remove(param);
+    public AnimatorControllerLayer addLayer(String name, AnimationMask mask) {
+        AnimatorControllerLayer layer = new AnimatorControllerLayer();
+        layer.name = name;
+        layer.avatarMask = mask;
+        layer.stateMachine = new AnimatorStateMachine(this);
+        layer.stateMachine.name = layer.name;
+        layers.add(layer);
+        animComposer.makeLayer(name, mask);
+        return layer;
+    }
+
+    /**
+     * Utility function to remove a layer from the controller.
+     * @param index - The AnimatorLayer.
+     */
+    public void removeLayer(AnimatorControllerLayer layer) {
+        layers.remove(layer);
+        animComposer.removeLayer(layer.name);
+    }
+    
+    public AnimatorControllerLayer getLayer(String name) {
+    	for (AnimatorControllerLayer layer : layers) {
+    		if (layer.name.equals(name)) {
+    			return layer;
+    		}
+    	}
+    	return null;
+    }
+
+    /**
+     * Returns an unmodifiable collection of all available layers. When an attempt
+     * is made to modify the collection, an UnsupportedOperationException is thrown.
+     *
+     * @return the unmodifiable collection of layers
+     */
+    public Collection<AnimatorControllerLayer> getLayers() {
+        return Collections.unmodifiableCollection(layers);
     }
 
     /**
      * Utility function to add a parameter to the controller.
-     * @param name
-     * @param type 
+     * @param name - The name of the parameter.
+     * @param type - The type of the parameter.
      */
     public void addParameter(String name, AnimatorControllerParameterType type) {
         AnimatorControllerParameter param = new AnimatorControllerParameter();
@@ -79,6 +95,14 @@ public class AnimatorController extends AdapterControl {
         param.type = type;
         param.nameHash = name.hashCode();
         parameters.add(param);
+    }
+
+    /**
+     * Utility function to remove a parameter from the controller.
+     * @param param - The AnimatorParameter.
+     */
+    public void removeParameter(AnimatorControllerParameter param) {
+        parameters.remove(param);
     }
 
     /**
@@ -94,10 +118,17 @@ public class AnimatorController extends AdapterControl {
         }
         return null;
     }
+    
+    /**
+     * Returns an unmodifiable collection of all available parameters. When an attempt
+     * is made to modify the collection, an UnsupportedOperationException is thrown.
+     *
+     * @return the unmodifiable collection of parameters
+     */
+    public Collection<AnimatorControllerParameter> getParameters() {
+    	return Collections.unmodifiableCollection(parameters);
+    }
 
-    //--------------------------------------------------------------------------
-    // Float
-    //--------------------------------------------------------------------------
     public float getFloat(String name) {
         AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Float);
         return param.defaultFloat;
@@ -108,9 +139,6 @@ public class AnimatorController extends AdapterControl {
         param.defaultFloat = value;
     }
 
-    //--------------------------------------------------------------------------
-    // Integer
-    //--------------------------------------------------------------------------
     public int getInt(String name) {
         AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Int);
         return param.defaultInt;
@@ -121,9 +149,6 @@ public class AnimatorController extends AdapterControl {
         param.defaultInt = value;
     }
 
-    //--------------------------------------------------------------------------
-    // Boolean
-    //--------------------------------------------------------------------------
     public boolean getBool(String name) {
         AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Bool);
         return param.defaultBool;
@@ -134,9 +159,6 @@ public class AnimatorController extends AdapterControl {
         param.defaultBool = value;
     }
 
-    //--------------------------------------------------------------------------
-    // Trigger
-    //--------------------------------------------------------------------------
     public void setTrigger(String name) {
         AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Trigger);
         param.defaultBool = true;
@@ -147,20 +169,12 @@ public class AnimatorController extends AdapterControl {
      * Throws an exception if the parameter is not found.
      */
     private AnimatorControllerParameter findParameter(String name, AnimatorControllerParameterType type) {
-        return findParameter(name.hashCode(), type);
-    }
-
-    /**
-     * Find a parameter with the given id. 
-     * Throws an exception if the parameter is not found.
-     */
-    private AnimatorControllerParameter findParameter(int id, AnimatorControllerParameterType type) {
         for (AnimatorControllerParameter param: parameters) {
-            if (param.nameHash == id && param.type == type) {
+            if (param.nameHash == name.hashCode() && param.type == type) {
                 return param;
             }
         }
-        throw new IllegalArgumentException("AnimatorControllerParameter not found: " + id);
+        throw new IllegalArgumentException("AnimatorControllerParameter not found: " + name);
     }
 
 }
