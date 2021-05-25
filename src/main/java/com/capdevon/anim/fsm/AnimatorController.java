@@ -66,12 +66,12 @@ public class AnimatorController extends AdapterControl {
     }
     
     public AnimatorControllerLayer getLayer(String name) {
-    	for (AnimatorControllerLayer layer : layers) {
-    		if (layer.name.equals(name)) {
-    			return layer;
-    		}
-    	}
-    	return null;
+        for (AnimatorControllerLayer layer: layers) {
+            if (layer.name.equals(name)) {
+                return layer;
+            }
+        }
+        return null;
     }
 
     /**
