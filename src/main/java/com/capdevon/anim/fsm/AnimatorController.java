@@ -169,6 +169,11 @@ public class AnimatorController extends AbstractControl {
         AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Trigger);
         param.defaultBool = true;
     }
+    
+    public void resetTrigger(String name) {
+    	AnimatorControllerParameter param = findParameter(name, AnimatorControllerParameterType.Trigger);
+        param.defaultBool = false;
+    }
 
     /**
      * Find a parameter with the given name. 
