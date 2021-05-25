@@ -22,27 +22,27 @@ public class ChildMotion {
     //The parameter used by the child when used in a BlendTree of type BlendTreeType.Direct. (not yet supported)
     protected String directBlendParameter = "Blend";
 
-    
+
     public String getAnimName() {
-		return animName;
-	}
+        return animName;
+    }
 
-	public float getTimeScale() {
-		return timeScale;
-	}
+    public float getTimeScale() {
+        return timeScale;
+    }
 
-	public void setTimeScale(float timeScale) {
-		this.timeScale = timeScale;
-	}
+    public void setTimeScale(float timeScale) {
+        this.timeScale = timeScale;
+    }
 
-	public float getThreshold() {
-		return threshold;
-	}
+    public float getThreshold() {
+        return threshold;
+    }
 
-	public void setThreshold(float threshold) {
-		this.threshold = threshold;
-	}
-	
+    public void setThreshold(float threshold) {
+        this.threshold = threshold;
+    }
+
     @Override
     public String toString() {
         return "ChildMotion [timeScale=" + timeScale + ", animName=" + animName + ", threshold=" + threshold + "]";
