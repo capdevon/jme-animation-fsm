@@ -9,13 +9,12 @@ public class Motion {
 
     //The name of the object.
     protected String name;
-
+    
     /**
      * Constructor.
-     * @param name
      */
-    public Motion(String name) {
-        this.name = name;
+    public Motion() {
+    	//default empty.
     }
 
     public String getName() {
