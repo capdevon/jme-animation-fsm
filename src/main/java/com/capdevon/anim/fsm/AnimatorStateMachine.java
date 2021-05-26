@@ -71,10 +71,10 @@ public class AnimatorStateMachine {
         }
     }
 
-	/**
-	 * Sets the initial state of this StateMachine.
-	 * @param state the initial state
-	 */
+    /**
+     * Sets the initial state of this StateMachine.
+     * @param state the initial state
+     */
     public void setDefaultState(AnimatorState state) {
         anyState.transitions.clear();
         anyState.addTransition(state);
