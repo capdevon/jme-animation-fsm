@@ -42,9 +42,9 @@ public class AnimatorController extends AbstractControl {
         layers.forEach(layer -> layer.stateMachine.update(tpf));
     }
 
-	@Override
-	protected void controlRender(RenderManager rm, ViewPort vp) {
-	}
+    @Override
+    protected void controlRender(RenderManager rm, ViewPort vp) {
+    }
 
     /**
      * Utility function to add a layer to the controller.
