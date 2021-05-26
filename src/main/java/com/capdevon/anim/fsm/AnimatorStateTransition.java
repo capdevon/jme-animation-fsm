@@ -75,7 +75,7 @@ public class AnimatorStateTransition {
         }
 
         if (doTransition && hasExitTime) {
-        	double animPercent = animator.animComposer.getTime(layerName) / animator.animComposer.getAction(sourceState.motion.name).getLength();
+            double animPercent = animator.animComposer.getTime(layerName) / animator.animComposer.getAction(sourceState.motion.name).getLength();
             return animPercent > exitTime;
         }
 
