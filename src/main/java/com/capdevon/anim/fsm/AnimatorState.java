@@ -96,36 +96,36 @@ public class AnimatorState {
      * @param layerName
      * @return
      */
-	protected AnimatorState checkTransitions(String layerName) {
-		for (AnimatorStateTransition transition : transitions) {
-			if (!transition.mute && transition.checkConditions(this, layerName)) {
+    protected AnimatorState checkTransitions(String layerName) {
+        for (AnimatorStateTransition transition: transitions) {
+            if (!transition.mute && transition.checkConditions(this, layerName)) {
 
-				// do transition
-				AnimatorState nextState = transition.destinationState;
-				String animName = nextState.motion.name;
-				
-				// Some states may not have an associated animation.
-				if (animName != null) {
-					BlendableAction action = (BlendableAction) animator.animComposer.getAction(animName);
-					action.setSpeed(nextState.speed);
-					action.setTransitionLength(transition.duration);
-					animator.animComposer.setCurrentAction(animName, layerName);
-					animator.animComposer.setTime(transition.offset);
-				} else {
-					// In this case, remove the previous state animation from the layer.
-					animator.animComposer.removeCurrentAction(layerName);
-				}
+                // do transition
+                AnimatorState nextState = transition.destinationState;
+                String animName = nextState.motion.name;
 
-				return nextState;
-			}
-		}
-		return this;
-	}
+                // Some states may not have an associated animation.
+                if (animName != null) {
+                    BlendableAction action = (BlendableAction) animator.animComposer.getAction(animName);
+                    action.setSpeed(nextState.speed);
+                    action.setTransitionLength(transition.duration);
+                    animator.animComposer.setCurrentAction(animName, layerName);
+                    animator.animComposer.setTime(transition.offset);
+                } else {
+                    // In this case, remove the previous state animation from the layer.
+                    animator.animComposer.removeCurrentAction(layerName);
+                }
 
-	/**
-	 * InternalCall
-	 * @param tpf
-	 */
+                return nextState;
+            }
+        }
+        return this;
+    }
+
+    /**
+     * InternalCall
+     * @param tpf
+     */
     protected void update(float tpf) {
 
         if (motion instanceof BlendTree) {
