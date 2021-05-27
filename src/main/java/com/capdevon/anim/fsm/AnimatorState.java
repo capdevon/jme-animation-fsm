@@ -158,13 +158,4 @@ public class AnimatorState {
         return speed;
     }
 
-    @Override
-    public String toString() {
-        return "AnimatorState{" +
-            "motion=" + motion.name +
-            ", name=" + name +
-            ", speed=" + speed +
-            '}';
-    }
-
 }
