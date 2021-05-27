@@ -88,5 +88,29 @@ public class AnimatorCondition {
         }
         return triggered;
     }
+    
+    public AnimatorConditionMode getMode() {
+        return mode;
+    }
+
+    public void setMode(AnimatorConditionMode mode) {
+        this.mode = mode;
+    }
+
+    public String getParameter() {
+        return parameter;
+    }
+
+    public void setParameter(String parameter) {
+        this.parameter = parameter;
+    }
+
+    public float getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(float threshold) {
+        this.threshold = threshold;
+    }
 
 }
