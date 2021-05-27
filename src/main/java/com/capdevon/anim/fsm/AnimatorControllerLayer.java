@@ -15,8 +15,6 @@ public class AnimatorControllerLayer {
     protected AnimatorStateMachine stateMachine;
     //The AvatarMask that is used to mask the animation on the given layer.
     protected AnimationMask avatarMask;
-    //Specifies the index of the Synced Layer. (not yet supported)
-    protected int syncedLayerIndex = -1;
 
     /**
      * Constructor.
