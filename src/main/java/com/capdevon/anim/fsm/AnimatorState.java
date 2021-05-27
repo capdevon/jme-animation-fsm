@@ -146,16 +146,20 @@ public class AnimatorState {
         }
     }
 
-    public Motion getMotion() {
-        return motion;
-    }
-
     public String getName() {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public float getSpeed() {
         return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
     }
 
 }
