@@ -81,5 +81,45 @@ public class AnimatorStateTransition {
 
         return doTransition;
     }
+    
+    public float getOffset() {
+        return offset;
+    }
+
+    public void setOffset(float offset) {
+        this.offset = offset;
+    }
+
+    public float getDuration() {
+        return duration;
+    }
+
+    public void setDuration(float duration) {
+        this.duration = duration;
+    }
+
+    public float getExitTime() {
+        return exitTime;
+    }
+
+    public void setExitTime(float exitTime) {
+        this.exitTime = exitTime;
+    }
+
+    public boolean hasExitTime() {
+        return hasExitTime;
+    }
+
+    public void setHasExitTime(boolean hasExitTime) {
+        this.hasExitTime = hasExitTime;
+    }
+
+    public boolean isMute() {
+        return mute;
+    }
+
+    public void setMute(boolean mute) {
+        this.mute = mute;
+    }
 
 }
