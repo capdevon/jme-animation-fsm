@@ -1,6 +1,9 @@
 # jme-capdevon-examples
 A collection of useful and fun demos made with jMonkeyEngine.
-For more details visit the Wiki section.
+
+Contains functions for handling finite state machine animations and a utility class for physics such as Raycast and OverlapSphere.
+
+For more details visit the [Wiki](https://github.com/capdevon/jme-capdevon-examples/wiki) section.
 
 Resource Used:
 - Code
