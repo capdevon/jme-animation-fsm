@@ -399,9 +399,9 @@ public class Test_Climbing extends SimpleApplication {
         }
         
         private void setAnimation(String animName) {
-        	if (animComposer.getCurrentAction() != animComposer.getAction(animName)) {
-        		animComposer.setCurrentAction(animName);
-        	}
+            if (animComposer.getCurrentAction() != animComposer.getAction(animName)) {
+                animComposer.setCurrentAction(animName);
+            }
         }
         
         private void stopMove() {
