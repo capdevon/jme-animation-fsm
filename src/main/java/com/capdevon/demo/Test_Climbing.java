@@ -258,23 +258,23 @@ public class Test_Climbing extends SimpleApplication {
             this.debugTools = new DebugTools(app.getAssetManager());
             registerWithInput(app.getInputManager());
         }
-
+        
         @Override
-		public void setSpatial(Spatial sp) {
-			super.setSpatial(sp);
-			if (spatial != null) {
-				this.bcc = getComponent(BetterCharacterControl.class);
-				this.animComposer = getComponentInChild(AnimComposer.class);
-				
-				// setup animations
-				animComposer.getAnimClipsNames().forEach(animName -> animComposer.action(animName));
-				
-				String animName = AnimDefs.Climbing;
-				Action action = animComposer.getAction(animName);
-		        action = new BaseAction(Tweens.sequence(action, Tweens.callMethod(this, "onClimbingDone")));
-		        animComposer.addAction(animName, action);
-			}
-		}
+        public void setSpatial(Spatial sp) {
+            super.setSpatial(sp);
+            if (spatial != null) {
+                this.bcc = getComponent(BetterCharacterControl.class);
+                this.animComposer = getComponentInChild(AnimComposer.class);
+
+                // setup animations
+                animComposer.getAnimClipsNames().forEach(animName -> animComposer.action(animName));
+
+                String animName = AnimDefs.Climbing;
+                Action action = animComposer.getAction(animName);
+                action = new BaseAction(Tweens.sequence(action, Tweens.callMethod(this, "onClimbingDone")));
+                animComposer.addAction(animName, action);
+            }
+        }
                 
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
@@ -290,81 +290,80 @@ public class Test_Climbing extends SimpleApplication {
                 checkLedgeGrab();
             }
         }
-
         @Override
-		protected void controlUpdate(float tpf) {
-			if (!isClimbingMode) {
-				// Player is in NORMAL state
-				updateMovement(tpf);
+        protected void controlUpdate(float tpf) {
+            if (!isClimbingMode) {
+                // Player is in NORMAL state
+                updateMovement(tpf);
 
-			} else {
-				// Player is in CLIMBING state
-				if (startClimb && !isClimbingAnimDone) {
-					// align with wall
-//					spatial.getWorldRotation().slerp(helper.getRotation(), tpf * 5);
+            } else {
+                // Player is in CLIMBING state
+                if (startClimb && !isClimbingAnimDone) {
+                    // align with wall
+                    //spatial.getWorldRotation().slerp(helper.getRotation(), tpf * 5);
 
-				} else if (isClimbingAnimDone) {
-					isClimbingMode = false;
-					startClimb = false;
-//					spatial.setLocalTranslation(goalPosition);
-//					bcc.setEnabled(true);
-					bcc.warp(goalPosition);
-				}
-			}
-		}
-        
+                } else if (isClimbingAnimDone) {
+                    isClimbingMode = false;
+                    startClimb = false;
+                    //spatial.setLocalTranslation(goalPosition);
+                    //bcc.setEnabled(true);
+                    bcc.warp(goalPosition);
+                }
+            }
+        }
+
         float hDistAwayFromLedge = 0.1f;
         float vDistAwayFromLedge = 0.1f;
         Transform helper = new Transform();
         Vector3f goalPosition = new Vector3f();
-        
-		private void checkLedgeGrab() {
 
-			if (!isClimbingMode && bcc.isOnGround()) {
+        private void checkLedgeGrab() {
 
-				Ray vRay = new Ray(ledgeRayV.getWorldTranslation(), Vector3f.UNIT_Y.negate());
-				debugTools.setRedArrow(vRay.getOrigin(), vRay.getDirection());
+            if (!isClimbingMode && bcc.isOnGround()) {
 
-				if (Physics.Raycast(vRay, hitInfo, 2)) {
+                Ray vRay = new Ray(ledgeRayV.getWorldTranslation(), Vector3f.UNIT_Y.negate());
+                debugTools.setRedArrow(vRay.getOrigin(), vRay.getDirection());
 
-					System.out.println(hitInfo);
-					Vector3f hRayPosition = ledgeRayH.getWorldTranslation().clone();
-					hRayPosition.setY(hitInfo.point.y - 0.01f);
+                if (Physics.Raycast(vRay, hitInfo, 2)) {
 
-					Ray hRay = new Ray(hRayPosition, ledgeRayH.getWorldRotation().mult(Vector3f.UNIT_Z));
-					debugTools.setBlueArrow(hRay.getOrigin(), hRay.getDirection());
+                    System.out.println(hitInfo);
+                    Vector3f hRayPosition = ledgeRayH.getWorldTranslation().clone();
+                    hRayPosition.setY(hitInfo.point.y - 0.01f);
 
-					if (Physics.Raycast(hRay, hitInfo, 2)) {
-						System.out.println(hitInfo);
-						debugTools.setPinkArrow(hitInfo.point, hitInfo.normal);
+                    Ray hRay = new Ray(hRayPosition, ledgeRayH.getWorldRotation().mult(Vector3f.UNIT_Z));
+                    debugTools.setBlueArrow(hRay.getOrigin(), hRay.getDirection());
 
-						goalPosition.set(hitInfo.point.add(0, 0.01f, 0));
+                    if (Physics.Raycast(hRay, hitInfo, 2)) {
+                        System.out.println(hitInfo);
+                        debugTools.setPinkArrow(hitInfo.point, hitInfo.normal);
 
-						bcc.setViewDirection(hitInfo.normal.negate()); // align with wall
-						bcc.setWalkDirection(Vector3f.ZERO); // stop walking
-//						bcc.setEnabled(false);
+                        goalPosition.set(hitInfo.point.add(0, 0.01f, 0));
 
-//						helper.setTranslation(hitInfo.normal.negate().multLocal(hDistAwayFromLedge).addLocal(spatial.getWorldTranslation()));
-//						helper.getTranslation().setY(hitInfo.point.y - vDistAwayFromLedge);
-//						helper.setRotation(FRotator.lookRotation(hitInfo.normal.negate()));
-						setAnimation(AnimDefs.Climbing);
+                        bcc.setViewDirection(hitInfo.normal.negate()); // align with wall
+                        bcc.setWalkDirection(Vector3f.ZERO); // stop walking
+                        //bcc.setEnabled(false);
 
-						isClimbingMode = true;
-						startClimb = true;
-						isClimbingAnimDone = false;
-						System.out.println("startClimbing");
-					}
-				}
-			} else {
-				isClimbingMode = false;
-//				bcc.setEnabled(true);
-			}
-		}
-        
-		void onClimbingDone() {
-			isClimbingAnimDone = true;
-			System.out.println("climbingDone");
-		}
+                        //helper.setTranslation(hitInfo.normal.negate().multLocal(hDistAwayFromLedge).addLocal(spatial.getWorldTranslation()));
+                        //helper.getTranslation().setY(hitInfo.point.y - vDistAwayFromLedge);
+                        //helper.setRotation(FRotator.lookRotation(hitInfo.normal.negate()));
+                        setAnimation(AnimDefs.Climbing);
+
+                        isClimbingMode = true;
+                        startClimb = true;
+                        isClimbingAnimDone = false;
+                        System.out.println("startClimbing");
+                    }
+                }
+            } else {
+                isClimbingMode = false;
+                //bcc.setEnabled(true);
+            }
+        }
+
+        void onClimbingDone() {
+            isClimbingAnimDone = true;
+            System.out.println("climbingDone");
+        }
         
         private void updateMovement(float tpf) {
 
