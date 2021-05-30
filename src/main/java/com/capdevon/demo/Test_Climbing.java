@@ -1,13 +1,17 @@
 package com.capdevon.demo;
 
+import com.capdevon.anim.AnimUtils;
+import com.capdevon.animation.MixamoBodyBones;
 import com.capdevon.control.AdapterControl;
 import com.capdevon.debug.DebugShape;
-import com.capdevon.engine.FRotator;
 import com.capdevon.engine.FVector;
 import com.capdevon.physx.Physics;
 import com.capdevon.physx.PhysxDebugAppState;
 import com.capdevon.physx.RaycastHit;
 import com.jme3.anim.AnimComposer;
+import com.jme3.anim.Joint;
+import com.jme3.anim.SkinningControl;
+import com.jme3.anim.TransformTrack;
 import com.jme3.anim.tween.Tweens;
 import com.jme3.anim.tween.action.Action;
 import com.jme3.anim.tween.action.BaseAction;
@@ -39,11 +43,14 @@ import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.jme3.system.AppSettings;
 import com.jme3.util.SkyFactory;
+
+import jme3utilities.MyAnimation;
 
 /**
  * @author capdevon
@@ -166,7 +173,12 @@ public class Test_Climbing extends SimpleApplication {
         Spatial model = assetManager.loadModel(CHARACTER_MODEL);
         model.setName("Character.Model");
         player.attachChild(model);
-
+        
+//        SkinningControl skeleton = AnimUtils.getSkeletonControl(model);
+//        Joint hips = skeleton.getArmature().getJoint("Armature_mixamorig:" + MixamoBodyBones.Hips);
+//        Vector3f negate = hips.getModelTransform().getTranslation().negate();
+//        model.setLocalTranslation(negate);
+        
         // setup physics character
         BetterCharacterControl bcc = new BetterCharacterControl(.4f, 1.8f, 40f);
         player.addControl(bcc);
@@ -175,11 +187,15 @@ public class Test_Climbing extends SimpleApplication {
         // setup third person camera
         setupChaseCamera();
         
+        Geometry rootBoneRef = debugShape.createWireSphere(0.4f, ColorRGBA.White);
+        rootNode.attachChild(rootBoneRef);
+        
         // setup player control
         PlayerControl pControl = new PlayerControl(this);
         pControl.ledgeRayH = ledgeRayH;
         pControl.ledgeRayV = ledgeRayV;
         pControl.model = model;
+        pControl.rootBoneRef = rootBoneRef;
         player.addControl(pControl);
     }
     
@@ -228,6 +244,7 @@ public class Test_Climbing extends SimpleApplication {
         public Node ledgeRayV;
         public Node ledgeRayH;
         public Spatial model;
+        public Geometry rootBoneRef;
         
         Camera camera;
         DebugTools debugTools;
@@ -247,6 +264,8 @@ public class Test_Climbing extends SimpleApplication {
         boolean _MoveForward, _MoveBackward, _MoveLeft, _MoveRight;
         boolean isClimbingMode, startClimb;
         boolean isClimbingAnimDone = true;
+        TransformTrack tt;
+        Transform rootMotion = new Transform();
         
         /**
          * Constructor.
@@ -273,6 +292,10 @@ public class Test_Climbing extends SimpleApplication {
                 Action action = animComposer.getAction(animName);
                 action = new BaseAction(Tweens.sequence(action, Tweens.callMethod(this, "onClimbingDone")));
                 animComposer.addAction(animName, action);
+                
+                SkinningControl skeleton = getComponentInChild(SkinningControl.class); 
+                Joint hips = skeleton.getArmature().getJoint("Armature_mixamorig:" + MixamoBodyBones.Hips);
+                tt = MyAnimation.findJointTrack(animComposer.getAnimClip(AnimDefs.Climbing), hips.getId());
             }
         }
                 
@@ -290,6 +313,7 @@ public class Test_Climbing extends SimpleApplication {
                 checkLedgeGrab();
             }
         }
+        
         @Override
         protected void controlUpdate(float tpf) {
             if (!isClimbingMode) {
@@ -301,6 +325,11 @@ public class Test_Climbing extends SimpleApplication {
                 if (startClimb && !isClimbingAnimDone) {
                     // align with wall
                     //spatial.getWorldRotation().slerp(helper.getRotation(), tpf * 5);
+                	
+                	tt.getDataAtTime(animComposer.getTime(), rootMotion);
+                	Vector3f vec = animComposer.getSpatial().localToWorld(rootMotion.getTranslation(), null);
+                	rootBoneRef.setLocalTranslation(vec);
+                	rootBoneRef.setLocalRotation(rootMotion.getRotation());
 
                 } else if (isClimbingAnimDone) {
                     isClimbingMode = false;
