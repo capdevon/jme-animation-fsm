@@ -160,14 +160,14 @@ public class AnimatorStateMachine {
      * Utility function to remove a state from the state machine.
      * @param stateName
      */
-	public void removeState(String stateName) {
-		AnimatorState state = findState(stateName);
-		String animName = state.motion.name;
-		if (animName != null) {
-			animator.animComposer.removeAction(animName);
-		}
-		states.remove(stateName);
-	}
+    public void removeState(String stateName) {
+        AnimatorState state = findState(stateName);
+        String animName = state.motion.name;
+        if (animName != null) {
+            animator.animComposer.removeAction(animName);
+        }
+        states.remove(stateName);
+    }
 
     /**
      * Find a state with the given name. 
