@@ -64,24 +64,33 @@ public class AnimatorStateTransition {
         conditions.add(condition);
     }
 
+    /**
+     * InternalCall.
+     * @param sourceState
+     * @param layerName
+     * @return
+     */
     protected boolean checkConditions(AnimatorState sourceState, String layerName) {
 
         boolean doTransition = true;
 
-        for (AnimatorCondition condition: conditions) {
+        for (AnimatorCondition condition : conditions) {
             if (!condition.evalute(animator.parameters)) {
                 doTransition = false;
+                break;
             }
         }
 
         if (doTransition && hasExitTime) {
-            double animPercent = animator.animComposer.getTime(layerName) / animator.animComposer.getAction(sourceState.motion.name).getLength();
+            double animTime = animator.animComposer.getTime(layerName);
+            double animDuration = animator.animComposer.getAction(sourceState.motion.name).getLength();
+            double animPercent = animTime / animDuration;
             return animPercent > exitTime;
         }
 
         return doTransition;
     }
-    
+
     public float getOffset() {
         return offset;
     }
