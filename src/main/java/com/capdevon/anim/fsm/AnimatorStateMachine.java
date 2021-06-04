@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.capdevon.anim.fsm.BlendTree.BlendTreeType;
 import com.jme3.anim.tween.action.Action;
 import com.jme3.anim.tween.action.BlendAction;
 import com.jme3.anim.tween.action.LinearBlendSpace;
@@ -29,7 +30,7 @@ public class AnimatorStateMachine {
     private AnimatorController animator;
 
     //The name of the state machine.
-    protected String name;
+    protected String layerName;
     //The anyState, not a proper state but used as dummy.
     protected AnimatorState anyState;
     //The state that the state machine will be in when it starts.
@@ -88,16 +89,27 @@ public class AnimatorStateMachine {
      */
     public AnimatorState createBlendTree(String stateName, BlendTree blendTree) {
 
-        if (blendTree.motions.size() < 2) {
-            throw new IllegalArgumentException("BlendTree requires at least 2 animations");
+        if (blendTree.blendType == BlendTreeType.Simple1D) {
+
+            if (blendTree.motions.size() < 2) {
+                throw new IllegalArgumentException("BlendTree requires at least 2 animations");
+            }
+
+            blendTree.name = stateName;
+
+            LinearBlendSpace blendSpace = new LinearBlendSpace(blendTree.minThreshold, blendTree.maxThreshold);
+            String[] clips = blendTree.getAnimMotionsNames();
+            BlendAction action = animator.animComposer.actionBlended(blendTree.name, blendSpace, clips);
+            logger.log(Level.INFO, "BlendAction created: {0}", blendTree.name);
+
+        } else if (blendTree.blendType == BlendTreeType.SimpleDirectional2D) {
+
+            for (ChildMotion childMotion : blendTree.motions) {
+                Action action = animator.animComposer.action(childMotion.animName);
+                logger.log(Level.INFO, "ActionClip created: {0}", action);
+            }
         }
 
-        LinearBlendSpace blendSpace = new LinearBlendSpace(blendTree.minThreshold, blendTree.maxThreshold);
-        String[] clips = blendTree.getAnimMotionsNames();
-        BlendAction action = animator.animComposer.actionBlended(stateName, blendSpace, clips);
-        logger.log(Level.INFO, "BlendAction created: " + stateName);
-
-        blendTree.name = stateName;
         return addState(stateName, blendTree);
     }
 
@@ -110,7 +122,7 @@ public class AnimatorStateMachine {
     public AnimatorState addState(String stateName, String animName) {
         
     	Action action = animator.animComposer.action(animName);
-        logger.log(Level.INFO, "ActionClip created: " + action);
+    	logger.log(Level.INFO, "ActionClip created: {0}", action);
         
         Motion motion = new Motion();
         motion.name = animName;
@@ -148,14 +160,14 @@ public class AnimatorStateMachine {
      * Utility function to remove a state from the state machine.
      * @param stateName
      */
-    public void removeState(String stateName) {
-        AnimatorState state = findState(stateName);
-        String animName = state.motion.name;
-        if (animName != null) {
-            animator.animComposer.removeAction(animName);
-        }
-        states.remove(stateName);
-    }
+	public void removeState(String stateName) {
+		AnimatorState state = findState(stateName);
+		String animName = state.motion.name;
+		if (animName != null) {
+			animator.animComposer.removeAction(animName);
+		}
+		states.remove(stateName);
+	}
 
     /**
      * Find a state with the given name. 
@@ -174,7 +186,6 @@ public class AnimatorStateMachine {
 
     /**
      * Returns the state with the given name or null if the state is not found.
-     *
      * @param stateName the name of the state
      * @return the state.
      */
@@ -184,15 +195,18 @@ public class AnimatorStateMachine {
 
     /**
      * Returns a read only collection of the states.
-     *
      * @return the states.
      */
     public Collection<AnimatorState> getStates() {
         return states.values();
     }
 
+    /**
+     * InternalCall
+     * @param tpf
+     */
     protected void update(float tpf) {
-        AnimatorState nextState = currentState.checkTransitions(name);
+        AnimatorState nextState = currentState.checkTransitions(layerName);
 
         if (currentState != nextState) {
 
@@ -207,8 +221,8 @@ public class AnimatorStateMachine {
             currentState.behaviours.forEach(behaviour -> behaviour.onStateEnter(animator));
         }
 
-        currentState.update(tpf);
+        currentState.update(layerName, tpf);
         currentState.behaviours.forEach(behaviour -> behaviour.onStateUpdate(animator, tpf));
     }
-
+    
 }
