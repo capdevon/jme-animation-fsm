@@ -23,7 +23,7 @@ public class BlendTree extends Motion {
 
     //Parameter that is used to compute the blending weight of the childs in 1D blend trees or on the X axis of a 2D blend tree.
     protected String blendParameter;
-    //Parameter that is used to compute the blending weight of the childs on the Y axis of a 2D blend tree. (not yet supported)
+    //Parameter that is used to compute the blending weight of the childs on the Y axis of a 2D blend tree.
     protected String blendParameterY;
     //The Blending type can be either 1D or different types of 2D.
     protected BlendTreeType blendType = BlendTreeType.Simple1D;
