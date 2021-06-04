@@ -2,12 +2,14 @@ package com.capdevon.anim.fsm;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.logging.Logger;
 
+import com.capdevon.anim.fsm.BlendTree.BlendTreeType;
+import com.jme3.anim.tween.action.Action;
 import com.jme3.anim.tween.action.BlendAction;
 import com.jme3.anim.tween.action.BlendableAction;
 import com.jme3.math.FastMath;
+import com.jme3.math.Vector2f;
 
 /**
  * States are the basic building blocks of a state machine. Each state contains
@@ -96,56 +98,71 @@ public class AnimatorState {
      * @param layerName
      * @return
      */
-    protected AnimatorState checkTransitions(String layerName) {
-        for (AnimatorStateTransition transition: transitions) {
-            if (!transition.mute && transition.checkConditions(this, layerName)) {
+	protected AnimatorState checkTransitions(String layerName) {
+		for (AnimatorStateTransition transition : transitions) {
+			if (!transition.mute && transition.checkConditions(this, layerName)) {
 
-                // do transition
-                AnimatorState nextState = transition.destinationState;
-                String animName = nextState.motion.name;
+				// do transition
+				AnimatorState nextState = transition.destinationState;
+				String animName = nextState.motion.name;
+				
+				// Some states may not have an associated animation.
+				if (animName != null) {
+					BlendableAction action = (BlendableAction) animator.animComposer.getAction(animName);
+					action.setSpeed(nextState.speed);
+					action.setTransitionLength(transition.duration);
+					animator.animComposer.setCurrentAction(animName, layerName);
+					animator.animComposer.setTime(transition.offset);
+				} else {
+					// In this case, remove the previous state animation from the layer.
+					animator.animComposer.removeCurrentAction(layerName);
+				}
 
-                // Some states may not have an associated animation.
-                if (animName != null) {
-                    BlendableAction action = (BlendableAction) animator.animComposer.getAction(animName);
-                    action.setSpeed(nextState.speed);
-                    action.setTransitionLength(transition.duration);
-                    animator.animComposer.setCurrentAction(animName, layerName);
-                    animator.animComposer.setTime(transition.offset);
-                } else {
-                    // In this case, remove the previous state animation from the layer.
-                    animator.animComposer.removeCurrentAction(layerName);
-                }
-
-                return nextState;
-            }
-        }
-        return this;
-    }
+				return nextState;
+			}
+		}
+		return this;
+	}
 
     /**
      * InternalCall
+     * @param layerName
      * @param tpf
      */
-    protected void update(float tpf) {
+    protected void update(String layerName, float tpf) {
 
         if (motion instanceof BlendTree) {
-            // Update blend value
-            BlendTree blendTree = (BlendTree) motion;
-            BlendAction action = (BlendAction) animator.animComposer.getAction(blendTree.name);
-            float value = animator.getFloat(blendTree.blendParameter);
-            action.getBlendSpace().setValue(value);
 
-            // The order of the children is important.
-            // They are supposed to be sorted in ascending order by threshold.
-            for (ChildMotion childMotion: blendTree.motions) {
-                if (value < childMotion.threshold) {
+            BlendTree blendTree = (BlendTree) motion;
+
+            if (blendTree.blendType == BlendTreeType.Simple1D) {
+
+                // Update blend value
+                BlendAction action = (BlendAction) animator.animComposer.getAction(blendTree.name);
+                float blendPos = animator.getFloat(blendTree.blendParameter);
+                action.getBlendSpace().setValue(blendPos);
+
+                ChildMotion childMotion = blendTree.getBlendMotion(blendPos);
+                action.setSpeed(childMotion.timeScale);
+
+            } else if (blendTree.blendType == BlendTreeType.SimpleDirectional2D) {
+
+                float x = animator.getFloat(blendTree.blendParameter);
+                float y = animator.getFloat(blendTree.blendParameterY);
+                Vector2f blendPos = new Vector2f(x, y);
+
+                ChildMotion childMotion = blendTree.getBlendMotion(blendPos);
+                Action action = animator.animComposer.getAction(childMotion.animName);
+
+                if (animator.animComposer.getCurrentAction(layerName) != action) {
+                    animator.animComposer.setCurrentAction(childMotion.animName, layerName);
+                    animator.animComposer.setTime(childMotion.cycleOffset * action.getLength());
                     action.setSpeed(childMotion.timeScale);
-                    break;
                 }
             }
         }
     }
-
+    
     public String getName() {
         return name;
     }
