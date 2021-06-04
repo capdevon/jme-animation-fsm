@@ -3,15 +3,13 @@ package com.capdevon.demo;
 import com.capdevon.anim.AnimUtils;
 import com.capdevon.anim.fsm.AnimatorConditionMode;
 import com.capdevon.anim.fsm.AnimatorController;
-import com.capdevon.anim.fsm.AnimatorControllerLayer;
 import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParameterType;
-import com.capdevon.animation.MixamoBodyBones;
 import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;
 import com.capdevon.anim.fsm.BlendTree;
+import com.capdevon.animation.MixamoBodyBones;
 import com.capdevon.physx.PhysxDebugAppState;
-import com.jme3.anim.AnimComposer;
 import com.jme3.app.Application;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
@@ -24,11 +22,9 @@ import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.input.ChaseCamera;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
-import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
-import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.input.controls.Trigger;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
@@ -83,7 +79,6 @@ public class Test_BlendTree extends SimpleApplication {
     
     private BulletAppState physics;
     private Node player;
-    private PlayerMovementControl playerControl;
     
     @Override
     public void simpleInitApp() {
@@ -95,23 +90,19 @@ public class Test_BlendTree extends SimpleApplication {
         setupSky();
         setupLights();
         
-        TPSInputAppState input = new TPSInputAppState();
-        input.setPlayerControl(playerControl);
+        PlayerInputAppState input = new PlayerInputAppState();
+        input.setPlayerControl(player.getControl(PlayerMovementControl.class));
         stateManager.attach(input);
     }
     
     /**
      * Initialize the physics simulation
-     *
      */
     public void initPhysics() {
         physics = new BulletAppState();
         //physics.setThreadingType(ThreadingType.SEQUENTIAL);
         stateManager.attach(physics);
         stateManager.attach(new PhysxDebugAppState());
-
-        physics.setDebugAxisLength(1);
-        physics.setDebugEnabled(false);
     }
     
     /**
@@ -183,26 +174,31 @@ public class Test_BlendTree extends SimpleApplication {
         player.addControl(bcc);
         physics.getPhysicsSpace().add(bcc);
 
-        // Create the controller and the parameters
+        setupAnimator(player);
+
+        // setup Player Movement Control
+        PlayerMovementControl playerControl = new PlayerMovementControl(this);
+        player.addControl(playerControl);
+    }
+    
+    private void setupAnimator(Spatial player) {
+    	// Create the controller and the parameters
         AnimatorController animator = new AnimatorController(AnimUtils.getAnimControl(player));
         animator.addParameter("moveSpeed", AnimatorControllerParameterType.Float);
         player.addControl(animator);
 
         // Define states for animations.
-        AnimatorControllerLayer layer0 = animator.getLayer(AnimComposer.DEFAULT_LAYER);
-        AnimatorStateMachine sm = layer0.getStateMachine();
+        AnimatorStateMachine sm = animator.getLayer(0).getStateMachine();
         AnimatorState idle = sm.addState("Idle", AnimDefs.RifleIdle);
 
         // Create blend tree with the minimum and maximum threshold for the LinearBlendSpace class
         BlendTree tree = new BlendTree(0, 1);
         // Configure the name of the parameter that controls the mixing of animations.
         tree.setBlendParameter("moveSpeed");
-        // set the animation speed to 1 if the moveSpeed parameter is less than 0.5
-        tree.addChild(AnimDefs.RifleWalk, 0.5f).setTimeScale(1f);
-        // set the animation speed to 2 if the moveSpeed parameter is between 0.5f and 1
-        tree.addChild(AnimDefs.RifleRun, 1f).setTimeScale(2f);
+        tree.addChild(AnimDefs.RifleWalk, 0).setTimeScale(1f);
+        tree.addChild(AnimDefs.RifleRun, 1).setTimeScale(2f);
         // Create the state from the blend tree
-        AnimatorState walk = sm.createBlendTree("Walk", tree);
+        AnimatorState walk = sm.createBlendTree("BlendTree-Walk", tree);
 
         // Define the transitions and conditions for each state
         AnimatorStateTransition idleToWalk = idle.addTransition(walk);
@@ -213,10 +209,6 @@ public class Test_BlendTree extends SimpleApplication {
 
         // set the initial state.
         sm.setDefaultState(idle);
-
-        // setup Player Movement Control
-        playerControl = new PlayerMovementControl(this);
-        player.addControl(playerControl);
     }
     
     private void setupChaseCamera() {
@@ -360,12 +352,9 @@ public class Test_BlendTree extends SimpleApplication {
         final String MOVE_RIGHT 	= "MOVE_RIGHT";
         final String MOVE_FORWARD 	= "MOVE_FORWARD";
         final String MOVE_BACKWARD 	= "MOVE_BACKWARD";
-        final String RUNNING 		= "RUNNING";
-        final String RELOAD		= "RELOAD";
-        final String FIRE 		= "FIRE";
     }
 	
-    private class TPSInputAppState extends BaseAppState implements AnalogListener, ActionListener {
+    private class PlayerInputAppState extends BaseAppState implements AnalogListener, ActionListener {
 
         private InputManager inputManager;
         private PlayerMovementControl playerControl;
@@ -394,9 +383,6 @@ public class Test_BlendTree extends SimpleApplication {
             addMapping(InputMapping.MOVE_BACKWARD, 	new KeyTrigger(KeyInput.KEY_S));
             addMapping(InputMapping.MOVE_LEFT, 		new KeyTrigger(KeyInput.KEY_A));
             addMapping(InputMapping.MOVE_RIGHT, 	new KeyTrigger(KeyInput.KEY_D));
-            addMapping(InputMapping.RUNNING, 		new KeyTrigger(KeyInput.KEY_SPACE));
-            addMapping(InputMapping.FIRE, 		new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-            addMapping(InputMapping.RELOAD, 		new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         }
 
         private void addMapping(String bindingName, Trigger...triggers) {
