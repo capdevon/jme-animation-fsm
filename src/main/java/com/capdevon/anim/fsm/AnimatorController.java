@@ -44,19 +44,21 @@ public class AnimatorController extends AbstractControl {
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
+    	
     }
 
     /**
      * Utility function to add a layer to the controller.
      * @param name - The name of the Layer.
      * @param mask - The desired mask for the new layer (alias created)
+     * @return 
      */
     public AnimatorControllerLayer addLayer(String name, AnimationMask mask) {
         AnimatorControllerLayer layer = new AnimatorControllerLayer();
         layer.name = name;
         layer.avatarMask = mask;
         layer.stateMachine = new AnimatorStateMachine(this);
-        layer.stateMachine.name = layer.name;
+        layer.stateMachine.layerName = layer.name;
         layers.add(layer);
         animComposer.makeLayer(name, mask);
         return layer;
@@ -64,22 +66,26 @@ public class AnimatorController extends AbstractControl {
 
     /**
      * Utility function to remove a layer from the controller.
-     * @param index - The AnimatorLayer.
+     * @param layer
      */
     public void removeLayer(AnimatorControllerLayer layer) {
         layers.remove(layer);
         animComposer.removeLayer(layer.name);
     }
     
+    public AnimatorControllerLayer getLayer(int index) {
+    	return layers.get(index);
+    }
+    
     public AnimatorControllerLayer getLayer(String name) {
-        for (AnimatorControllerLayer layer: layers) {
+        for (AnimatorControllerLayer layer : layers) {
             if (layer.name.equals(name)) {
                 return layer;
             }
         }
         return null;
     }
-
+    
     /**
      * Returns an unmodifiable collection of all available layers. When an attempt
      * is made to modify the collection, an UnsupportedOperationException is thrown.
@@ -117,7 +123,7 @@ public class AnimatorController extends AbstractControl {
      * @return the parameter
      */
     public AnimatorControllerParameter getParameter(String name) {
-        for (AnimatorControllerParameter param: parameters) {
+        for (AnimatorControllerParameter param : parameters) {
             if (param.nameHash == name.hashCode()) {
                 return param;
             }
@@ -218,12 +224,12 @@ public class AnimatorController extends AbstractControl {
      * Throws an exception if the parameter is not found.
      */
     private AnimatorControllerParameter findParameter(String name, AnimatorControllerParameterType type) {
-        for (AnimatorControllerParameter param: parameters) {
+        for (AnimatorControllerParameter param : parameters) {
             if (param.nameHash == name.hashCode() && param.type == type) {
                 return param;
             }
         }
         throw new IllegalArgumentException("AnimatorControllerParameter not found: " + name);
     }
-
+    
 }
