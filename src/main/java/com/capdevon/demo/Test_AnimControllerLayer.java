@@ -108,9 +108,6 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         //physics.setThreadingType(ThreadingType.SEQUENTIAL);
         stateManager.attach(physics);
         stateManager.attach(new PhysxDebugAppState());
-
-        physics.setDebugAxisLength(1);
-        physics.setDebugEnabled(false);
     }
     
     /**
@@ -178,8 +175,17 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         BetterCharacterControl bcc = new BetterCharacterControl(.4f, 1.8f, 10f);
         player.addControl(bcc);
         physics.getPhysicsSpace().add(bcc);
+        bcc.getRigidBody().setCollisionGroup(RigidBodyControl.COLLISION_GROUP_02);
+        bcc.getRigidBody().setCollideWithGroups(RigidBodyControl.COLLISION_GROUP_01);
         
-        AnimComposer animComposer = AnimUtils.getAnimControl(player);
+        setupAnimator(player);
+        
+        // setup Player Movement Control
+        player.addControl(new PlayerMovementControl(this));
+    }
+    
+    private void setupAnimator(Spatial player) {
+    	AnimComposer animComposer = AnimUtils.getAnimControl(player);
         SkinningControl skeleton = AnimUtils.getSkeletonControl(player);
         AnimUtils.listBones(skeleton.getArmature()).forEach(System.out::println);
         
@@ -192,8 +198,7 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         
         // Define states for layer 0
         //------------------------------------------------------------------------
-        AnimatorControllerLayer layer0 = animator.getLayer(AnimComposer.DEFAULT_LAYER);
-        AnimatorStateMachine sm = layer0.getStateMachine();
+        AnimatorStateMachine sm = animator.getLayer(0).getStateMachine();
         AnimatorState idle = sm.addState("Idle", AnimDefs.RifleAimingIdle);
         AnimatorState walk = sm.addState("Walk", AnimDefs.WalkWithRifle);
         
@@ -211,7 +216,7 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         AnimMaskBuilder avatarMask = new AnimMaskBuilder(skeleton.getArmature());
         avatarMask.addFromJoint("Armature_mixamorig:" + MixamoBodyBones.Spine);
         
-	// Define a layer that acts on an AnimationMask
+        // Define a layer that acts on an AnimationMask
         AnimatorControllerLayer layer1 = animator.addLayer("Torso", avatarMask);
         AnimatorStateMachine sm1 = layer1.getStateMachine();
         AnimatorState empty = sm1.addState("Empty");
@@ -225,9 +230,6 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         
         // set the initial state for state machine of layer1
         sm1.setDefaultState(empty);
-        
-        // setup Player Movement Control
-        player.addControl(new PlayerMovementControl(this));
     }
     
     private void setupChaseCamera() {
@@ -278,6 +280,7 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         private final Vector3f cameraDir = new Vector3f();
         private final Vector3f cameraLeft = new Vector3f();
         private final Vector3f walkDirection = new Vector3f();
+        private final Vector3f viewDirection = new Vector3f(0, 0, 1);
         private boolean _MoveForward, _MoveBackward, _TurnLeft, _TurnRight;
         
         public PlayerMovementControl(Application app) {
@@ -292,7 +295,7 @@ public class Test_AnimControllerLayer extends SimpleApplication {
                 this.bcc = spatial.getControl(BetterCharacterControl.class);
             }
         }
-
+        
         @Override
         public void onAnalog(String name, float value, float tpf) {
             // TODO Auto-generated method stub
@@ -341,7 +344,8 @@ public class Test_AnimControllerLayer extends SimpleApplication {
             	float angle = FastMath.atan2(walkDirection.x, walkDirection.z);
                 lookRotation.fromAngleNormalAxis(angle, Vector3f.UNIT_Y);
                 spatial.getWorldRotation().slerp(lookRotation, m_TurnSpeed * tpf);
-                bcc.setViewDirection(spatial.getWorldRotation().mult(Vector3f.UNIT_Z));
+                spatial.getWorldRotation().mult(Vector3f.UNIT_Z, viewDirection);
+                bcc.setViewDirection(viewDirection);
             }
             
             bcc.setWalkDirection(walkDirection.multLocal(m_MoveSpeed));
@@ -418,14 +422,14 @@ public class Test_AnimControllerLayer extends SimpleApplication {
 
         @Override
         public void onAnalog(String name, float value, float tpf) {
-            if (isEnabled() && playerControl != null) {
+            if (isEnabled()) {
                 playerControl.onAnalog(name, value, tpf);
             }
         }
 
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
-            if (isEnabled() && playerControl != null) {
+            if (isEnabled()) {
                 playerControl.onAction(name, isPressed, tpf);
             }
         }
