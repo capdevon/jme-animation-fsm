@@ -138,11 +138,11 @@ public class AnimatorState {
             if (blendTree.blendType == BlendTreeType.Simple1D) {
 
                 // Update blend value
-                BlendAction action = (BlendAction) animator.animComposer.getAction(blendTree.name);
                 float blendPos = animator.getFloat(blendTree.blendParameter);
-                action.getBlendSpace().setValue(blendPos);
-
                 ChildMotion childMotion = blendTree.getBlendMotion(blendPos);
+                
+                BlendAction action = (BlendAction) animator.animComposer.getAction(blendTree.name);
+                action.getBlendSpace().setValue(blendPos);
                 action.setSpeed(childMotion.timeScale);
 
             } else if (blendTree.blendType == BlendTreeType.SimpleDirectional2D) {
