@@ -112,7 +112,7 @@ public class AnimatorState {
                     action.setSpeed(nextState.speed);
                     action.setTransitionLength(transition.duration);
                     animator.animComposer.setCurrentAction(animName, layerName);
-                    animator.animComposer.setTime(transition.offset);
+                    animator.animComposer.setTime(layerName, transition.offset);
                 } else {
                     // In this case, remove the previous state animation from the layer.
                     animator.animComposer.removeCurrentAction(layerName);
@@ -156,7 +156,7 @@ public class AnimatorState {
 
                 if (animator.animComposer.getCurrentAction(layerName) != action) {
                     animator.animComposer.setCurrentAction(childMotion.animName, layerName);
-                    animator.animComposer.setTime(childMotion.cycleOffset * action.getLength());
+                    animator.animComposer.setTime(layerName, childMotion.cycleOffset * action.getLength());
                     action.setSpeed(childMotion.timeScale);
                 }
             }
