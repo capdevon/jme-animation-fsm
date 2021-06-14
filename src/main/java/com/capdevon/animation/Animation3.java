@@ -63,20 +63,11 @@ public class Animation3 {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
+        if (obj instanceof Animation3) {
+            Animation3 other = (Animation3) obj;
+            return Objects.equals(this.name, other.name);
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Animation3 other = (Animation3) obj;
-        if (!Objects.equals(this.name, other.name)) {
-            return false;
-        }
-        return true;
+        return false;
     }
 
 }
