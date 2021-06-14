@@ -68,7 +68,7 @@ public class TrackUtils {
         anim.addTrack(track);
     }
     
-    public static void addActionTrack(Spatial sp, Tween tween, String animName) {
+    public static void addCallbackTrack(Spatial sp, Tween tween, String animName) {
         addCallbackTrack(sp, tween, animName, 0f);
     }
 
