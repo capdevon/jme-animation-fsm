@@ -51,13 +51,15 @@ public class FRotator {
      * Spherically interpolates between quaternions a and b by ratio t. The
      * parameter t is clamped to the range [0, 1].
      *
-     * @param sp
-     * @param direction
-     * @param changeAmnt
+     * @param from
+     * @param to
+     * @param smoothTime
+     * @param viewDirection
+     * @return
      */
-    public static void slerp(Spatial sp, Vector3f direction, float changeAmnt) {
-        Quaternion q = fromToRotation(direction);
-        sp.getLocalRotation().slerp(q, changeAmnt);
+    public static Vector3f smoothDamp(Quaternion from, Quaternion to, float smoothTime, Vector3f viewDirection) {
+        from.slerp(to, FastMath.clamp(smoothTime, 0, 1));
+        return from.mult(Vector3f.UNIT_Z, viewDirection);
     }
         
     public static Vector3f eulerAngles(Spatial sp) {
