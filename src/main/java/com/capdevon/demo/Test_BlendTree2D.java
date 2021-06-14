@@ -326,8 +326,7 @@ public class Test_BlendTree2D extends SimpleApplication {
             lookDir.y = 0;
             lookDir.normalizeLocal();
             Quaternion lookRotation = FRotator.lookRotation(lookDir);
-            spatial.getLocalRotation().slerp(lookRotation, m_TurnSpeed * tpf);
-            spatial.getLocalRotation().mult(Vector3f.UNIT_Z, viewDirection);
+            FRotator.smoothDamp(spatial.getWorldRotation(), lookRotation, m_TurnSpeed * tpf, viewDirection);
             bcc.setViewDirection(viewDirection);
 
             // update animation
