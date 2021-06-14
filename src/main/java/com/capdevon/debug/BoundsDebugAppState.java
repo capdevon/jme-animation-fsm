@@ -31,85 +31,83 @@ import com.jme3.scene.debug.WireSphere;
  */
 public class BoundsDebugAppState extends BaseAppState {
 
-	protected static final Logger logger = Logger.getLogger(BoundsDebugAppState.class.getName());
+    protected static final Logger logger = Logger.getLogger(BoundsDebugAppState.class.getName());
 
-	protected Application app;
-	protected AssetManager assetManager;
-	protected Node rootNode;
-	/**
-	 * scene-graph node to parent the geometries
-	 */
-	protected final Node boundsDebugRootNode = new Node("Bounds Debug Root Node");
-	/**
-	 * view port in which to render (not null)
-	 */
-	protected ViewPort viewPort;
-	protected RenderManager rm;
-	/**
-	 * map bounding volumes to visualizations
-	 */
-	protected HashMap<Node, Spatial> bounds = new HashMap<>();
-	/**
-	 * limit which objects are visualized, or null to visualize all objects
-	 */
-	protected Function<Node, Boolean> filter;
+    protected Application app;
+    protected AssetManager assetManager;
+    protected Node rootNode;
+    /**
+     * scene-graph node to parent the geometries
+     */
+    protected final Node boundsDebugRootNode = new Node("Bounds Debug Root Node");
+    /**
+     * view port in which to render (not null)
+     */
+    protected ViewPort viewPort;
+    protected RenderManager rm;
+    /**
+     * map bounding volumes to visualizations
+     */
+    protected HashMap<Node, Spatial> bounds = new HashMap<>();
+    /**
+     * limit which objects are visualized, or null to visualize all objects
+     */
+    protected Function<Node, Boolean> filter;
 
-	protected Material wireMaterial;
-	
-	public BoundsDebugAppState(Node rootNode) {
-		this.rootNode = rootNode;
-	}
+    protected Material wireMaterial;
 
-	@Override
-	protected void initialize(Application app) {
-		this.app = app;
-		this.rm = app.getRenderManager();
-		this.assetManager = app.getAssetManager();
-		setupMaterials(app);
-		boundsDebugRootNode.setCullHint(Spatial.CullHint.Never);
-		viewPort = rm.createMainView("Bounds Debug Overlay", app.getCamera());
-		viewPort.setClearFlags(false, true, false);
-		viewPort.attachScene(boundsDebugRootNode);
-	}
+    public BoundsDebugAppState(Node rootNode) {
+        this.rootNode = rootNode;
+    }
 
-	@Override
-	protected void cleanup(Application app) {
-		rm.removeMainView(viewPort);
-	}
+    @Override
+    protected void initialize(Application app) {
+        this.app = app;
+        this.rm = app.getRenderManager();
+        this.assetManager = app.getAssetManager();
+        setupMaterials(app);
+        boundsDebugRootNode.setCullHint(Spatial.CullHint.Never);
+        viewPort = rm.createMainView("Bounds Debug Overlay", app.getCamera());
+        viewPort.setClearFlags(false, true, false);
+        viewPort.attachScene(boundsDebugRootNode);
+    }
 
-	@Override
-	public void update(float tpf) {
-		updateBounds();
-		// update our debug root node
-		boundsDebugRootNode.updateLogicalState(tpf);
-		boundsDebugRootNode.updateGeometricState();
-	}
+    @Override
+    protected void cleanup(Application app) {
+        rm.removeMainView(viewPort);
+    }
 
-	@Override
-	public void render(RenderManager rm) {
-		super.render(rm);
-		if (viewPort != null) {
-			rm.renderScene(boundsDebugRootNode, viewPort);
-		}
-	}
+    @Override
+    public void update(float tpf) {
+        updateBounds();
+        // update our debug root node
+        boundsDebugRootNode.updateLogicalState(tpf);
+        boundsDebugRootNode.updateGeometricState();
+    }
 
-	@Override
-	protected void onDisable() {
-	}
+    @Override
+    public void render(RenderManager rm) {
+        super.render(rm);
+        if (viewPort != null) {
+            rm.renderScene(boundsDebugRootNode, viewPort);
+        }
+    }
 
-	@Override
-	protected void onEnable() {
-	}
-	
+    @Override
+    protected void onDisable() {}
+
+    @Override
+    protected void onEnable() {}
+
     /**
      * Alter which objects are visualized.
      *
-     * @param filter the desired filter, or or null to visualize all objects
+     * @param filter the desired filter, or null to visualize all objects
      */
     public void setFilter(Function<Node, Boolean> filter) {
         this.filter = filter;
     }
-	
+
     /**
      * Alter the color of all lines.
      *
@@ -127,7 +125,7 @@ public class BoundsDebugAppState extends BaseAppState {
      * @param newSetting true to enable test, false to disable it
      */
     public void setDepthTest(boolean newSetting) {
-    	wireMaterial.getAdditionalRenderState().setDepthTest(newSetting);
+        wireMaterial.getAdditionalRenderState().setDepthTest(newSetting);
     }
 
     /**
@@ -136,77 +134,77 @@ public class BoundsDebugAppState extends BaseAppState {
      * @param newWidth (in pixels, &ge;0, values &lt;1 hide the lines)
      */
     public void setLineWidth(float newWidth) {
-    	wireMaterial.getAdditionalRenderState().setLineWidth(newWidth);
+        wireMaterial.getAdditionalRenderState().setLineWidth(newWidth);
     }
 
-	/**
-	 * Initialize the materials.
-	 *
-	 * @param app the application which owns this state (not null)
-	 */
-	private void setupMaterials(Application app) {
-		AssetManager manager = app.getAssetManager();
-		wireMaterial = new Material(manager, "Common/MatDefs/Misc/Unshaded.j3md");
-		wireMaterial.getAdditionalRenderState().setWireframe(true);
-		wireMaterial.setColor("Color", ColorRGBA.Green);
-	}
+    /**
+     * Initialize the materials.
+     *
+     * @param app the application which owns this state (not null)
+     */
+    private void setupMaterials(Application app) {
+        AssetManager manager = app.getAssetManager();
+        wireMaterial = new Material(manager, "Common/MatDefs/Misc/Unshaded.j3md");
+        wireMaterial.getAdditionalRenderState().setWireframe(true);
+        wireMaterial.setColor("Color", ColorRGBA.Green);
+    }
 
-	private void updateBounds() {
+    private void updateBounds() {
 
-		HashMap<Node, Spatial> oldObjects = bounds;
-		bounds = new HashMap<Node, Spatial>();
+        HashMap<Node, Spatial> oldObjects = bounds;
+        bounds = new HashMap<Node, Spatial>();
 
-		// create new map
-		rootNode.depthFirstTraversal(new SceneGraphVisitorAdapter() {
-			@Override
-			public void visit(Node geo) {
-				// copy existing spatials
-				if (oldObjects.containsKey(geo)) {
-					Spatial spat = oldObjects.get(geo);
-					bounds.put(geo, spat);
-					oldObjects.remove(geo);
-				} else {
-					if (filter == null || filter.apply(geo)) {
-						if (geo.getWorldBound() != null) {
-							logger.log(Level.FINE, "Create new debug BoundingVolume");
-							// create new spatial
-							Node node = new Node("Bounds." + geo.toString());
-							node.addControl(new BoundingVolumeDebugControl(BoundsDebugAppState.this, geo));
-							bounds.put(geo, node);
-							boundsDebugRootNode.attachChild(node);
-						}
-					}
-				}
-			}
-		});
+        // create new map
+        rootNode.depthFirstTraversal(new SceneGraphVisitorAdapter() {
+            @Override
+            public void visit(Node geo) {
+                // copy existing spatials
+                if (oldObjects.containsKey(geo)) {
+                    Spatial spat = oldObjects.get(geo);
+                    bounds.put(geo, spat);
+                    oldObjects.remove(geo);
+                } else {
+                    if (filter == null || filter.apply(geo)) {
+                        if (geo.getWorldBound() != null) {
+                            logger.log(Level.FINE, "Create new debug BoundingVolume");
+                            // create new spatial
+                            Node node = new Node("Bounds." + geo.toString());
+                            node.addControl(new BoundingVolumeDebugControl(BoundsDebugAppState.this, geo));
+                            bounds.put(geo, node);
+                            boundsDebugRootNode.attachChild(node);
+                        }
+                    }
+                }
+            }
+        });
 
-		// remove leftover spatials
-		for (Map.Entry<Node, Spatial> entry : oldObjects.entrySet()) {
-			Spatial spatial = entry.getValue();
-			spatial.removeFromParent();
-		}
-	}
+        // remove leftover spatials
+        for (Map.Entry<Node, Spatial> entry : oldObjects.entrySet()) {
+            Spatial spatial = entry.getValue();
+            spatial.removeFromParent();
+        }
+    }
 
-	/**
-	 * --------------------------------------------------------
-	 * @class BoundingVolumeDebugControl
-	 * --------------------------------------------------------
-	 */
-	public class BoundingVolumeDebugControl extends AbstractControl {
-		
-		Node source;
-		Geometry wire;
+    /**
+     * --------------------------------------------------------
+     * @class BoundingVolumeDebugControl
+     * --------------------------------------------------------
+     */
+    public class BoundingVolumeDebugControl extends AbstractControl {
 
-		public BoundingVolumeDebugControl(BoundsDebugAppState debugAppState, Node source) {
-			this.source = source;
-			
-			wire = makeGeometry(source.getWorldBound());
-			wire.setName(source.toString());
-			wire.setMaterial(debugAppState.wireMaterial);
-//			wire.setShadowMode(RenderQueue.ShadowMode.Off);
-//			wire.setQueueBucket(RenderQueue.Bucket.Inherit);
-		}
-		
+        Node source;
+        Geometry wire;
+
+        public BoundingVolumeDebugControl(BoundsDebugAppState debugAppState, Node source) {
+            this.source = source;
+
+            wire = makeGeometry(source.getWorldBound());
+            wire.setName(source.toString());
+            wire.setMaterial(debugAppState.wireMaterial);
+            //wire.setShadowMode(RenderQueue.ShadowMode.Off);
+            //wire.setQueueBucket(RenderQueue.Bucket.Inherit);
+        }
+
         private Geometry makeGeometry(BoundingVolume bv) {
             Mesh mesh = null;
 
@@ -225,28 +223,27 @@ public class BoundsDebugAppState extends BaseAppState {
             debug.updateGeometricState();
             return debug;
         }
-		
-		@Override
-		public void setSpatial(Spatial spatial) {
-			if (spatial != null && spatial instanceof Node) {
-				Node node = (Node) spatial;
-				node.attachChild(wire);
-				
-			} else if (spatial == null && this.spatial != null) {
-				Node node = (Node) this.spatial;
-				node.detachChild(wire);
-			}
-			super.setSpatial(spatial);
-		}
 
-		@Override
-		protected void controlUpdate(float tpf) {
-			wire.setLocalTransform(source.getWorldTransform());
-		}
+        @Override
+        public void setSpatial(Spatial spatial) {
+            if (spatial != null && spatial instanceof Node) {
+                Node node = (Node) spatial;
+                node.attachChild(wire);
 
-		@Override
-		protected void controlRender(RenderManager rm, ViewPort vp) {
-		}
-	}
+            } else if (spatial == null && this.spatial != null) {
+                Node node = (Node) this.spatial;
+                node.detachChild(wire);
+            }
+            super.setSpatial(spatial);
+        }
+
+        @Override
+        protected void controlUpdate(float tpf) {
+            wire.setLocalTransform(source.getWorldTransform());
+        }
+
+        @Override
+        protected void controlRender(RenderManager rm, ViewPort vp) {}
+    }
 
 }
