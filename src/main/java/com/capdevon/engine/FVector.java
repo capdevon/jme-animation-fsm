@@ -185,12 +185,12 @@ public class FVector {
     }
     
     public static boolean hasSameDirection(Vector3f a, Vector3f b) {
-		return a.dot(b) > 0;
-	}
+        return a.dot(b) > 0;
+    }
 
-	public static boolean hasOppositeDirection(Vector3f a, Vector3f b) {
-		return a.dot(b) < 0;
-	}
+    public static boolean hasOppositeDirection(Vector3f a, Vector3f b) {
+        return a.dot(b) < 0;
+    }
 
     public static Vector3f forward(Spatial sp) {
         return sp.getWorldRotation().mult(forward);
