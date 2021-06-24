@@ -79,7 +79,7 @@ public class FVector {
         float v = FastMath.nextRandomFloat();
 
         float theta = FastMath.TWO_PI * u; // azimuthal angle
-        float phi = (float) Math.acos(2 f * v - 1 f); // polar angle
+        float phi = (float) Math.acos(2f * v - 1f); // polar angle
 
         return setFromSpherical(theta, phi);
     }
