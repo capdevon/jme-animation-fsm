@@ -87,7 +87,7 @@ public class FVector {
     /**
      * Rotates this vector by the given angle in degrees around Y axis.
      */
-    public Vector3f rotate(final Vector3f v, float degrees) {
+    public static Vector3f rotate(final Vector3f v, float degrees) {
         return rotateRad(v, Vector3f.UNIT_Y, degrees * FastMath.DEG_TO_RAD);
     }
 
@@ -183,6 +183,14 @@ public class FVector {
     public static Vector3f dirFromAngle(float radians) {
         return new Vector3f(FastMath.sin(radians), 0, FastMath.cos(radians));
     }
+    
+    public static boolean hasSameDirection(Vector3f a, Vector3f b) {
+		return a.dot(b) > 0;
+	}
+
+	public static boolean hasOppositeDirection(Vector3f a, Vector3f b) {
+		return a.dot(b) < 0;
+	}
 
     public static Vector3f forward(Spatial sp) {
         return sp.getWorldRotation().mult(forward);
