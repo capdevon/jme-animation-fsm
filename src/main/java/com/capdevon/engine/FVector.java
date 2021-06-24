@@ -81,46 +81,77 @@ public class FVector {
         return setFromSpherical(theta, phi);
     }
 
+	/**
+	 * truncate the length of the vector to the given limit
+	 */
+	public static Vector3f truncate(Vector3f v, float limit) {
+	    float lengthSq = v.lengthSquared();
+	    if (lengthSq < limit * limit) {
+	        return v;
+	    }
+	    return v.mult(limit / FastMath.sqrt(lengthSq));
+	}
+
+	/**
+	 * The smallest squared distance between the world position of b and the bounding volume of a.
+	 */
+    public static float sqrDistanceTo(Spatial a, Spatial b) {
+        return a.getWorldBound().distanceSquaredTo(b.getWorldTranslation());
+    }
+    
+	/**
+	 * The smallest distance between the world position of b and the bounding volume of a.
+	 */
     public static float distanceTo(Spatial a, Spatial b) {
-        return a.getWorldBound().distanceToEdge(b.getWorldTranslation());
+        return a.getWorldBound().distanceTo(b.getWorldTranslation());
     }
-
-    public static float distanceTo(Spatial a, Spatial b, float radius) {
-        float dist = FVector.distance(a, b);
-        return Math.max(dist - radius, 0f);
-    }
-
-    //--------------------------------------------------------------------------
+    
+    /**
+     * Subtracts the world position of spatial b from those of spatial a creating a new vector object.
+     */
     public static Vector3f subtract(Spatial a, Spatial b) {
         return b.getWorldTranslation().subtract(a.getWorldTranslation());
     }
 
+    /**
+     * Returns the distance between a and b.
+     */
     public static float distance(Spatial a, Spatial b) {
         return b.getWorldTranslation().distance(a.getWorldTranslation());
     }
 
+    /**
+     * Returns the squared distance between a and b.
+     */
     public static float sqrDistance(Spatial a, Spatial b) {
         return b.getWorldTranslation().distanceSquared(a.getWorldTranslation());
     }
-    
-    //--------------------------------------------------------------------------
-    public static float distanceFrom(Vector3f a, Vector3f b) {
-        return a.subtract(b).length();
+
+    /**
+     * Returns the distance between a and b.
+     */
+    public static float distance(Vector3f a, Vector3f b) {
+        return a.distance(b);
     }
 
-    public static float sqrDistanceFrom(Vector3f a, Vector3f b) {
-        return a.subtract(b).lengthSquared();
+    /**
+     * Returns the squared distance between a and b.
+     */
+    public static float sqrDistance(Vector3f a, Vector3f b) {
+        return a.distanceSquared(b);
     }
 
-    public static float angle(Vector3f v1, Vector3f v2) {
-        return v1.angleBetween(v2);
+    /**
+     * Returns the angle in degrees between from and to.
+     */
+    public static float angle(Vector3f a, Vector3f b) {
+        return a.angleBetween(b);
     }
 
-    public static Vector3f dirFromAngle(float angle) {
-        return new Vector3f(FastMath.sin(angle), 0, FastMath.cos(angle));
+    public static Vector3f dirFromAngle(float radians) {
+        return new Vector3f(FastMath.sin(radians), 0, FastMath.cos(radians));
     }
 
-    //--------------------------------------------------------------------------
     public static Vector3f forward(Spatial sp) {
         return sp.getWorldRotation().mult(forward);
     }
