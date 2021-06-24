@@ -71,37 +71,40 @@ public class FVector {
         return new Vector3f(cosAzim * sinPolar, sinAzim * sinPolar, cosPolar);
     }
 
+    /**
+     * Returns a random point inside or on a sphere with radius 1.0
+     */
     public static Vector3f insideUnitSphere() {
         float u = FastMath.nextRandomFloat();
         float v = FastMath.nextRandomFloat();
 
         float theta = FastMath.TWO_PI * u; // azimuthal angle
-        float phi = (float) Math.acos(2f * v - 1f); // polar angle
+        float phi = (float) Math.acos(2 f * v - 1 f); // polar angle
 
         return setFromSpherical(theta, phi);
     }
 
-	/**
-	 * truncate the length of the vector to the given limit
-	 */
-	public static Vector3f truncate(Vector3f v, float limit) {
-	    float lengthSq = v.lengthSquared();
-	    if (lengthSq < limit * limit) {
-	        return v;
-	    }
-	    return v.mult(limit / FastMath.sqrt(lengthSq));
-	}
+    /**
+     * truncate the length of the vector to the given limit
+     */
+    public static Vector3f truncate(Vector3f v, float limit) {
+        float lengthSq = v.lengthSquared();
+        if (lengthSq < limit * limit) {
+            return v;
+        }
+        return v.mult(limit / FastMath.sqrt(lengthSq));
+    }
 
-	/**
-	 * The smallest squared distance between the world position of b and the bounding volume of a.
-	 */
+    /**
+     * The smallest squared distance between the world position of b and the bounding volume of a.
+     */
     public static float sqrDistanceTo(Spatial a, Spatial b) {
         return a.getWorldBound().distanceSquaredTo(b.getWorldTranslation());
     }
-    
-	/**
-	 * The smallest distance between the world position of b and the bounding volume of a.
-	 */
+
+    /**
+     * The smallest distance between the world position of b and the bounding volume of a.
+     */
     public static float distanceTo(Spatial a, Spatial b) {
         return a.getWorldBound().distanceTo(b.getWorldTranslation());
     }
