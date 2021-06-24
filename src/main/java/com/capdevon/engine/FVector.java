@@ -83,35 +83,35 @@ public class FVector {
 
         return setFromSpherical(theta, phi);
     }
-    
+
     /**
-	 * Rotates this vector by the given angle in degrees around Y axis.
-	 */
-	public Vector3f rotate(final Vector3f v, float degrees) {
-	    return rotateRad(v, Vector3f.UNIT_Y, degrees * FastMath.DEG_TO_RAD);
-	}
+     * Rotates this vector by the given angle in degrees around Y axis.
+     */
+    public Vector3f rotate(final Vector3f v, float degrees) {
+        return rotateRad(v, Vector3f.UNIT_Y, degrees * FastMath.DEG_TO_RAD);
+    }
 
-	/**
-	 * Rotates this vector by the given angle in degrees around the given axis.
-	 */
-	public static Vector3f rotate(Vector3f v, Vector3f axis, float degrees) {
-	    return rotateRad(v, axis, degrees * FastMath.DEG_TO_RAD);
-	}
+    /**
+     * Rotates this vector by the given angle in degrees around the given axis.
+     */
+    public static Vector3f rotate(Vector3f v, Vector3f axis, float degrees) {
+        return rotateRad(v, axis, degrees * FastMath.DEG_TO_RAD);
+    }
 
-	/**
-	 * Rotates this vector by the given angle in radians around Y axis.
-	 */
-	public static Vector3f rotateRad(Vector3f v, float radians) {
-	    return rotateRad(v, Vector3f.UNIT_Y, radians);
-	}
+    /**
+     * Rotates this vector by the given angle in radians around Y axis.
+     */
+    public static Vector3f rotateRad(Vector3f v, float radians) {
+        return rotateRad(v, Vector3f.UNIT_Y, radians);
+    }
 
-	/**
-	 * Rotates this vector by the given angle in radians around the given axis.
-	 */
-	public static Vector3f rotateRad(Vector3f v, Vector3f axis, float radians) {
-	    Quaternion q = new Quaternion().fromAngleAxis(radians, axis);
-	    return q.mult(v);
-	}
+    /**
+     * Rotates this vector by the given angle in radians around the given axis.
+     */
+    public static Vector3f rotateRad(Vector3f v, Vector3f axis, float radians) {
+        Quaternion q = new Quaternion().fromAngleAxis(radians, axis);
+        return q.mult(v);
+    }
 
     /**
      * truncate the length of the vector to the given limit
