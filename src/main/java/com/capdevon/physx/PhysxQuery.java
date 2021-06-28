@@ -94,8 +94,7 @@ public class PhysxQuery {
      * @param radius	- Radius of the sphere.
      * @param layerMask	- A Layer mask defines which layers of colliders to include in the query.
      * @param func		- Specifies a function to filter colliders.
-     * @return Returns an array with all PhysicsRigidBody touching or inside the
-     * sphere.
+     * @return Returns an array with all PhysicsRigidBody touching or inside the sphere.
      */
     public static List<PhysicsRigidBody> overlapSphere(Vector3f position, float radius, int layerMask, Function<PhysicsRigidBody, Boolean> func) {
 
