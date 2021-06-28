@@ -43,6 +43,43 @@ public class PhysxQuery {
     	// private constructor.
     }
     
+        /**
+     *
+     * @param position
+     * @param ghost
+     * @param overlappingObjects
+     * @param layerMask
+     * @return
+     */
+    public static int contactTest(Vector3f position, PhysicsGhostObject ghost, final Set <Spatial> overlappingObjects, int layerMask) {
+
+        overlappingObjects.clear();
+        ghost.setPhysicsLocation(position);
+
+        int numContacts = PhysicsSpace.getPhysicsSpace().contactTest(ghost, new PhysicsCollisionListener() {
+            @Override
+            public void collision(PhysicsCollisionEvent event) {
+
+                if (event.getDistance1() > 0f) {
+                    // Discard contacts with positive distance between the colliding objects
+                    return;
+                }
+
+                PhysicsCollisionObject pco = event.getNodeA() != null ? event.getObjectA() : event.getObjectB();
+                logger.log(Level.INFO, "NodeA={0} NodeB={1} CollGroup={2}",
+                    new Object[] { event.getNodeA(), event.getNodeB(), pco.getCollisionGroup() });
+
+                if (applyMask(layerMask, pco.getCollisionGroup())) {
+                    Spatial userObj = (Spatial) pco.getUserObject();
+                    overlappingObjects.add(userObj);
+                }
+            }
+        });
+
+        System.out.println("numContacts: " + numContacts);
+        return overlappingObjects.size();
+    }
+    
     /**
      * Computes and stores colliders inside the sphere.
      *
