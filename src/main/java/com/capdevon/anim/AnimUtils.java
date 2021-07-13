@@ -118,7 +118,7 @@ public class AnimUtils {
                 Joint joint = (Joint) tt.getTarget();
                 HasLocalTransform target = targetArmature.getJoint(joint.getName());
                 if (target == null) {
-                    throw new IllegalStateException("HasLocalTransform not found for the target Joint: " + joint.getName());
+                    throw new IllegalStateException("Joint not found in the target Armature: " + joint.getName());
                 }
 
                 //TransformTrack newTrack = new TransformTrack(target, tt.getTimes(), tt.getTranslations(), tt.getRotations(), tt.getScales());
