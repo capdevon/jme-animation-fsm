@@ -108,15 +108,19 @@ public class AnimUtils {
      */
     private static AnimTrack[] copyAnimTracks(AnimClip sourceClip, Armature targetArmature) {
 
-        SafeArrayList <AnimTrack> tracks = new SafeArrayList<>(AnimTrack.class);
+        SafeArrayList<AnimTrack> tracks = new SafeArrayList<>(AnimTrack.class);
 
-        for (AnimTrack track: sourceClip.getTracks()) {
+        for (AnimTrack track : sourceClip.getTracks()) {
 
             TransformTrack tt = (TransformTrack) track;
 
             if (tt.getTarget() instanceof Joint) {
                 Joint joint = (Joint) tt.getTarget();
                 HasLocalTransform target = targetArmature.getJoint(joint.getName());
+                if (target == null) {
+                    throw new IllegalStateException("HasLocalTransform not found for the target Joint: " + joint.getName());
+                }
+
                 //TransformTrack newTrack = new TransformTrack(target, tt.getTimes(), tt.getTranslations(), tt.getRotations(), tt.getScales());
                 TransformTrack newTrack = tt.jmeClone(); // optimization
                 newTrack.setTarget(target);
@@ -124,6 +128,7 @@ public class AnimUtils {
             }
         }
 
+        System.out.println("Copied tracks " + tracks.size() + " of " + sourceClip.getTracks().length);
         return tracks.getArray();
     }
 
