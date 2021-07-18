@@ -90,13 +90,46 @@ public class MainCamera {
         cam.setFrustumPerspective(fieldOfView, aspect, near, far);
     }
     
-    public Ray screenPointToRay(Vector2f click2d) {
+    /**
+     * Returns a ray going from camera through a screen point.
+     * usage is:
+     * <pre>
+     *     Ray ray = MainCamera.screenPointToRay(cam, inputManager.getCursorPosition());
+     * </pre>
+     */
+    public static Ray screenPointToRay(Camera cam, Vector2f click2d) {
         // Convert screen click to 3d position
-        Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d), 0f).clone();
-        Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d), 1f).subtractLocal(click3d);
+        Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d), 0).clone();
+        Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d), 1).subtractLocal(click3d).normalizeLocal();
         // Aim the ray from the clicked spot forwards.
         Ray ray = new Ray(click3d, dir);
         return ray;
+    }
+    
+    /**
+     * Transforms position from world space to local space.
+     * 
+     * @param cam
+     * @param position
+     * @return
+     */
+    public static Vector3f inverseTransformPoint(Camera cam, Vector3f position) {
+        Transform tr = new Transform(cam.getLocation(), cam.getRotation(), Vector3f.UNIT_XYZ);
+        Vector3f camRelative = tr.transformInverseVector(position, null);
+        return camRelative;
+    }
+
+    /**
+     * Transforms position from local space to world space.
+     * 
+     * @param cam
+     * @param position
+     * @return
+     */
+    public static Vector3f transformPoint(Camera cam, Vector3f position) {
+        Transform tr = new Transform(cam.getLocation(), cam.getRotation(), Vector3f.UNIT_XYZ);
+        Vector3f camRelative = tr.transformVector(position, null);
+        return camRelative;
     }
     
 }
