@@ -23,6 +23,17 @@ import com.jme3.scene.control.Control;
 public class AdapterControl extends AbstractControl {
     
     /**
+     * 
+     * @param obj
+     * @param to
+     * @param ts 
+     */
+    public void requireNonNull(Object obj, Class to, Class ts) {
+        String message = "Error: Component of type %s on GameObject %s expected to find an object of type %s, but none were found.";
+        Objects.requireNonNull(obj, String.format(message, ts.getName(), spatial.toString(), to.getName()));
+    }
+    
+    /**
      * @param <T>
      * @param key
      * @return 
