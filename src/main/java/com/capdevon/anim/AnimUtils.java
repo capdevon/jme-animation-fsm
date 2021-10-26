@@ -89,14 +89,21 @@ public class AnimUtils {
      * @param targetArmature
      */
     public static void copyAnimation(AnimComposer source, AnimComposer target, Armature targetArmature) {
-        for (String animName: source.getAnimClipsNames()) {
-            if (!target.getAnimClipsNames().contains(animName)) {
-                System.out.println("Copying Animation: " + animName);
+        int i = 1;
 
-                AnimClip clip = new AnimClip(animName);
-                clip.setTracks(copyAnimTracks(source.getAnimClip(animName), targetArmature));
-                target.addAnimClip(clip);
+        for (String animName : source.getAnimClipsNames()) {
+
+            String clipName = animName;
+            if (target.getAnimClipsNames().contains(animName)) {
+                clipName = animName + "_" + i;
             }
+
+            System.out.println("Copying Animation: " + clipName);
+            AnimClip result = new AnimClip(clipName);
+            result.setTracks(copyAnimTracks(source.getAnimClip(animName), targetArmature));
+            target.addAnimClip(result);
+
+            i++;
         }
     }
 
@@ -113,18 +120,25 @@ public class AnimUtils {
         for (AnimTrack track : sourceClip.getTracks()) {
 
             TransformTrack tt = (TransformTrack) track;
+            HasLocalTransform target = null;
 
-            if (tt.getTarget() instanceof Joint) {
+            if (tt.getTarget() instanceof Node) {
+                Node node = (Node) tt.getTarget();
+                target = targetArmature.getJoint(node.getName());
+
+            } else if (tt.getTarget() instanceof Joint) {
                 Joint joint = (Joint) tt.getTarget();
-                HasLocalTransform target = targetArmature.getJoint(joint.getName());
-                if (target == null) {
-                    throw new IllegalStateException("Joint not found in the target Armature: " + joint.getName());
-                }
+                target = targetArmature.getJoint(joint.getName());
+            }
 
+            if (target != null) {
                 //TransformTrack newTrack = new TransformTrack(target, tt.getTimes(), tt.getTranslations(), tt.getRotations(), tt.getScales());
-                TransformTrack newTrack = tt.jmeClone(); // optimization
+                TransformTrack newTrack = tt.jmeClone(); //optimization
                 newTrack.setTarget(target);
                 tracks.add(newTrack);
+
+            } else {
+                throw new IllegalStateException("Joint not found in the target Armature: " + tt.getTarget());
             }
         }
 
