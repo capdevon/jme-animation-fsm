@@ -96,14 +96,13 @@ public class AnimUtils {
             String clipName = animName;
             if (target.getAnimClipsNames().contains(animName)) {
                 clipName = animName + "_" + i;
+                i++;
             }
 
             System.out.println("Copying Animation: " + clipName);
             AnimClip result = new AnimClip(clipName);
             result.setTracks(copyAnimTracks(source.getAnimClip(animName), targetArmature));
             target.addAnimClip(result);
-
-            i++;
         }
     }
 
