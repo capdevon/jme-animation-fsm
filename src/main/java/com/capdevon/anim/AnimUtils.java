@@ -1,16 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.capdevon.anim;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.Objects;
 
 import com.jme3.anim.AnimClip;
 import com.jme3.anim.AnimComposer;
@@ -24,13 +17,15 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.Control;
 import com.jme3.util.SafeArrayList;
+import java.lang.reflect.Field;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author capdevon
  */
 public class AnimUtils {
-
+    
     /**
      * Running Mixamo Armature Renaming Script.
      *
@@ -42,7 +37,7 @@ public class AnimUtils {
             Joint joint = skeleton.getJoint(i);
 
             String replacement = StringUtils.substringAfterLast(joint.getName(), ":");
-            if (!replacement.isBlank()) {
+            if (StringUtils.isNotBlank(replacement)) {
                 renameJoint(joint, replacement);
             }
         }
@@ -83,31 +78,25 @@ public class AnimUtils {
     }
 
     /**
-     * 
+     *
      * @param source
      * @param target
      * @param targetArmature
      */
     public static void copyAnimation(AnimComposer source, AnimComposer target, Armature targetArmature) {
-        int i = 1;
-
         for (String animName : source.getAnimClipsNames()) {
+            if (!target.getAnimClipsNames().contains(animName)) {
+                System.out.println("Copying Animation: " + animName);
 
-            String clipName = animName;
-            if (target.getAnimClipsNames().contains(animName)) {
-                clipName = animName + "_" + i;
-                i++;
+                AnimClip clip = new AnimClip(animName);
+                clip.setTracks(copyAnimTracks(source.getAnimClip(animName), targetArmature));
+                target.addAnimClip(clip);
             }
-
-            System.out.println("Copying Animation: " + clipName);
-            AnimClip result = new AnimClip(clipName);
-            result.setTracks(copyAnimTracks(source.getAnimClip(animName), targetArmature));
-            target.addAnimClip(result);
         }
     }
 
     /**
-     * 
+     *
      * @param sourceClip
      * @param targetArmature
      * @return
@@ -144,6 +133,36 @@ public class AnimUtils {
         System.out.println("Copied tracks " + tracks.size() + " of " + sourceClip.getTracks().length);
         return tracks.getArray();
     }
+    
+    @SuppressWarnings("rawtypes")
+    public static AnimClip retargetClip(String name, AnimClip sourceClip, Spatial target) {
+        Spatial animRoot = findAnimRoot(target);
+        if (animRoot == null) {
+            System.err.println("Anim root is null!");
+            return null;
+        }
+
+        SkinningControl sc = animRoot.getControl(SkinningControl.class);
+        AnimClip copy = new AnimClip(name);
+        AnimTrack[] tracks = copyAnimTracks(sourceClip, sc.getArmature());
+        copy.setTracks(tracks);
+        return copy;
+    }
+    
+    public static Spatial findAnimRoot(Spatial s) {
+        if (s.getControl(AnimComposer.class) != null) {
+            return s;
+        }
+        if (s instanceof Node) {
+            for (Spatial child: ((Node) s).getChildren()) {
+                Spatial result = findAnimRoot(child);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
+    }
 
     public static AnimComposer getAnimControl(Spatial sp) {
         AnimComposer control = findControl(sp, AnimComposer.class);
@@ -178,7 +197,7 @@ public class AnimUtils {
         int boneCount = skeleton.getJointCount();
         List<String> lst = new ArrayList<>(boneCount);
 
-        for (Joint bone: skeleton.getJointList()) {
+        for (Joint bone : skeleton.getJointList()) {
             lst.add(bone.getName());
         }
 
@@ -191,13 +210,13 @@ public class AnimUtils {
      * @param clazz
      * @return
      */
-    private static <T extends Control> T findControl(Spatial sp, Class <T> clazz) {
+    private static <T extends Control> T findControl(Spatial sp, Class<T> clazz) {
         T control = sp.getControl(clazz);
         if (control != null) {
             return control;
         }
         if (sp instanceof Node) {
-            for (Spatial child: ((Node) sp).getChildren()) {
+            for (Spatial child : ((Node) sp).getChildren()) {
                 control = findControl(child, clazz);
                 if (control != null) {
                     return control;
