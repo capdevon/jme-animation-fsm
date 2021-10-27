@@ -147,36 +147,24 @@ public class AnimUtils {
 
     public static AnimComposer getAnimControl(Spatial sp) {
         AnimComposer control = findControl(sp, AnimComposer.class);
-        if (control == null) {
-            throw new IllegalArgumentException("AnimComposer not found: " + sp);
-        }
-        return control;
+        return Objects.requireNonNull(control, "AnimComposer not found: " + sp);
     }
 
     public static SkinningControl getSkeletonControl(Spatial sp) {
         SkinningControl control = findControl(sp, SkinningControl.class);
-        if (control == null) {
-            throw new IllegalArgumentException("SkinningControl not found: " + sp);
-        }
-        return control;
+        return Objects.requireNonNull(control, "SkinningControl not found: " + sp);
     }
 
     public static Joint findBone(Spatial sp, String boneName) {
         SkinningControl skControl = getSkeletonControl(sp);
-        Joint bone = skControl.getArmature().getJoint(boneName);
-        if (bone == null) {
-            throw new IllegalArgumentException("Armature Joint not found: " + boneName);
-        }
-        return bone;
+        Joint joint = skControl.getArmature().getJoint(boneName);
+        return Objects.requireNonNull(joint, "Armature Joint not found: " + boneName);
     }
 
     public static Node getAttachments(Spatial sp, String boneName) {
         SkinningControl skControl = getSkeletonControl(sp);
         Node attachedNode = skControl.getAttachmentsNode(boneName);
-        if (attachedNode == null) {
-            throw new IllegalArgumentException("AttachedNode not found: " + boneName);
-        }
-        return attachedNode;
+        return Objects.requireNonNull(attachedNode, "AttachmentsNode not found: " + boneName);
     }
 
     public static List<String> listBones(Spatial sp) {
