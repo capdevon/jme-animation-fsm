@@ -55,9 +55,6 @@ repositories {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    implementation 'org.apache.commons:commons-lang3:3.10'
-	
     // You can read more about how to add dependencies here:
     //   https://docs.gradle.org/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
 
@@ -93,6 +90,9 @@ dependencies {
     //implementation 'com.simsilica:lemur-props:1.1.1'
     //implementation 'com.simsilica:lemur-proto:1.12.0'
     //runtimeOnly 'org.codehaus.groovy:groovy-jsr223:3.0.7'
+    
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation 'org.apache.commons:commons-lang3:3.10'
 }
 
 // cleanup tasks
