@@ -15,22 +15,11 @@ plugins {
 description = 'prototypical JMonkeyEngine application'
 
 // select one source-code (JDK) option
-//sourceCompatibility = '1.6'
-//sourceCompatibility = '1.7'
 sourceCompatibility = '1.8'
-
-//targetCompatibility = '1.6'
-//targetCompatibility = '1.7'
 targetCompatibility = '1.8'
 
 // select one version of the Engine:
-//ext.jmonkeyengineVersion = '3.1.0-stable' // from mavenCentral
-//ext.jmonkeyengineVersion = '3.2.3-stable' // from mavenCentral
-//ext.jmonkeyengineVersion = '3.2.4-stable' // from mavenCentral
-//ext.jmonkeyengineVersion = '3.3.0-stable' // from mavenCentral
-//ext.jmonkeyengineVersion = '3.3.2-stable' // from mavenCentral
-ext.jmonkeyengineVersion = '3.4.0-stable' // from mavenCentral
-//ext.jmonkeyengineVersion = '3.4.0-SNAPSHOT' // from mavenLocal
+ext.jmonkeyengineVersion = '3.4.0-stable'
 
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) { // compile-time options:
@@ -66,13 +55,13 @@ repositories {
 }
 
 dependencies {
-	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation 'org.apache.commons:commons-lang3:3.10'
 	
     // You can read more about how to add dependencies here:
     //   https://docs.gradle.org/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
 
-    // from jcenter (or mavenLocal) repositories:
+    // Engine
     implementation 'org.jmonkeyengine:jme3-core:' + jmonkeyengineVersion
     implementation 'org.jmonkeyengine:jme3-desktop:' + jmonkeyengineVersion
     implementation 'org.jmonkeyengine:jme3-effects:' + jmonkeyengineVersion
@@ -80,14 +69,11 @@ dependencies {
     //implementation 'org.jmonkeyengine:jme3-niftygui:' + jmonkeyengineVersion
     //implementation 'org.jmonkeyengine:jme3-terrain:' + jmonkeyengineVersion
     
-    // BasicGame doesn't use physics. If your game needs physics, select either:
+    // If your game needs physics, select either:
     //    1. Minie
-    implementation 'com.github.stephengold:Minie:4.2.0+big3'
+    implementation 'com.github.stephengold:Minie:4.5.0+big3'
     //    2. jme3-jbullet
     //implementation 'org.jmonkeyengine:jme3-jbullet:' + jmonkeyengineVersion
-    //    3. jme3-bullet + jme3-bullet-native
-    //implementation 'org.jmonkeyengine:jme3-bullet:' + jmonkeyengineVersion
-    //runtimeOnly 'org.jmonkeyengine:jme3-bullet-native:' + jmonkeyengineVersion
 
     // select one version of LWJGL (from jCenter or mavenLocal)
     runtimeOnly 'org.jmonkeyengine:jme3-lwjgl:' + jmonkeyengineVersion  // LWJGL 2.x
@@ -102,7 +88,7 @@ dependencies {
     //runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.4.0-alpha6'
         
-    // Libraries related to the Lemur GUI and Groovy:
+    // Lemur GUI and Groovy:
     //implementation 'com.simsilica:lemur:1.15.0'
     //implementation 'com.simsilica:lemur-props:1.1.1'
     //implementation 'com.simsilica:lemur-proto:1.12.0'
