@@ -146,7 +146,7 @@ public class AnimatorStateMachine {
      */
     private AnimatorState addState(String stateName, Motion motion) {
     	if (states.containsKey(stateName)) {
-            String error = String.format("State '{0}' already exists in state machine", stateName);
+            String error = String.format("State '%s' already exists in state machine", stateName);
             throw new IllegalArgumentException(error);
         }
     	
