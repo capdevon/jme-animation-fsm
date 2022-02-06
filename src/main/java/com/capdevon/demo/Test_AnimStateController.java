@@ -239,7 +239,7 @@ public class Test_AnimStateController extends SimpleApplication {
     private class PlayerMovementControl extends AbstractControl implements ActionListener, AnalogListener {
 
         public float m_MoveSpeed = 4.5f;
-        public float m_TurnSpeed = 10f;
+        public float m_TurnSpeed = 6f;
         
         private Camera camera;
         private AnimatorController animator;
