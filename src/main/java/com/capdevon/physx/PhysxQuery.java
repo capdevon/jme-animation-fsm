@@ -122,10 +122,10 @@ public class PhysxQuery {
     /**
      * Computes and stores colliders inside the sphere.
      *
-     * @param position	- Center of the sphere.
-     * @param radius	- Radius of the sphere.
-     * @param layerMask	- A Layer mask defines which layers of colliders to include in the query.
-     * @param func		- Specifies a function to filter colliders.
+     * @param position  - Center of the sphere.
+     * @param radius    - Radius of the sphere.
+     * @param layerMask - A Layer mask defines which layers of colliders to include in the query.
+     * @param func      - Specifies a function to filter colliders.
      * @return Returns an array with all PhysicsRigidBody touching or inside the
      * sphere.
      */
