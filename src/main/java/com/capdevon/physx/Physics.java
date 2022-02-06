@@ -51,13 +51,6 @@ public class Physics {
         PhysicsSpace.getPhysicsSpace().addTickListener(listener);
     }
  
-    /**
-     * 
-     * @param spatial
-     * @param radius
-     * @param height
-     * @param mass 
-     */
     public static void addCapsuleCollider(Spatial spatial, float radius, float height, float mass) {
         BetterCharacterControl bcc = new BetterCharacterControl(radius, height, mass);
         spatial.addControl(bcc);
