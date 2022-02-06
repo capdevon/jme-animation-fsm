@@ -12,7 +12,7 @@ import com.jme3.animation.LoopMode;
 import com.jme3.scene.Spatial;
 
 /**
- * 
+ *
  * @author capdevon
  */
 public class Animator extends AdapterControl {
@@ -39,9 +39,9 @@ public class Animator extends AdapterControl {
      * @param anim
      */
     public void addActions(Animation3... animations) {
-    	for (Animation3 anim : animations) {
-    		addAction(anim, null);
-    	}
+        for (Animation3 anim : animations) {
+            addAction(anim, null);
+        }
     }
 
     /**
@@ -69,21 +69,24 @@ public class Animator extends AdapterControl {
 
     /**
      * Run animation
-     *
      * @param anim
      */
     public void setAnimation(Animation3 anim) {
         setAnimation(anim.getName(), false);
     }
-    
+
+    /**
+     * Run animation
+     * @param animName
+     */
     public void setAnimation(String animName) {
         setAnimation(animName, false);
     }
 
     /**
-     * 
+     *
      * @param animName
-     * @param overwrite 
+     * @param overwrite
      */
     public void setAnimation(String animName, boolean overwrite) {
 
