@@ -15,11 +15,11 @@ plugins {
 description = 'prototypical JMonkeyEngine application'
 
 // select one source-code (JDK) option
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 // select one version of the Engine:
-ext.jmonkeyengineVersion = '3.4.1-stable'
+ext.jmonkeyengineVersion = '3.5.0-stable'
 
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) { // compile-time options:
@@ -68,7 +68,7 @@ dependencies {
     
     // If your game needs physics, select either:
     //    1. Minie
-    implementation 'com.github.stephengold:Minie:4.5.0+big3'
+    implementation 'com.github.stephengold:Minie:4.6.1+big3'
     //    2. jme3-jbullet
     //implementation 'org.jmonkeyengine:jme3-jbullet:' + jmonkeyengineVersion
 
