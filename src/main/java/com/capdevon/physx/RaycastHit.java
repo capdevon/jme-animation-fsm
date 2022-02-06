@@ -4,6 +4,10 @@ import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.math.Vector3f;
 
+/**
+ * 
+ * @author capdevon
+ */
 public class RaycastHit {
 
     public PhysicsCollisionObject rigidBody;
