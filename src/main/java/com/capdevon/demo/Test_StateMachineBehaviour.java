@@ -219,13 +219,10 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         // set the initial state.
         sm.setDefaultState(patrol);
         
-        BitmapText bmp = createBitmap(patrol.getName(), ColorRGBA.Red);
-        bmp.setShadowMode(ShadowMode.Off);
-        Node label = new Node("Label");
-        label.attachChild(bmp);
-        label.setLocalTranslation(0, 2.5f, 0);
-        label.scale(0.2f);
-        soldier.attachChild(label);
+        BitmapText bmp = createBitmap(patrol.getName(), 0.5f, ColorRGBA.Red);
+        bmp.setName("Status");
+        bmp.setLocalTranslation(0, 2.5f, 0);
+        soldier.attachChild(bmp);
         
         SoldierAI aiControl = new SoldierAI();
         aiControl.player = player;
@@ -234,14 +231,15 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         sm.addListener(aiControl);
     }
     
-    private BitmapText createBitmap(String text, ColorRGBA color) {
-        BitmapText bmp = new BitmapText(guiFont, false);
+    private BitmapText createBitmap(String text, float size, ColorRGBA color) {
+        BitmapText bmp = new BitmapText(guiFont);
         bmp.setText(text);
         bmp.setColor(color);
-        bmp.setSize(1.5f);
         bmp.setBox(new Rectangle((-bmp.getLineWidth() / 2) * bmp.getSize(), 0f, bmp.getLineWidth() * bmp.getSize(), bmp.getLineHeight()));
+        bmp.setShadowMode(ShadowMode.Off);
         bmp.setQueueBucket(RenderQueue.Bucket.Transparent);
         bmp.setAlignment(BitmapFont.Align.Center);
+        bmp.setSize(size);
         bmp.addControl(new BillboardControl());
 
         return bmp;
