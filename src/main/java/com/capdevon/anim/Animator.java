@@ -70,21 +70,6 @@ public class Animator extends AdapterControl {
     }
 
     /**
-     * @param animName
-     * @param callback
-     * @param startOffset
-     */
-    public void addCallbackAction(String animName, Tween callback, float startOffset) {
-        AnimClip animClip = animComposer.getAnimClip(animName);
-        if (animClip == null) {
-            throw new IllegalArgumentException("AnimClip not found: " + animName);
-        }
-        Action action = animComposer.action(animClip.getName());
-        action = new BaseAction(Tweens.sequence(action, Tweens.delay(startOffset), callback));
-        animComposer.addAction(animClip.getName(), action);
-    }
-
-    /**
      * Run animation
      *
      * @param anim
