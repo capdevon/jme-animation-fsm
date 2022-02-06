@@ -179,7 +179,6 @@ public class Test_AnimStateController extends SimpleApplication {
         // Create the controller and the parameters
         AnimatorController animator = new AnimatorController(AnimUtils.getAnimControl(player));
         animator.addParameter("isRunning", AnimatorControllerParameterType.Bool);
-        animator.addParameter("isReloading", AnimatorControllerParameterType.Trigger);
         player.addControl(animator);
         
         // Define states for animations.
@@ -187,19 +186,12 @@ public class Test_AnimStateController extends SimpleApplication {
         AnimatorStateMachine sm = layer0.getStateMachine();
         AnimatorState idle = sm.addState("Idle", AnimDefs.RifleIdle);
         AnimatorState walk = sm.addState("Run", AnimDefs.RifleRun);
-        AnimatorState reload = sm.addState("Reload", AnimDefs.Reloading);
         
         AnimatorStateTransition idleToWalk = idle.addTransition(walk);
         idleToWalk.addCondition(AnimatorConditionMode.If, 0f, "isRunning");
         
         AnimatorStateTransition walkToIdle = walk.addTransition(idle);
         walkToIdle.addCondition(AnimatorConditionMode.IfNot, 0f, "isRunning");
-        
-        AnimatorStateTransition idleToReload = idle.addTransition(reload);
-        idleToReload.addCondition(AnimatorConditionMode.If, 0f, "isReloading");
-        
-        // execute 95% of the reloading animation before returning to idle state
-        AnimatorStateTransition reloadToIdle = reload.addTransition(idle, 0.95f);
         
         // set the initial state.
         sm.setDefaultState(idle);
@@ -288,8 +280,6 @@ public class Test_AnimStateController extends SimpleApplication {
                 _TurnLeft = isPressed;
             } else if (name.equals(InputMapping.MOVE_RIGHT)) {
                 _TurnRight = isPressed;
-            } else if (name.equals(InputMapping.RELOAD) && isPressed) {
-                animator.setTrigger("isReloading");
             }
         }
 
@@ -317,10 +307,7 @@ public class Test_AnimStateController extends SimpleApplication {
 
             if (isMoving) {
             	// smooth rotation
-            	float angle = FastMath.atan2(walkDirection.x, walkDirection.z);
-                dr.fromAngleNormalAxis(angle, Vector3f.UNIT_Y);
-                spatial.getWorldRotation().slerp(dr, m_TurnSpeed * tpf);
-                bcc.setViewDirection(spatial.getWorldRotation().mult(Vector3f.UNIT_Z));
+            	bcc.setViewDirection(bcc.getViewDirection().interpolateLocal(walkDirection, m_TurnSpeed * tpf));
             }
             
             bcc.setWalkDirection(walkDirection.multLocal(m_MoveSpeed));
