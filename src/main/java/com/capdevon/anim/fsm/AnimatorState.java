@@ -178,5 +178,16 @@ public class AnimatorState {
     public void setSpeed(float speed) {
         this.speed = speed;
     }
+    
+    @Override
+    public String toString() {
+        return "AnimatorState [object=" + animator.getSpatial()
+            + ", motion=" + motion.getName()
+            + ", state=" + name
+            + ", speed=" + speed
+            + ", transitions=" + transitions.size()
+            + ", behaviours=" + behaviours.size()
+            + "]";
+    }
 
 }
