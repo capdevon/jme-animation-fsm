@@ -4,7 +4,7 @@ import com.jme3.math.Vector2f;
 
 /**
  * Structure that represents a motion in the context of its parent blend tree.
- * 
+ *
  * @author capdevon
  */
 public class ChildMotion {
@@ -40,20 +40,20 @@ public class ChildMotion {
         this.threshold = threshold;
     }
 
-	public Vector2f getPosition() {
-		return position;
-	}
+    public Vector2f getPosition() {
+        return position;
+    }
 
-	public void setPosition(Vector2f position) {
-		this.position = position;
-	}
+    public void setPosition(Vector2f position) {
+        this.position = position;
+    }
 
-	public float getCycleOffset() {
-		return cycleOffset;
-	}
+    public float getCycleOffset() {
+        return cycleOffset;
+    }
 
-	public void setCycleOffset(float cycleOffset) {
-		this.cycleOffset = cycleOffset;
-	}
+    public void setCycleOffset(float cycleOffset) {
+        this.cycleOffset = cycleOffset;
+    }
 
 }
