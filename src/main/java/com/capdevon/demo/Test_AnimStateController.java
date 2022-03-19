@@ -177,7 +177,7 @@ public class Test_AnimStateController extends SimpleApplication {
         physics.getPhysicsSpace().add(bcc);
         
         // Create the controller and the parameters
-        AnimatorController animator = new AnimatorController(AnimUtils.getAnimControl(player));
+        AnimatorController animator = new AnimatorController(AnimUtils.getAnimComposer(player));
         animator.addParameter("isRunning", AnimatorControllerParameterType.Bool);
         player.addControl(animator);
         

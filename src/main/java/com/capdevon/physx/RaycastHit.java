@@ -5,7 +5,7 @@ import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.math.Vector3f;
 
 /**
- * 
+ *
  * @author capdevon
  */
 public class RaycastHit {
@@ -28,18 +28,19 @@ public class RaycastHit {
 
     @Override
     public String toString() {
-        return "RaycastHit [rigidbody=" + toHexString(rigidBody) +
-            ", collider=" + toHexString(collider) +
-            ", gameObject=" + toHexString(gameObject) +
-            ", distance=" + distance +
-            ", normal=" + normal +
-            ", point=" + point +
-            "]";
+        return "RaycastHit [rigidbody=" + toHexString(rigidBody)
+                + ", collider=" + toHexString(collider)
+                + ", gameObject=" + toHexString(gameObject)
+                + ", distance=" + distance
+                + ", normal=" + normal
+                + ", point=" + point
+                + "]";
     }
 
     private String toHexString(Object obj) {
-        if (obj != null)
+        if (obj != null) {
             return obj.getClass().getSimpleName() + '@' + Integer.toHexString(obj.hashCode());
+        }
         return null;
     }
 

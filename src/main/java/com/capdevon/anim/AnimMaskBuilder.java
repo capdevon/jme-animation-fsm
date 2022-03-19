@@ -48,8 +48,8 @@ public class AnimMaskBuilder implements AnimationMask {
      * @param jointNames
      * @return AnimMaskBuilder
      */
-    public AnimMaskBuilder addJoints(String...jointNames) {
-        for (String jointName: jointNames) {
+    public AnimMaskBuilder addJoints(String... jointNames) {
+        for (String jointName : jointNames) {
             Joint joint = findJoint(jointName);
             affectedJoints.set(joint.getId());
         }
@@ -79,7 +79,7 @@ public class AnimMaskBuilder implements AnimationMask {
 
     private void addFromJoint(Joint joint) {
         affectedJoints.set(joint.getId());
-        for (Joint j: joint.getChildren()) {
+        for (Joint j : joint.getChildren()) {
             addFromJoint(j);
         }
     }
@@ -99,7 +99,7 @@ public class AnimMaskBuilder implements AnimationMask {
 
     private void removeFromJoint(Joint joint) {
         affectedJoints.clear(joint.getId());
-        for (Joint j: joint.getChildren()) {
+        for (Joint j : joint.getChildren()) {
             removeFromJoint(j);
         }
     }
@@ -146,8 +146,8 @@ public class AnimMaskBuilder implements AnimationMask {
      * @param jointNames the names of the joints to be removed
      * @return AnimMaskBuilder
      */
-    public AnimMaskBuilder removeJoints(String...jointNames) {
-        for (String jointName: jointNames) {
+    public AnimMaskBuilder removeJoints(String... jointNames) {
+        for (String jointName : jointNames) {
             Joint joint = findJoint(jointName);
             affectedJoints.clear(joint.getId());
         }

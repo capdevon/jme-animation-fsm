@@ -11,6 +11,7 @@ import com.capdevon.animation.MixamoBodyBones;
 import com.capdevon.engine.FRotator;
 import com.capdevon.physx.PhysxDebugAppState;
 import com.jme3.anim.AnimComposer;
+import com.jme3.anim.SkinningControl;
 import com.jme3.app.Application;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
@@ -54,19 +55,18 @@ import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 
 /**
- * 
+ *
  * @author capdevon
  */
 public class Test_BlendTree2D extends SimpleApplication {
 
     /**
-     * 
-     * @param args 
+     *
+     * @param args
      */
     public static void main(String[] args) {
         Test_BlendTree2D app = new Test_BlendTree2D();
         AppSettings settings = new AppSettings(true);
-        //settings.setResolution(1024, 768);
         settings.setResolution(1280, 720);
         settings.setSamples(4);
         settings.setBitsPerPixel(32);
@@ -100,7 +100,6 @@ public class Test_BlendTree2D extends SimpleApplication {
      */
     public void initPhysics() {
         physics = new BulletAppState();
-        //physics.setThreadingType(ThreadingType.SEQUENTIAL);
         stateManager.attach(physics);
         stateManager.attach(new PhysxDebugAppState());
     }
@@ -118,6 +117,7 @@ public class Test_BlendTree2D extends SimpleApplication {
         rootNode.addLight(ambient);
 
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+        fpp.setNumSamples(settings.getSamples());
         viewPort.addProcessor(fpp);
 
         DirectionalLightShadowFilter shadowFilter = new DirectionalLightShadowFilter(assetManager, 2_048, 3);
@@ -166,7 +166,8 @@ public class Test_BlendTree2D extends SimpleApplication {
         pl.setColor(ColorRGBA.Yellow);
         pl.setRadius(4f);
         rootNode.addLight(pl);
-        Node rshoulder = AnimUtils.getAttachments(player, "Armature_mixamorig:" + MixamoBodyBones.RightShoulder);
+        SkinningControl sc = AnimUtils.getSkinningControl(player);
+        Node rshoulder = sc.getAttachmentsNode("Armature_mixamorig:" + MixamoBodyBones.RightShoulder);
         rshoulder.addControl(new LightControl(pl, LightControl.ControlDirection.SpatialToLight));
 
         // setup Physics Character
@@ -183,7 +184,7 @@ public class Test_BlendTree2D extends SimpleApplication {
 
     private void setupAnimator(Spatial player) {
         // setup Animation System
-        AnimComposer animComposer = AnimUtils.getAnimControl(player);
+        AnimComposer animComposer = AnimUtils.getAnimComposer(player);
 
         AnimatorController animator = new AnimatorController(animComposer);
         animator.addParameter("vSpeed", AnimatorControllerParameterType.Float);
@@ -263,6 +264,7 @@ public class Test_BlendTree2D extends SimpleApplication {
 
         /**
          * Constructor.
+         *
          * @param app
          */
         public PlayerMovementControl(Application app) {
@@ -285,8 +287,9 @@ public class Test_BlendTree2D extends SimpleApplication {
 
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
-            if (!enabled)
+            if (!enabled) {
                 return;
+            }
 
             if (name.equals(InputMapping.MOVE_FORWARD)) {
                 _MoveForward = isPressed;
@@ -343,10 +346,10 @@ public class Test_BlendTree2D extends SimpleApplication {
 
     private interface InputMapping {
 
-        final String MOVE_LEFT 		= "MOVE_LEFT";
-        final String MOVE_RIGHT 	= "MOVE_RIGHT";
-        final String MOVE_FORWARD 	= "MOVE_FORWARD";
-        final String MOVE_BACKWARD 	= "MOVE_BACKWARD";
+        final String MOVE_LEFT      = "MOVE_LEFT";
+        final String MOVE_RIGHT     = "MOVE_RIGHT";
+        final String MOVE_FORWARD   = "MOVE_FORWARD";
+        final String MOVE_BACKWARD  = "MOVE_BACKWARD";
     }
 
     private class PlayerInputAppState extends BaseAppState implements AnalogListener, ActionListener {
@@ -361,22 +364,25 @@ public class Test_BlendTree2D extends SimpleApplication {
         }
 
         @Override
-        protected void cleanup(Application app) {}
-
-        @Override
-        protected void onEnable() {}
-
-        @Override
-        protected void onDisable() {}
-
-        private void addInputMappings() {
-            addMapping(InputMapping.MOVE_FORWARD, 	new KeyTrigger(KeyInput.KEY_W));
-            addMapping(InputMapping.MOVE_BACKWARD, 	new KeyTrigger(KeyInput.KEY_S));
-            addMapping(InputMapping.MOVE_LEFT, 		new KeyTrigger(KeyInput.KEY_A));
-            addMapping(InputMapping.MOVE_RIGHT, 	new KeyTrigger(KeyInput.KEY_D));
+        protected void cleanup(Application app) {
         }
 
-        private void addMapping(String bindingName, Trigger...triggers) {
+        @Override
+        protected void onEnable() {
+        }
+
+        @Override
+        protected void onDisable() {
+        }
+
+        private void addInputMappings() {
+            addMapping(InputMapping.MOVE_FORWARD,   new KeyTrigger(KeyInput.KEY_W));
+            addMapping(InputMapping.MOVE_BACKWARD,  new KeyTrigger(KeyInput.KEY_S));
+            addMapping(InputMapping.MOVE_LEFT,      new KeyTrigger(KeyInput.KEY_A));
+            addMapping(InputMapping.MOVE_RIGHT,     new KeyTrigger(KeyInput.KEY_D));
+        }
+
+        private void addMapping(String bindingName, Trigger... triggers) {
             inputManager.addMapping(bindingName, triggers);
             inputManager.addListener(this, bindingName);
         }

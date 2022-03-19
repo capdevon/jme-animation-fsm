@@ -5,25 +5,16 @@ import com.jme3.anim.tween.Tween;
 import com.jme3.anim.tween.action.BaseAction;
 
 /**
- * 
+ *
  * @author capdevon
  */
 public class CustomAction extends BaseAction {
 
-    private ActionAnimEventListener animListener;
     private AnimComposer animComposer;
     private String animName;
     private String layer;
     private boolean loop;
 
-    /**
-     * Create new CustomAction
-     * 
-     * @param delegate
-     * @param animComposer
-     * @param animName
-     * @param layer
-     */
     public CustomAction(Tween delegate, AnimComposer animComposer, String animName, String layer) {
         super(delegate);
         this.animComposer = animComposer;
@@ -31,13 +22,6 @@ public class CustomAction extends BaseAction {
         this.layer = layer;
     }
 
-    /**
-     * Create new CustomAction
-     * 
-     * @param delegate
-     * @param animComposer
-     * @param animName
-     */
     public CustomAction(Tween delegate, AnimComposer animComposer, String animName) {
         this(delegate, animComposer, animName, AnimComposer.DEFAULT_LAYER);
     }
@@ -50,19 +34,6 @@ public class CustomAction extends BaseAction {
         this.loop = loop;
     }
 
-    public ActionAnimEventListener getAnimEventListener() {
-        return animListener;
-    }
-
-    public void setAnimEventListener(ActionAnimEventListener animListener) {
-        this.animListener = animListener;
-    }
-
-    public void playAnimation() {
-        animComposer.setCurrentAction(animName);
-        notifyAnimChange(animName);
-    }
-
     @Override
     public boolean interpolate(double t) {
         boolean running = super.interpolate(t);
@@ -70,20 +41,9 @@ public class CustomAction extends BaseAction {
             // animation done running...
             // now we can remove this action from the layer it is attached to
             animComposer.removeCurrentAction(layer);
-            notifyAnimCycleDone(animName);
             //System.out.println(animComposer.getTime(layer) + " " + this.getLength());
         }
         return running;
-    }
-
-    void notifyAnimChange(String name) {
-        if (animListener != null)
-            animListener.onAnimChange(this, animComposer, name);
-    }
-
-    void notifyAnimCycleDone(String name) {
-        if (animListener != null)
-            animListener.onAnimCycleDone(this, animComposer, name);
     }
 
     @Override

@@ -186,7 +186,7 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         bcc.getRigidBody().setCollideWithGroups(RigidBodyControl.COLLISION_GROUP_01);
         
         // Create the controller and the parameters
-        AnimatorController animator = new AnimatorController(AnimUtils.getAnimControl(soldier));
+        AnimatorController animator = new AnimatorController(AnimUtils.getAnimComposer(soldier));
         animator.addParameter("distance", AnimatorControllerParameterType.Float);
         soldier.addControl(animator);
         

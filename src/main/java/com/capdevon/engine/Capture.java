@@ -10,6 +10,8 @@ import java.io.File;
  * @author capdevon
  */
 public class Capture {
+	
+    private Capture() {}
 
     /**
      * @param app

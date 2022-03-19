@@ -25,14 +25,15 @@ import org.apache.commons.lang3.StringUtils;
  * @author capdevon
  */
 public class AnimUtils {
-    
+
+    private AnimUtils() {
+    }
+
     /**
      * Running Mixamo Armature Renaming Script.
-     *
-     * @param sp
      */
     public static void renameMixamoArmature(Spatial sp) {
-        Armature skeleton = getSkeletonControl(sp).getArmature();
+        Armature skeleton = getSkinningControl(sp).getArmature();
         for (int i = 0; i < skeleton.getJointCount(); ++i) {
             Joint joint = skeleton.getJoint(i);
 
@@ -70,9 +71,9 @@ public class AnimUtils {
      */
     public static void copyAnimation(Spatial from, Spatial to) {
 
-        AnimComposer source = getAnimControl(from);
-        AnimComposer target = getAnimControl(to);
-        Armature targetArmature = getSkeletonControl(to).getArmature();
+        AnimComposer source = getAnimComposer(from);
+        AnimComposer target = getAnimComposer(to);
+        Armature targetArmature = getSkinningControl(to).getArmature();
 
         copyAnimation(source, target, targetArmature);
     }
@@ -133,7 +134,7 @@ public class AnimUtils {
         System.out.println("Copied tracks " + tracks.size() + " of " + sourceClip.getTracks().length);
         return tracks.getArray();
     }
-    
+
     @SuppressWarnings("rawtypes")
     public static AnimClip retargetClip(String name, AnimClip sourceClip, Spatial target) {
         Spatial animRoot = findAnimRoot(target);
@@ -148,13 +149,13 @@ public class AnimUtils {
         copy.setTracks(tracks);
         return copy;
     }
-    
-    public static Spatial findAnimRoot(Spatial s) {
+
+    private static Spatial findAnimRoot(Spatial s) {
         if (s.getControl(AnimComposer.class) != null) {
             return s;
         }
         if (s instanceof Node) {
-            for (Spatial child: ((Node) s).getChildren()) {
+            for (Spatial child : ((Node) s).getChildren()) {
                 Spatial result = findAnimRoot(child);
                 if (result != null) {
                     return result;
@@ -164,43 +165,28 @@ public class AnimUtils {
         return null;
     }
 
-    public static AnimComposer getAnimControl(Spatial sp) {
+    public static AnimComposer getAnimComposer(Spatial sp) {
         AnimComposer control = findControl(sp, AnimComposer.class);
         return Objects.requireNonNull(control, "AnimComposer not found: " + sp);
     }
 
-    public static SkinningControl getSkeletonControl(Spatial sp) {
+    public static SkinningControl getSkinningControl(Spatial sp) {
         SkinningControl control = findControl(sp, SkinningControl.class);
         return Objects.requireNonNull(control, "SkinningControl not found: " + sp);
     }
 
-    public static Joint findBone(Spatial sp, String boneName) {
-        SkinningControl skControl = getSkeletonControl(sp);
-        Joint joint = skControl.getArmature().getJoint(boneName);
-        return Objects.requireNonNull(joint, "Armature Joint not found: " + boneName);
+    public static List<String> listJoints(Spatial sp) {
+        SkinningControl sc = getSkinningControl(sp);
+        return listJoints(sc.getArmature());
     }
 
-    public static Node getAttachments(Spatial sp, String boneName) {
-        SkinningControl skControl = getSkeletonControl(sp);
-        Node attachedNode = skControl.getAttachmentsNode(boneName);
-        return Objects.requireNonNull(attachedNode, "AttachmentsNode not found: " + boneName);
-    }
-
-    public static List<String> listBones(Spatial sp) {
-        SkinningControl skControl = getSkeletonControl(sp);
-        List<String> lst = listBones(skControl.getArmature());
-        Collections.sort(lst);
-        return lst;
-    }
-
-    public static List<String> listBones(Armature skeleton) {
+    public static List<String> listJoints(Armature skeleton) {
         int boneCount = skeleton.getJointCount();
         List<String> lst = new ArrayList<>(boneCount);
-
         for (Joint bone : skeleton.getJointList()) {
             lst.add(bone.getName());
         }
-
+        Collections.sort(lst);
         return lst;
     }
 

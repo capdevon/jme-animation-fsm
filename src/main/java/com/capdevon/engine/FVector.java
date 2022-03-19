@@ -6,6 +6,7 @@
 package com.capdevon.engine;
 
 import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Spatial;
 
@@ -25,6 +26,8 @@ public class FVector {
     public static final Vector3f back    = new Vector3f(0f, 0f, -1f);
     public static final Vector3f positiveInfinity = new Vector3f(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY);
     public static final Vector3f negativeInfinity = new Vector3f(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY);
+    
+    private FVector() {}
     
     /**
      * Spherically interpolates between start vector and the end vector by

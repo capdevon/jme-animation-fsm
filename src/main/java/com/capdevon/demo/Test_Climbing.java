@@ -283,7 +283,7 @@ public class Test_Climbing extends SimpleApplication {
             super.setSpatial(sp);
             if (spatial != null) {
                 this.bcc = getComponent(BetterCharacterControl.class);
-                this.animComposer = getComponentInChild(AnimComposer.class);
+                this.animComposer = getComponentInChildren(AnimComposer.class);
 
                 // setup animations
                 animComposer.getAnimClipsNames().forEach(animName -> animComposer.action(animName));
@@ -293,7 +293,7 @@ public class Test_Climbing extends SimpleApplication {
                 action = new BaseAction(Tweens.sequence(action, Tweens.callMethod(this, "onClimbingDone")));
                 animComposer.addAction(animName, action);
                 
-                SkinningControl skeleton = getComponentInChild(SkinningControl.class); 
+                SkinningControl skeleton = getComponentInChildren(SkinningControl.class); 
                 Joint hips = skeleton.getArmature().getJoint("Armature_mixamorig:" + MixamoBodyBones.Hips);
                 tt = MyAnimation.findJointTrack(animComposer.getAnimClip(AnimDefs.Climbing), hips.getId());
             }

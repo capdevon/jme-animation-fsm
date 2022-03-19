@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.capdevon.engine;
 
 import com.jme3.math.Ray;
+import com.jme3.math.Transform;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
@@ -15,16 +11,16 @@ import com.jme3.renderer.Camera;
  * @author capdevon
  */
 public class MainCamera {
-    
+
     private Camera cam;
     private float fieldOfView;
     private float near;
     private float far;
-    
+
     /**
      * Creates a camera state that will initialize the application camera to a
      * 45 degree fov, 0.1 near plane, and 1000 far plane.
-     * 
+     *
      * @param cam
      */
     public MainCamera(Camera cam) {
@@ -35,7 +31,7 @@ public class MainCamera {
      * Creates a camera state that will initialize the specified camera to the
      * specified parameters. If the specified camera is null then the
      * application's main camera will be used.
-     * 
+     *
      * @param cam
      * @param fov
      * @param near
@@ -48,7 +44,7 @@ public class MainCamera {
         this.far = far;
         resetCamera();
     }
-    
+
     public void setFieldOfView(float f) {
         if (this.fieldOfView == f) {
             return;
@@ -84,15 +80,14 @@ public class MainCamera {
     public float getFar() {
         return far;
     }
-    
+
     private void resetCamera() {
         float aspect = (float) cam.getWidth() / (float) cam.getHeight();
         cam.setFrustumPerspective(fieldOfView, aspect, near, far);
     }
-    
+
     /**
-     * Returns a ray going from camera through a screen point.
-     * usage is:
+     * Returns a ray going from camera through a screen point. usage is:
      * <pre>
      *     Ray ray = MainCamera.screenPointToRay(cam, inputManager.getCursorPosition());
      * </pre>
@@ -105,10 +100,10 @@ public class MainCamera {
         Ray ray = new Ray(click3d, dir);
         return ray;
     }
-    
+
     /**
      * Transforms position from world space to local space.
-     * 
+     *
      * @param cam
      * @param position
      * @return
@@ -121,7 +116,7 @@ public class MainCamera {
 
     /**
      * Transforms position from local space to world space.
-     * 
+     *
      * @param cam
      * @param position
      * @return
@@ -131,5 +126,5 @@ public class MainCamera {
         Vector3f camRelative = tr.transformVector(position, null);
         return camRelative;
     }
-    
+
 }

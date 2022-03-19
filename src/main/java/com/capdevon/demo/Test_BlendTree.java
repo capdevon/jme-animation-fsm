@@ -10,6 +10,7 @@ import com.capdevon.anim.fsm.AnimatorStateTransition;
 import com.capdevon.anim.fsm.BlendTree;
 import com.capdevon.animation.MixamoBodyBones;
 import com.capdevon.physx.PhysxDebugAppState;
+import com.jme3.anim.SkinningControl;
 import com.jme3.app.Application;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
@@ -53,80 +54,77 @@ import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 
 /**
- * 
+ *
  * @author capdevon
  */
 public class Test_BlendTree extends SimpleApplication {
 
     /**
-     * 
-     * @param args 
+     *
+     * @param args
      */
     public static void main(String[] args) {
         Test_BlendTree app = new Test_BlendTree();
         AppSettings settings = new AppSettings(true);
-//        settings.setResolution(1024, 768);
         settings.setResolution(1280, 720);
-        settings.setFrameRate(60);
         settings.setSamples(4);
         settings.setBitsPerPixel(32);
-        settings.setGammaCorrection(true);
         app.setSettings(settings);
         app.setShowSettings(false);
         app.setPauseOnLostFocus(false);
         app.start();
     }
-    
+
     private BulletAppState physics;
     private Node player;
-    
+
     @Override
     public void simpleInitApp() {
-        
+
         initPhysics();
         createFloor();
         setupPlayer();
         setupChaseCamera();
         setupSky();
         setupLights();
-        
+
         PlayerInputAppState input = new PlayerInputAppState();
         input.setPlayerControl(player.getControl(PlayerMovementControl.class));
         stateManager.attach(input);
     }
-    
+
     /**
      * Initialize the physics simulation
      */
     public void initPhysics() {
         physics = new BulletAppState();
-        //physics.setThreadingType(ThreadingType.SEQUENTIAL);
         stateManager.attach(physics);
         stateManager.attach(new PhysxDebugAppState());
     }
-    
+
     /**
      * An ambient light and a directional sun light
      */
     private void setupLights() {
-    	DirectionalLight sun = new DirectionalLight();
+        DirectionalLight sun = new DirectionalLight();
         sun.setDirection(new Vector3f(-0.2f, -1, -0.3f).normalizeLocal());
         rootNode.addLight(sun);
 
         AmbientLight ambient = new AmbientLight();
         ambient.setColor(new ColorRGBA(0.25f, 0.25f, 0.25f, 1));
         rootNode.addLight(ambient);
-        
+
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+        fpp.setNumSamples(settings.getSamples());
         viewPort.addProcessor(fpp);
-        
+
         DirectionalLightShadowFilter shadowFilter = new DirectionalLightShadowFilter(assetManager, 2_048, 3);
         shadowFilter.setLight(sun);
         shadowFilter.setShadowIntensity(0.4f);
         shadowFilter.setShadowZExtend(256);
         fpp.addFilter(shadowFilter);
     }
-    
+
     /**
      * a sky as background
      */
@@ -135,10 +133,10 @@ public class Test_BlendTree extends SimpleApplication {
         sky.setShadowMode(RenderQueue.ShadowMode.Off);
         rootNode.attachChild(sky);
     }
-    
+
     private void createFloor() {
         rootNode.setShadowMode(ShadowMode.CastAndReceive);
-        
+
         Box box = new Box(20, .1f, 20);
         box.scaleTextureCoordinates(new Vector2f(20, 20));
         Geometry floorGeo = new Geometry("Floor.GeoMesh", box);
@@ -154,7 +152,7 @@ public class Test_BlendTree extends SimpleApplication {
         floorGeo.addControl(rBody);
         physics.getPhysicsSpace().add(rBody);
     }
-    
+
     private void setupPlayer() {
         // setup Player model
         player = (Node) assetManager.loadModel(AnimDefs.MODEL);
@@ -166,7 +164,8 @@ public class Test_BlendTree extends SimpleApplication {
         pl.setColor(ColorRGBA.Yellow);
         pl.setRadius(4f);
         rootNode.addLight(pl);
-        Node rshoulder = AnimUtils.getAttachments(player, "Armature_mixamorig:" + MixamoBodyBones.RightShoulder);
+        SkinningControl sc = AnimUtils.getSkinningControl(player);
+        Node rshoulder = sc.getAttachmentsNode("Armature_mixamorig:" + MixamoBodyBones.RightShoulder);
         rshoulder.addControl(new LightControl(pl, LightControl.ControlDirection.SpatialToLight));
 
         // setup Physics Character
@@ -180,10 +179,10 @@ public class Test_BlendTree extends SimpleApplication {
         PlayerMovementControl playerControl = new PlayerMovementControl(this);
         player.addControl(playerControl);
     }
-    
+
     private void setupAnimator(Spatial player) {
-    	// Create the controller and the parameters
-        AnimatorController animator = new AnimatorController(AnimUtils.getAnimControl(player));
+        // Create the controller and the parameters
+        AnimatorController animator = new AnimatorController(AnimUtils.getAnimComposer(player));
         animator.addParameter("moveSpeed", AnimatorControllerParameterType.Float);
         player.addControl(animator);
 
@@ -210,12 +209,12 @@ public class Test_BlendTree extends SimpleApplication {
         // set the initial state.
         sm.setDefaultState(idle);
     }
-    
+
     private void setupChaseCamera() {
         // disable the default 1st-person flyCam!
         stateManager.detach(stateManager.getState(FlyCamAppState.class));
         flyCam.setEnabled(false);
-        
+
         ChaseCamera chaseCam = new ChaseCamera(cam, player, inputManager);
         chaseCam.setLookAtOffset(Vector3f.UNIT_Y.mult(1.5f));
         chaseCam.setMinDistance(5);
@@ -224,10 +223,10 @@ public class Test_BlendTree extends SimpleApplication {
         chaseCam.setMinVerticalRotation(-FastMath.QUARTER_PI);
         chaseCam.setMaxVerticalRotation(FastMath.QUARTER_PI);
         chaseCam.setDownRotateOnCloseViewOnly(false);
-        
+
         chaseCam.setDefaultDistance(chaseCam.getMinDistance());
     }
-    
+
     private interface AnimDefs {
 
         final String MODEL = "Models/Rifle/rifle.glb";
@@ -245,7 +244,7 @@ public class Test_BlendTree extends SimpleApplication {
         final String TPose = "TPose";
 
     }
-    
+
     private class PlayerMovementControl extends AbstractControl implements ActionListener, AnalogListener {
 
         public float m_MoveSpeed = 4.5f;
@@ -253,21 +252,21 @@ public class Test_BlendTree extends SimpleApplication {
         public float velocity = 0;
         public float acceleration = 0.5f;
         public float deceleration = 1f;
-        
+
         private Camera camera;
         private AnimatorController animator;
         private BetterCharacterControl bcc;
-        
+
         private final Quaternion lookRotation = new Quaternion();
         private final Vector3f cameraDir = new Vector3f();
         private final Vector3f cameraLeft = new Vector3f();
         private final Vector3f walkDirection = new Vector3f();
         private boolean _MoveForward, _MoveBackward, _TurnLeft, _TurnRight;
-        
+
         public PlayerMovementControl(Application app) {
             this.camera = app.getCamera();
         }
-        
+
         @Override
         public void setSpatial(Spatial sp) {
             super.setSpatial(sp);
@@ -276,7 +275,7 @@ public class Test_BlendTree extends SimpleApplication {
                 this.bcc = spatial.getControl(BetterCharacterControl.class);
             }
         }
-        
+
         @Override
         public void onAnalog(String name, float value, float tpf) {
             // TODO Auto-generated method stub
@@ -319,22 +318,22 @@ public class Test_BlendTree extends SimpleApplication {
             boolean isMoving = walkDirection.lengthSquared() > 0;
 
             if (isMoving) {
-            	// smooth rotation
-            	float angle = FastMath.atan2(walkDirection.x, walkDirection.z);
+                // smooth rotation
+                float angle = FastMath.atan2(walkDirection.x, walkDirection.z);
                 lookRotation.fromAngleNormalAxis(angle, Vector3f.UNIT_Y);
                 spatial.getWorldRotation().slerp(lookRotation, m_TurnSpeed * tpf);
                 bcc.setViewDirection(spatial.getWorldRotation().mult(Vector3f.UNIT_Z));
             }
-            
+
             if (isMoving) {
-            	velocity += acceleration * tpf;
+                velocity += acceleration * tpf;
             } else {
-            	velocity -= deceleration * tpf;
+                velocity -= deceleration * tpf;
             }
-            
+
             velocity = FastMath.clamp(velocity, 0, 1);
             fpsText.setText(velocity + "");
-            
+
             bcc.setWalkDirection(walkDirection.multLocal(m_MoveSpeed * velocity));
             animator.setFloat("moveSpeed", velocity);
         }
@@ -345,15 +344,15 @@ public class Test_BlendTree extends SimpleApplication {
         }
 
     }
-	
+
     private interface InputMapping {
 
-        final String MOVE_LEFT 		= "MOVE_LEFT";
-        final String MOVE_RIGHT 	= "MOVE_RIGHT";
-        final String MOVE_FORWARD 	= "MOVE_FORWARD";
-        final String MOVE_BACKWARD 	= "MOVE_BACKWARD";
+        final String MOVE_LEFT      = "MOVE_LEFT";
+        final String MOVE_RIGHT     = "MOVE_RIGHT";
+        final String MOVE_FORWARD   = "MOVE_FORWARD";
+        final String MOVE_BACKWARD  = "MOVE_BACKWARD";
     }
-	
+
     private class PlayerInputAppState extends BaseAppState implements AnalogListener, ActionListener {
 
         private InputManager inputManager;
@@ -379,13 +378,13 @@ public class Test_BlendTree extends SimpleApplication {
 
         private void addInputMappings() {
 
-            addMapping(InputMapping.MOVE_FORWARD, 	new KeyTrigger(KeyInput.KEY_W));
-            addMapping(InputMapping.MOVE_BACKWARD, 	new KeyTrigger(KeyInput.KEY_S));
-            addMapping(InputMapping.MOVE_LEFT, 		new KeyTrigger(KeyInput.KEY_A));
-            addMapping(InputMapping.MOVE_RIGHT, 	new KeyTrigger(KeyInput.KEY_D));
+            addMapping(InputMapping.MOVE_FORWARD,   new KeyTrigger(KeyInput.KEY_W));
+            addMapping(InputMapping.MOVE_BACKWARD,  new KeyTrigger(KeyInput.KEY_S));
+            addMapping(InputMapping.MOVE_LEFT,      new KeyTrigger(KeyInput.KEY_A));
+            addMapping(InputMapping.MOVE_RIGHT,     new KeyTrigger(KeyInput.KEY_D));
         }
 
-        private void addMapping(String bindingName, Trigger...triggers) {
+        private void addMapping(String bindingName, Trigger... triggers) {
             inputManager.addMapping(bindingName, triggers);
             inputManager.addListener(this, bindingName);
         }

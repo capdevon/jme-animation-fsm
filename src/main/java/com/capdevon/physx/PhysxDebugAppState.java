@@ -14,7 +14,7 @@ import com.jme3.input.controls.KeyTrigger;
  */
 public class PhysxDebugAppState extends BaseAppState implements ActionListener {
 
-    private final String TOGGLE_PHYSICS_DEBUG = "TOGGLE_PHYSICS_DEBUG";
+    private static final String TOGGLE_PHYSICS_DEBUG = "TOGGLE_PHYSICS_DEBUG";
 
     private BulletAppState bulletAppState;
     private InputManager inputManager;
@@ -27,7 +27,6 @@ public class PhysxDebugAppState extends BaseAppState implements ActionListener {
 
     @Override
     protected void cleanup(Application app) {
-        // TODO Auto-generated method stub
     }
 
     @Override
