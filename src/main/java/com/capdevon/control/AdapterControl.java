@@ -48,16 +48,7 @@ public class AdapterControl extends AbstractControl {
      * Returns all components of Type type in the GameObject.
      */
     public <T extends Control> T[] getComponents(Class<T> clazz) {
-        final List<Node> lst = new ArrayList<>(10);
-        spatial.breadthFirstTraversal(new SceneGraphVisitorAdapter() {
-            @Override
-            public void visit(Node node) {
-                if (node.getControl(clazz) != null) {
-                    lst.add(node);
-                }
-            }
-        });
-        return (T[]) lst.toArray();
+        return GameObject.getComponents(spatial, clazz);
     }
 
     /**
