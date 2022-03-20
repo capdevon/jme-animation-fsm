@@ -67,12 +67,9 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
     public static void main(String[] args) {
         Test_StateMachineBehaviour app = new Test_StateMachineBehaviour();
         AppSettings settings = new AppSettings(true);
-//        settings.setResolution(1024, 768);
         settings.setResolution(1280, 720);
-        settings.setFrameRate(60);
         settings.setSamples(4);
         settings.setBitsPerPixel(32);
-        settings.setGammaCorrection(true);
         app.setSettings(settings);
         app.setShowSettings(false);
         app.setPauseOnLostFocus(false);
@@ -108,7 +105,6 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
      */
     public void initPhysics() {
         physics = new BulletAppState();
-        //physics.setThreadingType(ThreadingType.SEQUENTIAL);
         stateManager.attach(physics);
         stateManager.attach(new PhysxDebugAppState());
 
