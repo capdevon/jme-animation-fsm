@@ -6,7 +6,7 @@
 package com.capdevon.demo;
 
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -160,6 +160,7 @@ public class Test_OverlappingSphere extends SimpleApplication implements ActionL
             node.addControl(rBody);
             physics.getPhysicsSpace().add(rBody);
             rBody.setCollisionGroup(PhysicsCollisionObject.COLLISION_GROUP_02);
+            rBody.addCollideWithGroup(PhysicsCollisionObject.COLLISION_GROUP_02);
         }
     }
     
@@ -170,7 +171,7 @@ public class Test_OverlappingSphere extends SimpleApplication implements ActionL
     }
 
     private Spatial createLabel(String text, ColorRGBA color) {
-        BitmapText bmp = new BitmapText(guiFont, false);
+        BitmapText bmp = new BitmapText(guiFont);
         bmp.setText(text);
         bmp.setColor(color);
         bmp.setSize(1);
@@ -240,7 +241,7 @@ public class Test_OverlappingSphere extends SimpleApplication implements ActionL
     private float radius = 2.5f;
     private final int LAYER_1 = PhysicsCollisionObject.COLLISION_GROUP_01;
     private final int LAYER_2 = PhysicsCollisionObject.COLLISION_GROUP_02;
-    private final Function<PhysicsRigidBody, Boolean> dynamicObjects = (x) -> x.getMass() > 0;
+    private final Predicate<PhysicsRigidBody> dynamicObjects = (x) -> x.getMass() > 0;
     
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
