@@ -15,6 +15,7 @@ import com.jme3.renderer.Camera;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
@@ -29,7 +30,7 @@ import com.jme3.shadow.ShadowUtil;
 /**
  * https://wiki.jmonkeyengine.org/jme3/advanced/debugging.html#debug-shapes
  */
-public class DebugShape {
+public class DebugShapes {
 
     protected final AssetManager assetManager;
 
@@ -38,7 +39,7 @@ public class DebugShape {
 
     public float lineWidth = 1f;
 
-    public DebugShape(AssetManager assetManager) {
+    public DebugShapes(AssetManager assetManager) {
         this.assetManager = assetManager;
     }
 
@@ -58,6 +59,7 @@ public class DebugShape {
         mat.setColor("Color", color);
         g.setMaterial(mat);
         g.center().move(pos);
+        g.setShadowMode(ShadowMode.Off);
         debugNode.attachChild(g);
         return g;
     }
@@ -69,23 +71,23 @@ public class DebugShape {
      *
      * @return 
      */
-    public Node getAxisCoordinate() {
-        Node node = new Node("Axis");
-        node.attachChild(getAxisUnitX());
-        node.attachChild(getAxisUnitY());
-        node.attachChild(getAxisUnitZ());
+    public Node getAxesCoordinate() {
+        Node node = new Node("Axes");
+        node.attachChild(getXAxis());
+        node.attachChild(getYAxis());
+        node.attachChild(getZAxis());
         return node;
     }
 
-    public Geometry getAxisUnitX() {
+    public Geometry getXAxis() {
         return getArrow("AX", Vector3f.UNIT_X, ColorRGBA.Red);
     }
 
-    public Geometry getAxisUnitY() {
+    public Geometry getYAxis() {
         return getArrow("AY", Vector3f.UNIT_Y, ColorRGBA.Green);
     }
 
-    public Geometry getAxisUnitZ() {
+    public Geometry getZAxis() {
         return getArrow("AZ", Vector3f.UNIT_Z, ColorRGBA.Blue);
     }
 
@@ -100,6 +102,7 @@ public class DebugShape {
         mat.getAdditionalRenderState().setLineWidth(lineWidth);
         mat.setColor("Color", color);
         g.setMaterial(mat);
+        g.setShadowMode(ShadowMode.Off);
         debugNode.attachChild(g);
         return g;
     }
@@ -120,6 +123,7 @@ public class DebugShape {
         mat.getAdditionalRenderState().setWireframe(true);
         mat.setColor("Color", color);
         g.setMaterial(mat);
+        g.setShadowMode(ShadowMode.Off);
         debugNode.attachChild(g);
         return g;
     }
@@ -140,6 +144,7 @@ public class DebugShape {
         mat.getAdditionalRenderState().setWireframe(true);
         mat.setColor("Color", color);
         g.setMaterial(mat);
+        g.setShadowMode(ShadowMode.Off);
         debugNode.attachChild(g);
         return g;
     }
@@ -175,30 +180,6 @@ public class DebugShape {
         debugNode.attachChild(geo);
         return geo;
     }
-
-    /**
-     * Making the skeleton visible inside animated models can be handy for
-     * debugging animations
-     *
-     * @param spatial
-     */
-//    public void debugSkeleton(Spatial spatial) {
-//        spatial.depthFirstTraversal(new SceneGraphVisitorAdapter() {
-//            @Override
-//            public void visit(Node node) {
-//                AnimControl animControl = node.getControl(AnimControl.class);
-//                
-//                if (animControl != null) {
-//                    SkeletonDebugger skeletonDebug = new SkeletonDebugger("Skeleton." + node.getName(), animControl.getSkeleton());
-//                    Material mat = new Material(assetManager, Materials.UNSHADED);
-//                    mat.setColor("Color", ColorRGBA.Green);
-//                    mat.getAdditionalRenderState().setDepthTest(false);
-//                    skeletonDebug.setMaterial(mat);
-//                    node.attachChild(skeletonDebug);
-//                }
-//            }
-//        });
-//    }
 
     /**
      * Render all the debug geometries to the specified view port.

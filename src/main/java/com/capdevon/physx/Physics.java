@@ -3,27 +3,19 @@ package com.capdevon.physx;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.jme3.bounding.BoundingBox;
-import com.jme3.bounding.BoundingSphere;
 import com.jme3.bullet.PhysicsSpace;
-import com.jme3.bullet.PhysicsTickListener;
-import com.jme3.bullet.collision.PhysicsCollisionListener;
 import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.bullet.collision.PhysicsRayTestResult;
-import com.jme3.bullet.collision.shapes.BoxCollisionShape;
-import com.jme3.bullet.collision.shapes.CollisionShape;
-import com.jme3.bullet.collision.shapes.SphereCollisionShape;
-import com.jme3.bullet.control.BetterCharacterControl;
-import com.jme3.bullet.control.PhysicsControl;
-import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.objects.PhysicsRigidBody;
-import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.math.FastMath;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Spatial;
 import com.jme3.util.TempVars;
 
+/**
+ * 
+ * @author capdevon
+ */
 public class Physics {
 	
     /**
@@ -32,74 +24,16 @@ public class Physics {
     private static final int DefaultRaycastLayers = ~0;
     
     private Physics() {
-    	// private constructor.
+        // private constructor.
     }
-    
-    public static void addObject(Spatial sp) {
-        PhysicsSpace.getPhysicsSpace().add(sp);
-    }
-
-    public static void addControl(PhysicsControl control) {
-        PhysicsSpace.getPhysicsSpace().add(control);
-    }
-
-    public static void addCollisionListener(PhysicsCollisionListener listener) {
-        PhysicsSpace.getPhysicsSpace().addCollisionListener(listener);
-    }
-
-    public static void addTickListener(PhysicsTickListener listener) {
-        PhysicsSpace.getPhysicsSpace().addTickListener(listener);
-    }
- 
-    public static void addCapsuleCollider(Spatial spatial, float radius, float height, float mass) {
-        BetterCharacterControl bcc = new BetterCharacterControl(radius, height, mass);
-        spatial.addControl(bcc);
-        PhysicsSpace.getPhysicsSpace().add(bcc);
-    }
-
-    public static void addCapsuleCollider(Spatial spatial) {
-        BoundingBox bb = (BoundingBox) spatial.getWorldBound();
-        float radius = Math.min(bb.getXExtent(), bb.getZExtent());
-        float height = Math.max(bb.getYExtent(), radius * 2.5f);
-        float mass = 50f;
-        addCapsuleCollider(spatial, radius, height, mass);
-    }
-
-    public static void addBoxCollider(Spatial sp, float mass, boolean isKinematic) {
-        BoundingBox bb = (BoundingBox) sp.getWorldBound();
-        BoxCollisionShape box = new BoxCollisionShape(bb.getExtent(null));
-        addRigidBody(box, sp, mass, isKinematic);
-    }
-
-    public static void addSphereCollider(Spatial sp, float mass, boolean isKinematic) {
-        BoundingSphere bs = (BoundingSphere) sp.getWorldBound();
-        SphereCollisionShape sphere = new SphereCollisionShape(bs.getRadius());
-        addRigidBody(sphere, sp, mass, isKinematic);
-    }
-
-    public static void addMeshCollider(Spatial sp, float mass, boolean isKinematic) {
-        CollisionShape shape = CollisionShapeFactory.createMeshShape(sp);
-        addRigidBody(shape, sp, mass, isKinematic);
-    }
-
-    public static void addDynamicMeshCollider(Spatial sp, float mass, boolean isKinematic) {
-        CollisionShape shape = CollisionShapeFactory.createDynamicMeshShape(sp);
-        addRigidBody(shape, sp, mass, isKinematic);
-    }
-
-    public static void addRigidBody(CollisionShape shape, Spatial sp, float mass, boolean isKinematic) {
-        RigidBodyControl rgb = new RigidBodyControl(shape, mass);
-        sp.addControl(rgb);
-        rgb.setKinematic(isKinematic);
-        PhysicsSpace.getPhysicsSpace().add(rgb);
-    }
- 
     
     /**
-     * @param rb
-     * @param explosionForce	- The force of the explosion (which may be modified by distance).
-     * @param explosionPosition	- The centre of the sphere within which the explosion has its effect.
-     * @param explosionRadius	- The radius of the sphere within which the explosion has its effect.
+     * Applies a force to a rigidbody that simulates explosion effects.
+     * 
+     * @param rb                The rigidbody object.
+     * @param explosionForce    The force of the explosion (which may be modified by distance).
+     * @param explosionPosition The centre of the sphere within which the explosion has its effect.
+     * @param explosionRadius   The radius of the sphere within which the explosion has its effect.
      */
     public static void addExplosionForce(PhysicsRigidBody rb, float explosionForce, Vector3f explosionPosition, float explosionRadius) {
         Vector3f expCenter2Body = rb.getPhysicsLocation().subtract(explosionPosition);
@@ -110,38 +44,44 @@ public class Physics {
             rb.setLinearVelocity(expCenter2Body.normalize().mult(strength));
         }
     }
+    
+    /**
+     * Casts a ray through the scene and returns all hits.
+     */
+    public static List<RaycastHit> raycastAll(Ray ray, float maxDistance) {
+        return raycastAll(ray, maxDistance, DefaultRaycastLayers);
+    }
 
     /**
      * Casts a ray through the scene and returns all hits.
      * 
-     * @param origin
-     * @param direction
-     * @param maxDistance
-     * @param layerMask
-     * @return 
+     * @param ray         The starting point and direction of the ray.
+     * @param maxDistance The max distance the rayhit is allowed to be from the start of the ray.
+     * @param layerMask   A Layer mask that is used to selectively ignore colliders when casting a ray.
+     * @return A list of RaycastHit objects.
      */
-    public static List<RaycastHit> raycastAll(Vector3f origin, Vector3f direction, float maxDistance, int layerMask) {
+    public static List<RaycastHit> raycastAll(Ray ray, float maxDistance, int layerMask) {
 
         List<RaycastHit> lstResults = new ArrayList<>();
 
         TempVars t = TempVars.get();
-        Vector3f beginVec = t.vect1.set(origin);
-        Vector3f finalVec = t.vect2.set(direction).multLocal(maxDistance).addLocal(origin);
+        Vector3f beginVec = t.vect1.set(ray.origin);
+        Vector3f finalVec = t.vect2.set(ray.direction).multLocal(maxDistance).addLocal(ray.origin);
 
         List<PhysicsRayTestResult> results = PhysicsSpace.getPhysicsSpace().rayTest(beginVec, finalVec);
 
-        for (PhysicsRayTestResult ray : results) {
-            PhysicsCollisionObject pco = ray.getCollisionObject();
+        for (PhysicsRayTestResult phRay : results) {
+            PhysicsCollisionObject pco = phRay.getCollisionObject();
 
-            if (ray.getHitFraction() < maxDistance && applyMask(layerMask, pco.getCollisionGroup())) {
+            if (phRay.getHitFraction() < maxDistance && applyMask(layerMask, pco.getCollisionGroup())) {
 
                 RaycastHit hitInfo = new RaycastHit();
                 hitInfo.rigidBody   = pco;
                 hitInfo.collider    = pco.getCollisionShape();
-                hitInfo.gameObject  = (Spatial) pco.getUserObject();
-                hitInfo.normal      = ray.getHitNormalLocal();
-                hitInfo.distance    = finalVec.subtract(beginVec).length() * ray.getHitFraction();
-                hitInfo.point.interpolateLocal(beginVec, finalVec, ray.getHitFraction());
+                hitInfo.gameObject  = pco.getUserObject();
+                hitInfo.normal      = phRay.getHitNormalLocal();
+                hitInfo.distance    = finalVec.subtract(beginVec).length() * phRay.getHitFraction();
+                hitInfo.point.interpolateLocal(beginVec, finalVec, phRay.getHitFraction());
 
                 lstResults.add(hitInfo);
             }
@@ -150,34 +90,32 @@ public class Physics {
         t.release();
         return lstResults;
     }
-     
+    
     /**
-     * Casts a ray through the scene and returns all hits.
-     * 
-     * @param origin
-     * @param direction
-     * @param maxDistance
-     * @return
+     * Casts a ray, from point origin, in direction direction, of length
+     * maxDistance, against all colliders in the Scene.
      */
-    public static List<RaycastHit> raycastAll(Vector3f origin, Vector3f direction, float maxDistance) {
-        return raycastAll(origin, direction, maxDistance, DefaultRaycastLayers);
+    public static boolean raycast(Vector3f origin, Vector3f direction, RaycastHit hitInfo, float maxDistance) {
+        return raycast(origin, direction, hitInfo, maxDistance, DefaultRaycastLayers);
+    }
+    
+    public static boolean raycast(Ray ray, RaycastHit hitInfo, float maxDistance) {
+        return raycast(ray.origin, ray.direction, hitInfo, maxDistance, DefaultRaycastLayers);
     }
     
     /**
      * Casts a ray, from point origin, in direction direction, of length
-     * maxDistance, against all colliders in the scene. You may optionally
-     * provide a LayerMask, to filter out any Colliders you aren't interested in
-     * generating collisions with.
-     *
-     * @param origin        - The starting point of the ray in world coordinates. (not null, unaffected)
-     * @param direction     - The direction of the ray. (not null, unaffected)
-     * @param hitInfo       - If true is returned, hitInfo will contain more information about where the closest collider was hit. (See Also: RaycastHit).
-     * @param maxDistance   - The max distance the ray should check for collisions.
-     * @param layerMask     - A Layer mask that is used to selectively ignore Colliders when casting a ray.
-     * @return Returns true if the ray intersects with a Collider, otherwise
-     * false.
+     * maxDistance, against all colliders in the Scene.
+     * 
+     * @param origin      The starting point of the ray in world coordinates. (not null, unaffected)
+     * @param direction   The direction of the ray. (not null, unaffected)
+     * @param hitInfo     If true is returned, hitInfo will contain more information
+     *                    about where the closest collider was hit. (See Also: RaycastHit).
+     * @param maxDistance The max distance the ray should check for collisions.
+     * @param layerMask   A Layer mask that is used to selectively ignore Colliders when casting a ray.
+     * @return Returns true if the ray intersects with a Collider, otherwise false.
      */
-    public static boolean Raycast(Vector3f origin, Vector3f direction, RaycastHit hitInfo, float maxDistance, int layerMask) {
+    public static boolean raycast(Vector3f origin, Vector3f direction, RaycastHit hitInfo, float maxDistance, int layerMask) {
         
         boolean collision = false;
         float hf = maxDistance;
@@ -197,7 +135,7 @@ public class Physics {
 
                 hitInfo.rigidBody   = pco;
                 hitInfo.collider    = pco.getCollisionShape();
-                hitInfo.gameObject  = (Spatial) pco.getUserObject();
+                hitInfo.gameObject  = pco.getUserObject();
                 hitInfo.normal      = ray.getHitNormalLocal();
                 hitInfo.distance    = finalVec.subtract(beginVec).length() * hf;
                 hitInfo.point.interpolateLocal(beginVec, finalVec, hf);
@@ -212,27 +150,24 @@ public class Physics {
         return collision;
     }
     
-    public static boolean Raycast(Ray ray, RaycastHit hitInfo, float maxDistance) {
-        return Raycast(ray.origin, ray.direction, hitInfo, maxDistance, DefaultRaycastLayers);
-    }
-
-    public static boolean Raycast(Ray ray, RaycastHit hitInfo, float maxDistance, int layerMask) {
-        return Raycast(ray.origin, ray.direction, hitInfo, maxDistance, layerMask);
-    }
-
-    public static boolean Raycast(Vector3f origin, Vector3f direction, RaycastHit hitInfo, float maxDistance) {
-        return Raycast(origin, direction, hitInfo, maxDistance, DefaultRaycastLayers);
+    /**
+     * Returns true if there is any collider intersecting the line between beginVec and finalVec.
+     */
+    public static boolean linecast(Vector3f beginVec, Vector3f finalVec, RaycastHit hitInfo) {
+        return linecast(beginVec, finalVec, hitInfo, DefaultRaycastLayers);
     }
     
     /**
-     * @param beginVec  - (not null, unaffected)
-     * @param finalVec  - (not null, unaffected)
-     * @param hitInfo   - If true is returned, hitInfo will contain more information about where the closest collider was hit. (See Also: RaycastHit).
-     * @param layerMask - A Layer mask that is used to selectively ignore Colliders when casting a ray.
-     * @return Returns true if the ray intersects with a Collider, otherwise
-     * false.
+     * Returns true if there is any collider intersecting the line between beginVec and finalVec.
+     * 
+     * @param beginVec  (not null, unaffected)
+     * @param finalVec  (not null, unaffected)
+     * @param hitInfo   If true is returned, hitInfo will contain more information
+     *                  about where the closest collider was hit. (See Also: RaycastHit).
+     * @param layerMask A Layer mask that is used to selectively ignore Colliders when casting a ray.
+     * @return Returns true if the ray intersects with a Collider, otherwise false.
      */
-    public static boolean Linecast(Vector3f beginVec, Vector3f finalVec, RaycastHit hitInfo, int layerMask) {
+    public static boolean linecast(Vector3f beginVec, Vector3f finalVec, RaycastHit hitInfo, int layerMask) {
 
         boolean collision = false;
         float hf = finalVec.length();
@@ -248,7 +183,7 @@ public class Physics {
 
                 hitInfo.rigidBody   = pco;
                 hitInfo.collider    = pco.getCollisionShape();
-                hitInfo.gameObject  = (Spatial) pco.getUserObject();
+                hitInfo.gameObject  = pco.getUserObject();
                 hitInfo.normal      = ray.getHitNormalLocal();
                 hitInfo.point       = FastMath.interpolateLinear(hf, beginVec, finalVec);
                 hitInfo.distance    = beginVec.distance(hitInfo.point);
@@ -260,17 +195,6 @@ public class Physics {
         }
 
         return collision;
-    }
-        
-    /**
-     * 
-     * @param beginVec
-     * @param finalVec
-     * @param hitInfo
-     * @return 
-     */
-    public static boolean Linecast(Vector3f beginVec, Vector3f finalVec, RaycastHit hitInfo) {
-        return Linecast(beginVec, finalVec, hitInfo, DefaultRaycastLayers);
     }
 
     /**

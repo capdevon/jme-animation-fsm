@@ -1,9 +1,8 @@
 package com.capdevon.demo;
 
-import com.capdevon.anim.AnimUtils;
 import com.capdevon.animation.MixamoBodyBones;
 import com.capdevon.control.AdapterControl;
-import com.capdevon.debug.DebugShape;
+import com.capdevon.debug.DebugShapes;
 import com.capdevon.engine.FVector;
 import com.capdevon.physx.Physics;
 import com.capdevon.physx.PhysxDebugAppState;
@@ -64,13 +63,9 @@ public class Test_Climbing extends SimpleApplication {
     	
         Test_Climbing app = new Test_Climbing();
         AppSettings settings = new AppSettings(true);
-        settings.setUseJoysticks(true);
         settings.setResolution(1280, 720);
-        settings.setFrequency(60);
-        settings.setFrameRate(200);
         settings.setSamples(4);
         settings.setBitsPerPixel(32);
-        settings.setVSync(false);
         
         app.setSettings(settings);
         app.setShowSettings(false);
@@ -98,9 +93,7 @@ public class Test_Climbing extends SimpleApplication {
     
     private void initPhysics() {
         physics = new BulletAppState();
-        //physics.setThreadingType(ThreadingType.SEQUENTIAL);
         stateManager.attach(physics);
-        physics.setDebugAxisLength(1);
         physics.setDebugEnabled(true);
         
         // press 0 to toggle physics debug
@@ -149,23 +142,23 @@ public class Test_Climbing extends SimpleApplication {
     }
 
     private void setupPlayer() {
-    	DebugShape debugShape = new DebugShape(assetManager);
+    	DebugShapes debugShapes = new DebugShapes(assetManager);
     	
     	//
         player = new Node("MainCharacter");
-        player.attachChild(debugShape.getAxisCoordinate());
+        player.attachChild(debugShapes.getAxesCoordinate());
         player.setLocalTranslation(0, 1, -1);
         rootNode.attachChild(player);
         
         // vertical
         Node ledgeRayV = new Node("LedgeRayV");
-        ledgeRayV.attachChild(debugShape.createWireBox(0.1f, ColorRGBA.Red));
+        ledgeRayV.attachChild(debugShapes.createWireBox(0.1f, ColorRGBA.Red));
         player.attachChild(ledgeRayV);
         ledgeRayV.setLocalTranslation(FVector.forward(player).multLocal(0.5f).addLocal(0, 3, 0));
         
         // horizontal
         Node ledgeRayH = new Node("LedgeRayH");
-        ledgeRayH.attachChild(debugShape.createWireBox(0.1f, ColorRGBA.Blue));
+        ledgeRayH.attachChild(debugShapes.createWireBox(0.1f, ColorRGBA.Blue));
         player.attachChild(ledgeRayH);
         ledgeRayH.setLocalTranslation(FVector.forward(player).multLocal(0.2f).addLocal(0, 1.5f, 0));
         
@@ -174,7 +167,7 @@ public class Test_Climbing extends SimpleApplication {
         model.setName("Character.Model");
         player.attachChild(model);
         
-//        SkinningControl skeleton = AnimUtils.getSkeletonControl(model);
+//        SkinningControl skeleton = AnimUtils.getSkinningControl(model);
 //        Joint hips = skeleton.getArmature().getJoint("Armature_mixamorig:" + MixamoBodyBones.Hips);
 //        Vector3f negate = hips.getModelTransform().getTranslation().negate();
 //        model.setLocalTranslation(negate);
@@ -187,7 +180,7 @@ public class Test_Climbing extends SimpleApplication {
         // setup third person camera
         setupChaseCamera();
         
-        Geometry rootBoneRef = debugShape.createWireSphere(0.4f, ColorRGBA.White);
+        Geometry rootBoneRef = debugShapes.createWireSphere(0.4f, ColorRGBA.White);
         rootNode.attachChild(rootBoneRef);
         
         // setup player control
@@ -293,8 +286,8 @@ public class Test_Climbing extends SimpleApplication {
                 action = new BaseAction(Tweens.sequence(action, Tweens.callMethod(this, "onClimbingDone")));
                 animComposer.addAction(animName, action);
                 
-                SkinningControl skeleton = getComponentInChildren(SkinningControl.class); 
-                Joint hips = skeleton.getArmature().getJoint("Armature_mixamorig:" + MixamoBodyBones.Hips);
+                SkinningControl sc = getComponentInChildren(SkinningControl.class); 
+                Joint hips = sc.getArmature().getJoint("Armature_mixamorig:" + MixamoBodyBones.Hips);
                 tt = MyAnimation.findJointTrack(animComposer.getAnimClip(AnimDefs.Climbing), hips.getId());
             }
         }
@@ -350,10 +343,11 @@ public class Test_Climbing extends SimpleApplication {
 
             if (!isClimbingMode && bcc.isOnGround()) {
 
+            	float maxDist = 2f;
                 Ray vRay = new Ray(ledgeRayV.getWorldTranslation(), Vector3f.UNIT_Y.negate());
                 debugTools.setRedArrow(vRay.getOrigin(), vRay.getDirection());
 
-                if (Physics.Raycast(vRay, hitInfo, 2)) {
+                if (Physics.raycast(vRay, hitInfo, maxDist)) {
 
                     System.out.println(hitInfo);
                     Vector3f hRayPosition = ledgeRayH.getWorldTranslation().clone();
@@ -362,7 +356,8 @@ public class Test_Climbing extends SimpleApplication {
                     Ray hRay = new Ray(hRayPosition, ledgeRayH.getWorldRotation().mult(Vector3f.UNIT_Z));
                     debugTools.setBlueArrow(hRay.getOrigin(), hRay.getDirection());
 
-                    if (Physics.Raycast(hRay, hitInfo, 2)) {
+                    if (Physics.raycast(hRay, hitInfo, maxDist)) {
+                    	
                         System.out.println(hitInfo);
                         debugTools.setPinkArrow(hitInfo.point, hitInfo.normal);
 
