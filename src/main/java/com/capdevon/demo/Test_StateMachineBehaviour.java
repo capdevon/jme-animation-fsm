@@ -1,8 +1,5 @@
 package com.capdevon.demo;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import com.capdevon.anim.AnimUtils;
 import com.capdevon.anim.fsm.AnimatorConditionMode;
 import com.capdevon.anim.fsm.AnimatorController;
@@ -67,23 +64,22 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
     public static void main(String[] args) {
         Test_StateMachineBehaviour app = new Test_StateMachineBehaviour();
         AppSettings settings = new AppSettings(true);
-        settings.setResolution(1280, 720);
+        settings.setResolution(1024, 768);
         settings.setSamples(4);
         settings.setBitsPerPixel(32);
         app.setSettings(settings);
-        app.setShowSettings(false);
+        //app.setShowSettings(false);
         app.setPauseOnLostFocus(false);
         app.start();
     }
     
-//    private ExecutorService threadExecutor = Executors.newCachedThreadPool(); 
     private BulletAppState physics;
     private Node player;
     
     @Override
     public void simpleInitApp() {
-        
-    	PrimitiveUtils.init(assetManager);
+
+        PrimitiveUtils.init(assetManager);
         initPhysics();
         createFloor();
         setupPlayer();
@@ -91,12 +87,6 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         setupEnemyAI();
         setupSky();
         setupLights();
-    }
-    
-    @Override
-    public void stop() {
-    	super.stop();
-//    	threadExecutor.shutdown();
     }
     
     /**
@@ -282,19 +272,19 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
 
     private interface AnimDefs {
 
-        final String MODEL = "Models/Rifle/rifle.glb";
-        final String RifleIdle = "RifleIdle";
-        final String RifleWalk = "RifleWalk";
-        final String RifleRun = "RifleRun";
-        final String WalkWithRifle = "WalkWithRifle";
-        final String ThrowGrenade = "ThrowGrenade";
-        final String Reloading = "Reloading";
-        final String RifleAimingIdle = "RifleAimingIdle";
-        final String FiringRifleSingle = "FiringRifleSingle";
-        final String FiringRifleAuto = "FiringRifleAuto";
-        final String DeathFromRight = "DeathFromRight";
-        final String DeathFromHeadshot = "DeathFromHeadshot";
-        final String TPose = "TPose";
+        final String MODEL              = "Models/Rifle/rifle.glb";
+        final String RifleIdle          = "RifleIdle";
+        final String RifleWalk          = "RifleWalk";
+        final String RifleRun           = "RifleRun";
+        final String WalkWithRifle      = "WalkWithRifle";
+        final String ThrowGrenade       = "ThrowGrenade";
+        final String Reloading          = "Reloading";
+        final String RifleAimingIdle    = "RifleAimingIdle";
+        final String FiringRifleSingle  = "FiringRifleSingle";
+        final String FiringRifleAuto    = "FiringRifleAuto";
+        final String DeathFromRight     = "DeathFromRight";
+        final String DeathFromHeadshot  = "DeathFromHeadshot";
+        final String TPose              = "TPose";
 
     }
     
@@ -310,7 +300,9 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
 
         AnimatorController animator;
         BetterCharacterControl bcc;
-        Timer fireTimer; //TODO: find a more efficient way to handle the timer cancellation
+        float fireTime = 0;
+        float fireRate = .6f;
+        boolean isFiring;
 
         @Override
         public void setSpatial(Spatial sp) {
@@ -325,6 +317,14 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         protected void controlUpdate(float tpf) {
             float distance = player.getWorldTranslation().distance(spatial.getWorldTranslation());
             animator.setFloat("distance", distance);
+            
+            if (isFiring) {
+                fireTime += tpf;
+                if (fireTime > fireRate) {
+                    fireTime = 0;
+                    System.out.println("Firing");
+                }
+            }
         }
 
         @Override
@@ -338,21 +338,14 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         }
 
         public void startFiring() {
-//            fireTimer = new Timer();
-//            fireTimer.scheduleAtFixedRate(new FireTask(), 500, 500);
+            isFiring = true;
             System.out.println("FireTimer schedule");
         }
 
         public void stopFiring() {
-//            fireTimer.cancel();
+            isFiring = false;
+            fireTime = 0;
             System.out.println("FireTimer cancel");
-        }
-
-        class FireTask extends TimerTask {
-            @Override
-            public void run() {
-                System.out.println("Firing");
-            }
         }
 
         @Override
