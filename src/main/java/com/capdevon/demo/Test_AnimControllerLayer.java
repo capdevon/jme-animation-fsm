@@ -13,6 +13,7 @@ import com.capdevon.animation.MixamoBodyBones;
 import com.capdevon.engine.FRotator;
 import com.capdevon.physx.PhysxDebugAppState;
 import com.jme3.anim.AnimComposer;
+import com.jme3.anim.AnimationMask;
 import com.jme3.anim.SkinningControl;
 import com.jme3.app.Application;
 import com.jme3.app.FlyCamAppState;
@@ -209,11 +210,12 @@ public class Test_AnimControllerLayer extends SimpleApplication {
 
         // Define states for layer 1
         //------------------------------------------------------------------------
-        AnimMaskBuilder avatarMask = new AnimMaskBuilder(skeleton.getArmature());
-        avatarMask.addFromJoint("Armature_mixamorig:" + MixamoBodyBones.Spine);
+        AnimationMask animMask = new AnimMaskBuilder(skeleton.getArmature())
+        		.addFromJoint("Armature_mixamorig:" + MixamoBodyBones.Spine)
+        		.build();
 
         // Define a layer that acts on an AnimationMask
-        AnimatorControllerLayer layer1 = animator.addLayer("Torso", avatarMask);
+        AnimatorControllerLayer layer1 = animator.addLayer("Torso", animMask);
         AnimatorStateMachine sm1 = layer1.getStateMachine();
         AnimatorState empty = sm1.addState("Empty");
         AnimatorState reload = sm1.addState("Reload", AnimDefs.Reloading);

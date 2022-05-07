@@ -1,6 +1,8 @@
 package com.capdevon.anim;
 
+import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -9,10 +11,11 @@ import com.jme3.anim.Armature;
 import com.jme3.anim.Joint;
 
 /**
+ * An AnimationMask to select joints from a single Armature.
  *
  * @author capdevon
  */
-public class AnimMaskBuilder implements AnimationMask {
+public class AnimMaskBuilder {
 
     private static final Logger logger = Logger.getLogger(AnimMaskBuilder.class.getName());
 
@@ -20,7 +23,7 @@ public class AnimMaskBuilder implements AnimationMask {
     private final Armature armature;
 
     /**
-     * Instantiate a builder with Armature.
+     * Instantiate a mask that affects no joints.
      *
      * @param armature
      */
@@ -155,9 +158,36 @@ public class AnimMaskBuilder implements AnimationMask {
         return this;
     }
 
-    @Override
-    public boolean contains(Object target) {
-        return affectedJoints.get(((Joint) target).getId());
+    /**
+     * Get the list of joints affected by this animation mask.
+     *
+     * @return
+     */
+    public List<Joint> getAffectedJoints() {
+        List<Joint> lst = new ArrayList<>();
+        for (Joint joint : armature.getJointList()) {
+            if (affectedJoints.get(joint.getId())) {
+                lst.add(joint);
+            }
+        }
+        return lst;
+    }
+
+    /**
+     * Build AnimationMask
+     *
+     * @return
+     */
+    public AnimationMask build() {
+        AvatarMask mask = new AvatarMask();
+        for (int i = 0; i < affectedJoints.length(); i++) {
+
+            if (affectedJoints.get(i) == true) {
+                Joint joint = armature.getJoint(i);
+                mask.addJoint(joint.getId());
+            }
+        }
+        return mask;
     }
 
 }
