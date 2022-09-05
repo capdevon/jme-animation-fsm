@@ -1,6 +1,5 @@
 plugins {
     id 'application'
-    // Apply the java-library plugin to add support for Java Library
     id 'java-library'
 }
 
@@ -11,7 +10,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 // select one version of the Engine:
-ext.jmonkeyengineVersion = '3.5.2-stable'
+ext.jmeVersion = '3.5.2-stable'
 
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) { // compile-time options:
@@ -51,24 +50,24 @@ dependencies {
     //   https://docs.gradle.org/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
 
     // Engine
-    implementation 'org.jmonkeyengine:jme3-core:' + jmonkeyengineVersion
-    implementation 'org.jmonkeyengine:jme3-desktop:' + jmonkeyengineVersion
-    implementation 'org.jmonkeyengine:jme3-effects:' + jmonkeyengineVersion
-    //implementation 'org.jmonkeyengine:jme3-networking:' + jmonkeyengineVersion
-    //implementation 'org.jmonkeyengine:jme3-niftygui:' + jmonkeyengineVersion
-    //implementation 'org.jmonkeyengine:jme3-terrain:' + jmonkeyengineVersion
+    implementation 'org.jmonkeyengine:jme3-core:' + jmeVersion
+    implementation 'org.jmonkeyengine:jme3-desktop:' + jmeVersion
+    implementation 'org.jmonkeyengine:jme3-effects:' + jmeVersion
+    //implementation 'org.jmonkeyengine:jme3-networking:' + jmeVersion
+    //implementation 'org.jmonkeyengine:jme3-niftygui:' + jmeVersion
+    //implementation 'org.jmonkeyengine:jme3-terrain:' + jmeVersion
     
     // Physics
-    implementation 'com.github.stephengold:Minie:5.1.0+big3'
+    implementation 'com.github.stephengold:Minie:6.0.1+big3'
 
     // select one version of LWJGL
-    runtimeOnly 'org.jmonkeyengine:jme3-lwjgl:' + jmonkeyengineVersion  // LWJGL 2.x
-    //runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jmonkeyengineVersion // LWJGL 3.x
+    runtimeOnly 'org.jmonkeyengine:jme3-lwjgl:' + jmeVersion  // LWJGL 2.x
+    //runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jmeVersion // LWJGL 3.x
 
-    runtimeOnly 'org.jmonkeyengine:jme3-jogg:' + jmonkeyengineVersion
-    runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jmonkeyengineVersion
+    runtimeOnly 'org.jmonkeyengine:jme3-jogg:' + jmeVersion
+    runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jmeVersion
 
-    //runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.1.0-stable'
+    //runtimeOnly 'org.jmonkeyengine:jme3-testdata:' + jmeVersion
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.4.0-alpha6'
         
     // Lemur GUI and Groovy:
