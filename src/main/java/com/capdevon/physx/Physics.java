@@ -40,7 +40,7 @@ public class Physics {
         float distance = expCenter2Body.length();
         if (distance < explosionRadius) {
             // apply proportional explosion force
-            float strength = (1.f - FastMath.clamp(distance / explosionRadius, 0, 1)) * explosionForce;
+            float strength = (1.0f - FastMath.clamp(distance / explosionRadius, 0, 1)) * explosionForce;
             rb.setLinearVelocity(expCenter2Body.normalize().mult(strength));
         }
     }
@@ -76,13 +76,7 @@ public class Physics {
             if (phRay.getHitFraction() < maxDistance && applyMask(layerMask, pco.getCollisionGroup())) {
 
                 RaycastHit hitInfo = new RaycastHit();
-                hitInfo.rigidBody   = pco;
-                hitInfo.collider    = pco.getCollisionShape();
-                hitInfo.gameObject  = pco.getUserObject();
-                hitInfo.normal      = phRay.getHitNormalLocal();
-                hitInfo.distance    = finalVec.subtract(beginVec).length() * phRay.getHitFraction();
-                hitInfo.point.interpolateLocal(beginVec, finalVec, phRay.getHitFraction());
-
+                hitInfo.set(beginVec, finalVec, phRay);
                 lstResults.add(hitInfo);
             }
         }
@@ -132,13 +126,8 @@ public class Physics {
             if (ray.getHitFraction() < hf && applyMask(layerMask, pco.getCollisionGroup())) {
                 collision = true;
                 hf = ray.getHitFraction();
-
-                hitInfo.rigidBody   = pco;
-                hitInfo.collider    = pco.getCollisionShape();
-                hitInfo.gameObject  = pco.getUserObject();
-                hitInfo.normal      = ray.getHitNormalLocal();
-                hitInfo.distance    = finalVec.subtract(beginVec).length() * hf;
-                hitInfo.point.interpolateLocal(beginVec, finalVec, hf);
+                hitInfo.set(beginVec, finalVec, ray);
+                break;
             }
         }
 
@@ -180,13 +169,8 @@ public class Physics {
             if (ray.getHitFraction() < hf && applyMask(layerMask, pco.getCollisionGroup())) {
                 collision = true;
                 hf = ray.getHitFraction();
-
-                hitInfo.rigidBody   = pco;
-                hitInfo.collider    = pco.getCollisionShape();
-                hitInfo.gameObject  = pco.getUserObject();
-                hitInfo.normal      = ray.getHitNormalLocal();
-                hitInfo.point       = FastMath.interpolateLinear(hf, beginVec, finalVec);
-                hitInfo.distance    = beginVec.distance(hitInfo.point);
+                hitInfo.set(beginVec, finalVec, ray);
+                break;
             }
         }
 
