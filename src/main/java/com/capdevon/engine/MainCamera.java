@@ -11,16 +11,25 @@ import com.jme3.renderer.Camera;
  * @author capdevon
  */
 public class MainCamera {
-
+	
+    /**
+     * Z value for the far clipping plane (in screen coordinates)
+     */
+    private static final float farZ = 1f;
+    /**
+     * Z value for the near clipping plane (in screen coordinates)
+     */
+    private static final float nearZ = 0f;
+    
     private Camera cam;
     private float fieldOfView;
     private float near;
     private float far;
-
+    
     /**
      * Creates a camera state that will initialize the application camera to a
      * 45 degree fov, 0.1 near plane, and 1000 far plane.
-     *
+     * 
      * @param cam
      */
     public MainCamera(Camera cam) {
@@ -31,7 +40,7 @@ public class MainCamera {
      * Creates a camera state that will initialize the specified camera to the
      * specified parameters. If the specified camera is null then the
      * application's main camera will be used.
-     *
+     * 
      * @param cam
      * @param fov
      * @param near
@@ -44,7 +53,7 @@ public class MainCamera {
         this.far = far;
         resetCamera();
     }
-
+    
     public void setFieldOfView(float f) {
         if (this.fieldOfView == f) {
             return;
@@ -80,30 +89,31 @@ public class MainCamera {
     public float getFar() {
         return far;
     }
-
+    
     private void resetCamera() {
         float aspect = (float) cam.getWidth() / (float) cam.getHeight();
         cam.setFrustumPerspective(fieldOfView, aspect, near, far);
     }
-
+    
     /**
-     * Returns a ray going from camera through a screen point. usage is:
+     * Returns a ray going from camera through a screen point.
+     * usage is:
      * <pre>
      *     Ray ray = MainCamera.screenPointToRay(cam, inputManager.getCursorPosition());
      * </pre>
      */
-    public static Ray screenPointToRay(Camera cam, Vector2f click2d) {
-        // Convert screen click to 3d position
-        Vector3f click3d = cam.getWorldCoordinates(new Vector2f(click2d), 0).clone();
-        Vector3f dir = cam.getWorldCoordinates(new Vector2f(click2d), 1).subtractLocal(click3d).normalizeLocal();
+    public static Ray screenPointToRay(Camera cam, Vector2f screenXY) {
+        // Convert screen click to 3D position
+        Vector3f nearPos = cam.getWorldCoordinates(screenXY, nearZ);
+        Vector3f dir = cam.getWorldCoordinates(screenXY, farZ).subtractLocal(nearPos).normalizeLocal();
         // Aim the ray from the clicked spot forwards.
-        Ray ray = new Ray(click3d, dir);
+        Ray ray = new Ray(nearPos, dir);
         return ray;
     }
 
     /**
      * Transforms position from world space to local space.
-     *
+     * 
      * @param cam
      * @param position
      * @return
@@ -116,7 +126,7 @@ public class MainCamera {
 
     /**
      * Transforms position from local space to world space.
-     *
+     * 
      * @param cam
      * @param position
      * @return
@@ -126,5 +136,5 @@ public class MainCamera {
         Vector3f camRelative = tr.transformVector(position, null);
         return camRelative;
     }
-
+    
 }
