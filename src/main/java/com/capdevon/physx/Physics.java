@@ -1,13 +1,22 @@
 package com.capdevon.physx;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.jme3.bullet.PhysicsSpace;
+import com.jme3.bullet.collision.PhysicsCollisionEvent;
 import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.bullet.collision.PhysicsRayTestResult;
+import com.jme3.bullet.collision.shapes.BoxCollisionShape;
+import com.jme3.bullet.collision.shapes.SphereCollisionShape;
+import com.jme3.bullet.objects.PhysicsGhostObject;
 import com.jme3.bullet.objects.PhysicsRigidBody;
 import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
 import com.jme3.math.Ray;
 import com.jme3.math.Vector3f;
 import com.jme3.util.TempVars;
@@ -17,6 +26,8 @@ import com.jme3.util.TempVars;
  * @author capdevon
  */
 public class Physics {
+	
+    private static final Logger logger = Logger.getLogger(Physics.class.getName());
 	
     /**
      * DefaultRaycastLayers ALL LAYERS
@@ -112,7 +123,6 @@ public class Physics {
     public static boolean raycast(Vector3f origin, Vector3f direction, RaycastHit hitInfo, float maxDistance, int layerMask) {
         
         boolean collision = false;
-        float hf = maxDistance;
 
         TempVars t = TempVars.get();
         Vector3f beginVec = t.vect1.set(origin);
@@ -123,9 +133,8 @@ public class Physics {
         for (PhysicsRayTestResult ray : results) {
             PhysicsCollisionObject pco = ray.getCollisionObject();
 
-            if (ray.getHitFraction() < hf && applyMask(layerMask, pco.getCollisionGroup())) {
+            if (applyMask(layerMask, pco.getCollisionGroup())) {
                 collision = true;
-                hf = ray.getHitFraction();
                 hitInfo.set(beginVec, finalVec, ray);
                 break;
             }
@@ -159,16 +168,14 @@ public class Physics {
     public static boolean linecast(Vector3f beginVec, Vector3f finalVec, RaycastHit hitInfo, int layerMask) {
 
         boolean collision = false;
-        float hf = finalVec.length();
 
         List<PhysicsRayTestResult> results = PhysicsSpace.getPhysicsSpace().rayTest(beginVec, finalVec);
         for (PhysicsRayTestResult ray : results) {
 
             PhysicsCollisionObject pco = ray.getCollisionObject();
 
-            if (ray.getHitFraction() < hf && applyMask(layerMask, pco.getCollisionGroup())) {
+            if (applyMask(layerMask, pco.getCollisionGroup())) {
                 collision = true;
-                hf = ray.getHitFraction();
                 hitInfo.set(beginVec, finalVec, ray);
                 break;
             }
@@ -179,6 +186,84 @@ public class Physics {
         }
 
         return collision;
+    }
+    
+    /**
+     * Computes and stores colliders inside the sphere.
+     * https://docs.unity3d.com/ScriptReference/Physics.OverlapSphere.html
+     *
+     * @param position  Center of the sphere.
+     * @param radius    Radius of the sphere.
+     * @param layerMask A Layer mask defines which layers of colliders to include in
+     *                  the query.
+     * @return Returns all colliders that overlap with the given sphere.
+     */
+    public static Set<PhysicsCollisionObject> overlapSphere(Vector3f position, float radius, int layerMask) {
+
+        Set<PhysicsCollisionObject> overlappingObjects = new HashSet<>(5);
+        PhysicsGhostObject ghost = new PhysicsGhostObject(new SphereCollisionShape(radius)); //MultiSphere
+        ghost.setPhysicsLocation(position);
+        
+        contactTest(ghost, overlappingObjects, layerMask);
+        return overlappingObjects;
+    }
+
+    public static Set<PhysicsCollisionObject> overlapSphere(Vector3f position, float radius) {
+        return overlapSphere(position, radius, DefaultRaycastLayers);
+    }
+    
+    /**
+     * Find all colliders touching or inside of the given box.
+     * https://docs.unity3d.com/ScriptReference/Physics.OverlapBox.html
+     * 
+     * @param center      Center of the box.
+     * @param halfExtents Half of the size of the box in each dimension.
+     * @param rotation    Rotation of the box.
+     * @param layerMask   A Layer mask that is used to selectively ignore colliders
+     *                    when casting a ray.
+     * @return Returns all colliders that overlap with the given box.
+     */
+    public static Set<PhysicsCollisionObject> overlapBox(Vector3f center, Vector3f halfExtents, Quaternion rotation, int layerMask) {
+
+        Set<PhysicsCollisionObject> overlappingObjects = new HashSet<>(5);
+        PhysicsGhostObject ghost = new PhysicsGhostObject(new BoxCollisionShape(halfExtents));
+        ghost.setPhysicsLocation(center);
+        ghost.setPhysicsRotation(rotation);
+        
+        contactTest(ghost, overlappingObjects, layerMask);
+        return overlappingObjects;
+    }
+
+    public static Set<PhysicsCollisionObject> overlapBox(Vector3f center, Vector3f halfExtents, Quaternion rotation) {
+        return overlapBox(center, halfExtents, rotation, DefaultRaycastLayers);
+    }
+
+    /**
+     * Perform a contact test. This will not detect contacts with soft bodies.
+     */
+    private static int contactTest(PhysicsGhostObject ghost, final Set<PhysicsCollisionObject> overlappingObjects, int layerMask) {
+
+        overlappingObjects.clear();
+
+        int numContacts = PhysicsSpace.getPhysicsSpace().contactTest(ghost, (PhysicsCollisionEvent event) -> {
+
+            // bug: Discard contacts with positive distance between the colliding objects.
+            if (event.getDistance1() > 0f) {
+                return;
+            }
+
+            PhysicsCollisionObject pco = event.getNodeA() != null ? event.getObjectA() : event.getObjectB();
+
+            logger.log(Level.INFO, "NodeA={0} NodeB={1} CollGroup={2}",
+                    new Object[]{event.getNodeA(), event.getNodeB(), pco.getCollisionGroup()});
+
+            if (applyMask(layerMask, pco.getCollisionGroup())) {
+                overlappingObjects.add(pco);
+            }
+        });
+
+        logger.log(Level.INFO, "numContacts={0}", numContacts);
+        return overlappingObjects.size();
     }
 
     /**

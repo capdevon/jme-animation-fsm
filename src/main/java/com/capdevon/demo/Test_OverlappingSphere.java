@@ -1,16 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.capdevon.demo;
 
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import org.apache.commons.lang3.StringUtils;
-
 import com.capdevon.control.PlayerBaseControl;
+import com.capdevon.physx.Physics;
 import com.capdevon.physx.PhysxQuery;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
@@ -252,21 +247,28 @@ public class Test_OverlappingSphere extends SimpleApplication implements ActionL
             physics.setDebugEnabled(!debugEnabled);
             
         } else if (name.equals("ContactTest") && isPressed) {
-            
-            System.out.println("\n--ContactTest:");
-            Set<Spatial> set = PhysxQuery.contactTest(player.getWorldTranslation(), radius, LAYER_2);
-            System.out.println(StringUtils.join(set, "; "));
-            
+
+            System.out.println("\n--OverlapSphere with ContactTest:");
+            Set<PhysicsCollisionObject> set = Physics.overlapSphere(player.getWorldTranslation(), radius, LAYER_2);
+            for (PhysicsCollisionObject pco : set) {
+                printDetails(pco);
+            }
+
         } else if (name.equals("OverlapSphere") && isPressed) {
-            
-            System.out.println("\n--OverlapSphere:");
-            for (PhysicsRigidBody pco : PhysxQuery.overlapSphere(player.getWorldTranslation(), radius)) {// LAYER_1, dynamicObjects)) {
-                System.out.printf("Class: %s, UserObj: %s, CollisionGroup: %d %n", 
-                        pco.getClass().getSimpleName(), 
-                        pco.getUserObject().toString(), 
-                        pco.getCollisionGroup());
+
+            System.out.println("\n--OverlapSphere with Math:");
+            List<PhysicsRigidBody> lst = PhysxQuery.overlapSphere(player.getWorldTranslation(), radius); // LAYER_1, dynamicObjects));
+            for (PhysicsRigidBody pco : lst) {
+                printDetails(pco);
             }
         }
+    }
+    
+    private void printDetails(PhysicsCollisionObject pco) {
+        System.out.printf("Class: %s, UserObj: %s, CollisionGroup: %d %n",
+                pco.getClass().getSimpleName(),
+                pco.getUserObject().toString(),
+                pco.getCollisionGroup());
     }
     
     @Override
