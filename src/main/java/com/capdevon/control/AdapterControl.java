@@ -1,14 +1,11 @@
 package com.capdevon.control;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import com.capdevon.engine.GameObject;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
-import com.jme3.scene.SceneGraphVisitorAdapter;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.Control;
@@ -17,7 +14,7 @@ import com.jme3.scene.control.Control;
  *
  * @author capdevon
  */
-public class AdapterControl extends AbstractControl {
+public abstract class AdapterControl extends AbstractControl {
 
     /**
      * Returns the first child found with exactly the given name

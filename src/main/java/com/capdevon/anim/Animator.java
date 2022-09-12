@@ -1,21 +1,16 @@
 package com.capdevon.anim;
 
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.capdevon.animation.Animation3;
 import com.capdevon.control.AdapterControl;
 import com.jme3.anim.AnimClip;
 import com.jme3.anim.AnimComposer;
-import com.jme3.anim.AnimTrack;
 import com.jme3.anim.Armature;
 import com.jme3.anim.SkinningControl;
 import com.jme3.anim.tween.Tween;
 import com.jme3.anim.tween.Tweens;
 import com.jme3.anim.tween.action.Action;
-import com.jme3.anim.tween.action.BaseAction;
-import com.jme3.animation.LoopMode;
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
@@ -33,9 +28,9 @@ public class Animator extends AdapterControl {
 
     private AnimComposer animComposer;
     private SkinningControl skinningControl;
-    private String currentAnim;
     private ArrayList<ActionAnimEventListener> listeners = new ArrayList<>();
     private ArmatureDebugger debugger;
+    private String currentAnim;
 
     @Override
     public void setSpatial(Spatial sp) {
@@ -45,69 +40,64 @@ public class Animator extends AdapterControl {
             animComposer = getComponentInChildren(AnimComposer.class);
             skinningControl = getComponentInChildren(SkinningControl.class);
 
-            initActions();
+            printInfo();
         }
     }
 
-    private void initActions() {
-        StringBuilder sb = new StringBuilder();
-        String r = String.format("Owner: %s, AnimRoot: %s", spatial, animComposer.getSpatial());
-        sb.append(r);
-
+    private void printInfo() {
+        System.out.printf("Owner: %s, AnimRoot: %s", spatial, getAnimRoot());
         for (AnimClip clip : animComposer.getAnimClips()) {
-            AnimTrack[] tracks = clip.getTracks();
-            String s = String.format("%n * %s (%d), Length: %f", clip.getName(), tracks.length, clip.getLength());
-            sb.append(s);
-            setAnimCallback(clip.getName(), true);
+            System.out.printf("%n * Clip=%s Tracks=%d, Length=%.2f sec",
+                    clip.getName(), clip.getTracks().length, clip.getLength());
         }
-
-        logger.log(Level.INFO, sb.toString());
     }
 
-    public void setAnimCallback(String animName, boolean loop) {
+    public void createDefaultActions() {
+        for (AnimClip clip : animComposer.getAnimClips()) {
+            actionCallback(clip.getName(), true);
+        }
+    }
+
+    /**
+     * @param def (not null)
+     */
+    public void actionCallback(Animation3 def) {
+        Action action = actionCallback(def.getName(), def.isLooping());
+        action.setSpeed(def.speed);
+    }
+
+    public Action actionCallback(String animName, boolean loop) {
+        // Get action registered with specified name. It will make a new action if there isn't any.
         Action action = animComposer.action(animName);
         Tween callback = Tweens.callMethod(this, "notifyAnimCycleDone", animName, loop);
-        action = new BaseAction(Tweens.sequence(action, callback));
-        animComposer.addAction(animName, action);
-    }
-
-    /**
-     * @param anim (not null)
-     */
-    public void setAnimCallback(Animation3 anim) {
-        String animName = anim.getName();
-        boolean isLooping = (anim.getLoopMode() == LoopMode.Loop);
-        setAnimCallback(animName, isLooping);
-
-        /*
-        // Get action registered with specified name. It will make a new action if there isn't any.
-        Tween delegate = animComposer.action(animName);
-        // Configure custom action with specified name, layer, loop, speed and listener.
-        CustomAction action = new CustomAction(delegate, animComposer, animName, AnimComposer.DEFAULT_LAYER);
-        action.setLooping(isLooping);
-        action.setSpeed(speed);
         // Register custom action with specified name.
-        animComposer.addAction(animName, action);
-         */
+        return animComposer.actionSequence(animName, action, callback);
     }
 
     /**
-     * Run an action on the default layer.
-     *
-     * @param name The name of the action to run.
+     * @param def (not null)
      */
-    public void setAnimation(Animation3 anim) {
-        setAnimation(anim.getName(), false);
+    public void actionNoLoop(Animation3 def) {
+        Action action = actionNoLoop(def.name, def.layer);
+        action.setSpeed(def.speed);
     }
 
-    /**
-     * Run an action on the default layer.
-     *
-     * @param name The name of the action to run.
-     */
-    public void setAnimation(String animName, boolean override) {
-        if (override || !animName.equals(currentAnim)) {
-            animComposer.setCurrentAction(animName);
+    public Action actionNoLoop(String animName, String layerName) {
+        // Get action registered with specified name. It will make a new action if there isn't any.
+        Action action = animComposer.action(animName);
+        Tween remove = Tweens.callMethod(animComposer, "removeCurrentAction", layerName);
+        // Register custom action with specified name.
+        return animComposer.actionSequence(animName, action, remove);
+    }
+
+    public void playAnimation(Animation3 def) {
+        playAnimation(def.name, def.layer);
+    }
+
+    public void playAnimation(String animName, String layerName) {
+        if (!animName.equals(currentAnim)) {
+            animComposer.setCurrentAction(animName, layerName);
+            currentAnim = animName;
             notifyAnimChange(animName);
         }
     }
@@ -182,15 +172,14 @@ public class Animator extends AdapterControl {
     }
 
     void notifyAnimChange(String name) {
-        currentAnim = name;
         for (ActionAnimEventListener listener : listeners) {
-            listener.onAnimChange(animComposer, name);
+            listener.onAnimChange(this, name);
         }
     }
 
     void notifyAnimCycleDone(String name, boolean loop) {
         for (ActionAnimEventListener listener : listeners) {
-            listener.onAnimCycleDone(animComposer, name, loop);
+            listener.onAnimCycleDone(this, name, loop);
         }
     }
 
