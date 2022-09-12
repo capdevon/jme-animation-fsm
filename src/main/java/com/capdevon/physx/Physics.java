@@ -252,6 +252,7 @@ public class Physics {
                 return;
             }
 
+            // ghost is not linked to any Spatial, so one of the two nodes A and B is null.
             PhysicsCollisionObject pco = event.getNodeA() != null ? event.getObjectA() : event.getObjectB();
 
             logger.log(Level.INFO, "NodeA={0} NodeB={1} CollGroup={2}",
