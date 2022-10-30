@@ -11,7 +11,7 @@ import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;
 import com.capdevon.engine.FRotator;
-import com.capdevon.physx.PhysxDebugAppState;
+import com.capdevon.physx.TogglePhysicsDebugState;
 import com.jme3.anim.AnimComposer;
 import com.jme3.anim.AnimationMask;
 import com.jme3.anim.SkinningControl;
@@ -104,7 +104,7 @@ public class Test_AnimControllerLayer extends SimpleApplication {
     public void initPhysics() {
         physics = new BulletAppState();
         stateManager.attach(physics);
-        stateManager.attach(new PhysxDebugAppState());
+        stateManager.attach(new TogglePhysicsDebugState());
     }
 
     /**

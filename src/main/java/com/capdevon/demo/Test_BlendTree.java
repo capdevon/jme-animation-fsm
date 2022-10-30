@@ -9,7 +9,7 @@ import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;
 import com.capdevon.anim.fsm.BlendTree;
-import com.capdevon.physx.PhysxDebugAppState;
+import com.capdevon.physx.TogglePhysicsDebugState;
 import com.jme3.anim.SkinningControl;
 import com.jme3.app.Application;
 import com.jme3.app.FlyCamAppState;
@@ -99,7 +99,7 @@ public class Test_BlendTree extends SimpleApplication {
     public void initPhysics() {
         physics = new BulletAppState();
         stateManager.attach(physics);
-        stateManager.attach(new PhysxDebugAppState());
+        stateManager.attach(new TogglePhysicsDebugState());
     }
 
     /**

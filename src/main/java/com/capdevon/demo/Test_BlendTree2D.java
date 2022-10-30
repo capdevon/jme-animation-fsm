@@ -9,7 +9,7 @@ import com.capdevon.anim.fsm.BlendTree;
 import com.capdevon.anim.fsm.BlendTree.BlendTreeType;
 import com.capdevon.animation.MixamoBodyBones;
 import com.capdevon.engine.FRotator;
-import com.capdevon.physx.PhysxDebugAppState;
+import com.capdevon.physx.TogglePhysicsDebugState;
 import com.jme3.anim.AnimComposer;
 import com.jme3.anim.SkinningControl;
 import com.jme3.app.Application;
@@ -101,7 +101,7 @@ public class Test_BlendTree2D extends SimpleApplication {
     public void initPhysics() {
         physics = new BulletAppState();
         stateManager.attach(physics);
-        stateManager.attach(new PhysxDebugAppState());
+        stateManager.attach(new TogglePhysicsDebugState());
     }
 
     /**

@@ -257,7 +257,7 @@ public class Test_OverlappingSphere extends SimpleApplication implements ActionL
         } else if (name.equals("OverlapSphere") && isPressed) {
 
             System.out.println("\n--OverlapSphere with Math:");
-            List<PhysicsRigidBody> lst = PhysxQuery.overlapSphere(player.getWorldTranslation(), radius); // LAYER_1, dynamicObjects));
+            List<PhysicsRigidBody> lst = PhysxQuery.checkSphere(player.getWorldTranslation(), radius); // LAYER_1, dynamicObjects));
             for (PhysicsRigidBody pco : lst) {
                 printDetails(pco);
             }

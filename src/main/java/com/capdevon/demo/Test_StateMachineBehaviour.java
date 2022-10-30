@@ -11,7 +11,7 @@ import com.capdevon.anim.fsm.AnimatorStateTransition;
 import com.capdevon.anim.fsm.StateMachineBehaviour;
 import com.capdevon.anim.fsm.StateMachineListener;
 import com.capdevon.control.PlayerBaseControl;
-import com.capdevon.physx.PhysxDebugAppState;
+import com.capdevon.physx.TogglePhysicsDebugState;
 import com.capdevon.util.PrimitiveUtils;
 import com.jme3.anim.AnimComposer;
 import com.jme3.app.FlyCamAppState;
@@ -96,7 +96,7 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
     public void initPhysics() {
         physics = new BulletAppState();
         stateManager.attach(physics);
-        stateManager.attach(new PhysxDebugAppState());
+        stateManager.attach(new TogglePhysicsDebugState());
 
         physics.setDebugAxisLength(1);
         physics.setDebugEnabled(false);

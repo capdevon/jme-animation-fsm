@@ -6,7 +6,7 @@
 package com.capdevon.demo;
 
 import com.capdevon.control.TimekeeperControl;
-import com.capdevon.physx.PhysxDebugAppState;
+import com.capdevon.physx.TogglePhysicsDebugState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bounding.BoundingBox;
 import com.jme3.bullet.BulletAppState;
@@ -59,7 +59,7 @@ public class Test_CellFracture extends SimpleApplication {
         flyCam.setMoveSpeed(20f);
 
         stateManager.attach(new BulletAppState());
-        stateManager.attach(new PhysxDebugAppState());
+        stateManager.attach(new TogglePhysicsDebugState());
 
         setupScene();
         setupLights();

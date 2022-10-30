@@ -5,7 +5,7 @@ import com.capdevon.control.AdapterControl;
 import com.capdevon.debug.DebugShapes;
 import com.capdevon.engine.FVector;
 import com.capdevon.physx.Physics;
-import com.capdevon.physx.PhysxDebugAppState;
+import com.capdevon.physx.TogglePhysicsDebugState;
 import com.capdevon.physx.RaycastHit;
 import com.jme3.anim.AnimComposer;
 import com.jme3.anim.Joint;
@@ -97,7 +97,7 @@ public class Test_Climbing extends SimpleApplication {
         physics.setDebugEnabled(true);
         
         // press 0 to toggle physics debug
-        stateManager.attach(new PhysxDebugAppState());
+        stateManager.attach(new TogglePhysicsDebugState());
     }
     
     /**

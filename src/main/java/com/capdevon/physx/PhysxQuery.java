@@ -18,13 +18,13 @@ public class PhysxQuery {
     private static final Logger logger = Logger.getLogger(PhysxQuery.class.getName());
 
     /**
-     * DefaultRaycastLayers ALL LAYERS
+     * DefaultRaycastLayers
      */
-    private static final int DefaultRaycastLayers = ~0;
+    private static final int ALL_LAYERS = ~0;
     /**
      * IdentityFunction
      */
-    private static final Predicate<PhysicsRigidBody> IdentityFunction = x -> true;
+    private static final Predicate<PhysicsRigidBody> AlwaysTrue = x -> true;
 
     private PhysxQuery() {
         // private constructor.
@@ -40,7 +40,7 @@ public class PhysxQuery {
      * @return Returns an array with all PhysicsRigidBody touching or inside the
      * sphere.
      */
-    public static List<PhysicsRigidBody> overlapSphere(Vector3f position, float radius, int layerMask, Predicate<PhysicsRigidBody> func) {
+    public static List<PhysicsRigidBody> checkSphere(Vector3f position, float radius, int layerMask, Predicate<PhysicsRigidBody> func) {
 
         List<PhysicsRigidBody> results = new ArrayList<>(10);
         for (PhysicsRigidBody pco : PhysicsSpace.getPhysicsSpace().getRigidBodyList()) {
@@ -56,12 +56,12 @@ public class PhysxQuery {
         return results;
     }
 
-    public static List<PhysicsRigidBody> overlapSphere(Vector3f position, float radius, int layerMask) {
-        return overlapSphere(position, radius, layerMask, IdentityFunction);
+    public static List<PhysicsRigidBody> checkSphere(Vector3f position, float radius, int layerMask) {
+        return checkSphere(position, radius, layerMask, AlwaysTrue);
     }
 
-    public static List<PhysicsRigidBody> overlapSphere(Vector3f position, float radius) {
-        return overlapSphere(position, radius, DefaultRaycastLayers, IdentityFunction);
+    public static List<PhysicsRigidBody> checkSphere(Vector3f position, float radius) {
+        return checkSphere(position, radius, ALL_LAYERS, AlwaysTrue);
     }
 
     /**
@@ -75,7 +75,7 @@ public class PhysxQuery {
      * @param func      - Specifies a function to filter colliders.
      * @return Returns the amount of colliders stored into the results buffer.
      */
-    public static int overlapSphereNonAlloc(Vector3f position, float radius, PhysicsRigidBody[] results, int layerMask, Predicate<PhysicsRigidBody> func) {
+    public static int checkSphereNonAlloc(Vector3f position, float radius, PhysicsRigidBody[] results, int layerMask, Predicate<PhysicsRigidBody> func) {
 
         int numColliders = 0;
         for (PhysicsRigidBody pco : PhysicsSpace.getPhysicsSpace().getRigidBodyList()) {
@@ -94,12 +94,12 @@ public class PhysxQuery {
         return numColliders;
     }
 
-    public static int overlapSphereNonAlloc(Vector3f position, float radius, PhysicsRigidBody[] results, int layerMask) {
-        return overlapSphereNonAlloc(position, radius, results, layerMask, IdentityFunction);
+    public static int checkSphereNonAlloc(Vector3f position, float radius, PhysicsRigidBody[] results, int layerMask) {
+        return checkSphereNonAlloc(position, radius, results, layerMask, AlwaysTrue);
     }
 
-    public static int overlapSphereNonAlloc(Vector3f position, float radius, PhysicsRigidBody[] results) {
-        return overlapSphereNonAlloc(position, radius, results, DefaultRaycastLayers, IdentityFunction);
+    public static int checkSphereNonAlloc(Vector3f position, float radius, PhysicsRigidBody[] results) {
+        return checkSphereNonAlloc(position, radius, results, ALL_LAYERS, AlwaysTrue);
     }
 
     /**

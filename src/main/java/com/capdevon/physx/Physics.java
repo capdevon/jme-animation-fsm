@@ -30,9 +30,9 @@ public class Physics {
     private static final Logger logger = Logger.getLogger(Physics.class.getName());
 	
     /**
-     * DefaultRaycastLayers ALL LAYERS
+     * DefaultRaycastLayers
      */
-    private static final int DefaultRaycastLayers = ~0;
+    private static final int ALL_LAYERS = ~0;
     
     private Physics() {
         // private constructor.
@@ -60,7 +60,7 @@ public class Physics {
      * Casts a ray through the scene and returns all hits.
      */
     public static List<RaycastHit> raycastAll(Ray ray, float maxDistance) {
-        return raycastAll(ray, maxDistance, DefaultRaycastLayers);
+        return raycastAll(ray, maxDistance, ALL_LAYERS);
     }
 
     /**
@@ -77,17 +77,16 @@ public class Physics {
 
         TempVars t = TempVars.get();
         Vector3f beginVec = t.vect1.set(ray.origin);
-        Vector3f finalVec = t.vect2.set(ray.direction).multLocal(maxDistance).addLocal(ray.origin);
+        Vector3f finalVec = t.vect2.set(ray.direction).scaleAdd(maxDistance, ray.origin);
 
         List<PhysicsRayTestResult> results = PhysicsSpace.getPhysicsSpace().rayTest(beginVec, finalVec);
 
-        for (PhysicsRayTestResult phRay : results) {
-            PhysicsCollisionObject pco = phRay.getCollisionObject();
+        for (PhysicsRayTestResult phyRay : results) {
+            PhysicsCollisionObject pco = phyRay.getCollisionObject();
 
-            if (phRay.getHitFraction() < maxDistance && applyMask(layerMask, pco.getCollisionGroup())) {
-
+            if (applyMask(layerMask, pco.getCollisionGroup())) {
                 RaycastHit hitInfo = new RaycastHit();
-                hitInfo.set(beginVec, finalVec, phRay);
+                hitInfo.set(beginVec, finalVec, phyRay);
                 lstResults.add(hitInfo);
             }
         }
@@ -101,11 +100,11 @@ public class Physics {
      * maxDistance, against all colliders in the Scene.
      */
     public static boolean raycast(Vector3f origin, Vector3f direction, RaycastHit hitInfo, float maxDistance) {
-        return raycast(origin, direction, hitInfo, maxDistance, DefaultRaycastLayers);
+        return raycast(origin, direction, hitInfo, maxDistance, ALL_LAYERS);
     }
     
     public static boolean raycast(Ray ray, RaycastHit hitInfo, float maxDistance) {
-        return raycast(ray.origin, ray.direction, hitInfo, maxDistance, DefaultRaycastLayers);
+        return raycast(ray.origin, ray.direction, hitInfo, maxDistance, ALL_LAYERS);
     }
     
     /**
@@ -122,11 +121,12 @@ public class Physics {
      */
     public static boolean raycast(Vector3f origin, Vector3f direction, RaycastHit hitInfo, float maxDistance, int layerMask) {
         
+        hitInfo.clear();
         boolean collision = false;
 
         TempVars t = TempVars.get();
         Vector3f beginVec = t.vect1.set(origin);
-        Vector3f finalVec = t.vect2.set(direction).multLocal(maxDistance).addLocal(origin);
+        Vector3f finalVec = t.vect2.set(direction).scaleAdd(maxDistance, origin);
 
         List<PhysicsRayTestResult> results = PhysicsSpace.getPhysicsSpace().rayTest(beginVec, finalVec);
 
@@ -134,14 +134,10 @@ public class Physics {
             PhysicsCollisionObject pco = ray.getCollisionObject();
 
             if (applyMask(layerMask, pco.getCollisionGroup())) {
-                collision = true;
                 hitInfo.set(beginVec, finalVec, ray);
+                collision = true;
                 break;
             }
-        }
-
-        if (!collision) {
-            hitInfo.clear();
         }
 
         t.release();
@@ -152,7 +148,7 @@ public class Physics {
      * Returns true if there is any collider intersecting the line between beginVec and finalVec.
      */
     public static boolean linecast(Vector3f beginVec, Vector3f finalVec, RaycastHit hitInfo) {
-        return linecast(beginVec, finalVec, hitInfo, DefaultRaycastLayers);
+        return linecast(beginVec, finalVec, hitInfo, ALL_LAYERS);
     }
     
     /**
@@ -167,22 +163,19 @@ public class Physics {
      */
     public static boolean linecast(Vector3f beginVec, Vector3f finalVec, RaycastHit hitInfo, int layerMask) {
 
+        hitInfo.clear();
         boolean collision = false;
 
         List<PhysicsRayTestResult> results = PhysicsSpace.getPhysicsSpace().rayTest(beginVec, finalVec);
+        
         for (PhysicsRayTestResult ray : results) {
-
             PhysicsCollisionObject pco = ray.getCollisionObject();
 
             if (applyMask(layerMask, pco.getCollisionGroup())) {
-                collision = true;
                 hitInfo.set(beginVec, finalVec, ray);
+                collision = true;
                 break;
             }
-        }
-
-        if (!collision) {
-            hitInfo.clear();
         }
 
         return collision;
@@ -209,7 +202,7 @@ public class Physics {
     }
 
     public static Set<PhysicsCollisionObject> overlapSphere(Vector3f position, float radius) {
-        return overlapSphere(position, radius, DefaultRaycastLayers);
+        return overlapSphere(position, radius, ALL_LAYERS);
     }
     
     /**
@@ -235,7 +228,7 @@ public class Physics {
     }
 
     public static Set<PhysicsCollisionObject> overlapBox(Vector3f center, Vector3f halfExtents, Quaternion rotation) {
-        return overlapBox(center, halfExtents, rotation, DefaultRaycastLayers);
+        return overlapBox(center, halfExtents, rotation, ALL_LAYERS);
     }
 
     /**

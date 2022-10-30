@@ -8,7 +8,7 @@ import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParam
 import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;
-import com.capdevon.physx.PhysxDebugAppState;
+import com.capdevon.physx.TogglePhysicsDebugState;
 import com.jme3.anim.AnimComposer;
 import com.jme3.app.Application;
 import com.jme3.app.FlyCamAppState;
@@ -104,7 +104,7 @@ public class Test_AnimStateController extends SimpleApplication {
         physics = new BulletAppState();
         //physics.setThreadingType(ThreadingType.SEQUENTIAL);
         stateManager.attach(physics);
-        stateManager.attach(new PhysxDebugAppState());
+        stateManager.attach(new TogglePhysicsDebugState());
 
         physics.setDebugAxisLength(1);
         physics.setDebugEnabled(false);
