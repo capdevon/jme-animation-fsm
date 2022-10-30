@@ -146,19 +146,19 @@ public class Test_Climbing extends SimpleApplication {
     	
     	//
         player = new Node("MainCharacter");
-        player.attachChild(debugShapes.getAxesCoordinate());
+        player.attachChild(debugShapes.drawAxis());
         player.setLocalTranslation(0, 1, -1);
         rootNode.attachChild(player);
         
         // vertical
         Node ledgeRayV = new Node("LedgeRayV");
-        ledgeRayV.attachChild(debugShapes.createWireBox(0.1f, ColorRGBA.Red));
+        ledgeRayV.attachChild(debugShapes.drawWireCube(0.1f, ColorRGBA.Red));
         player.attachChild(ledgeRayV);
         ledgeRayV.setLocalTranslation(FVector.forward(player).multLocal(0.5f).addLocal(0, 3, 0));
         
         // horizontal
         Node ledgeRayH = new Node("LedgeRayH");
-        ledgeRayH.attachChild(debugShapes.createWireBox(0.1f, ColorRGBA.Blue));
+        ledgeRayH.attachChild(debugShapes.drawWireCube(0.1f, ColorRGBA.Blue));
         player.attachChild(ledgeRayH);
         ledgeRayH.setLocalTranslation(FVector.forward(player).multLocal(0.2f).addLocal(0, 1.5f, 0));
         
@@ -180,7 +180,7 @@ public class Test_Climbing extends SimpleApplication {
         // setup third person camera
         setupChaseCamera();
         
-        Geometry rootBoneRef = debugShapes.createWireSphere(0.4f, ColorRGBA.White);
+        Geometry rootBoneRef = debugShapes.drawWireSphere(0.4f, ColorRGBA.White);
         rootNode.attachChild(rootBoneRef);
         
         // setup player control

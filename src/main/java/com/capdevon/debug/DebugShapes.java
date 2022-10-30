@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.capdevon.debug;
 
 import com.jme3.asset.AssetManager;
@@ -52,59 +47,46 @@ public class DebugShapes {
      * @param color
      * @return
      */
-    public Geometry createGrid(Vector3f pos, int size, ColorRGBA color) {
-        Geometry g = new Geometry("wireframe grid", new Grid(size, size, 0.2f));
-        Material mat = new Material(assetManager, Materials.UNSHADED);
-        mat.getAdditionalRenderState().setWireframe(true);
-        mat.setColor("Color", color);
-        g.setMaterial(mat);
-        g.center().move(pos);
-        g.setShadowMode(ShadowMode.Off);
-        debugNode.attachChild(g);
-        return g;
+    public Geometry drawGrid(Vector3f pos, int size, ColorRGBA color) {
+        Grid grid = new Grid(size, size, 0.2f);
+        Geometry geo = new Geometry("wireframe grid", grid);
+        geo.setMaterial(createWireMat(color));
+        geo.setShadowMode(ShadowMode.Off);
+        geo.center().move(pos);
+        debugNode.attachChild(geo);
+        return geo;
     }
 
     /**
      * The coordinate axes (com.jme3.scene.debug.Arrow) help you see the
      * cardinal directions (X,Y,Z) from their center point. Scale the arrows to
-     * use them as a “ruler” for a certain length.
+     * use them as a "ruler" for a certain length.
      *
-     * @return 
+     * @return
      */
-    public Node getAxesCoordinate() {
-        Node node = new Node("Axes");
-        node.attachChild(getXAxis());
-        node.attachChild(getYAxis());
-        node.attachChild(getZAxis());
+    public Node drawAxis() {
+        Node node = new Node("AxisCoords");
+        node.attachChild(drawArrow("AX", Vector3f.UNIT_X, ColorRGBA.Red));
+        node.attachChild(drawArrow("AY", Vector3f.UNIT_Y, ColorRGBA.Green));
+        node.attachChild(drawArrow("AZ", Vector3f.UNIT_Z, ColorRGBA.Blue));
         return node;
     }
 
-    public Geometry getXAxis() {
-        return getArrow("AX", Vector3f.UNIT_X, ColorRGBA.Red);
+    public Geometry drawArrow(String name, Vector3f dir, ColorRGBA color) {
+        Arrow arrow = new Arrow(dir);
+        Geometry geo = new Geometry(name, arrow);
+        geo.setMaterial(createWireMat(color));
+        geo.setShadowMode(ShadowMode.Off);
+        debugNode.attachChild(geo);
+        return geo;
     }
 
-    public Geometry getYAxis() {
-        return getArrow("AY", Vector3f.UNIT_Y, ColorRGBA.Green);
-    }
-
-    public Geometry getZAxis() {
-        return getArrow("AZ", Vector3f.UNIT_Z, ColorRGBA.Blue);
-    }
-
-    public Geometry getArrow(String name, Vector3f dir, ColorRGBA color) {
-        return putShape(name, new Arrow(dir), color);
-    }
-
-    public Geometry putShape(String name, Mesh shape, ColorRGBA color) {
-        Geometry g = new Geometry(name, shape);
-        Material mat = new Material(assetManager, Materials.UNSHADED);
-        mat.getAdditionalRenderState().setWireframe(true);
-        mat.getAdditionalRenderState().setLineWidth(lineWidth);
-        mat.setColor("Color", color);
-        g.setMaterial(mat);
-        g.setShadowMode(ShadowMode.Off);
-        debugNode.attachChild(g);
-        return g;
+    public Geometry drawMesh(String name, Mesh shape, ColorRGBA color) {
+        Geometry geo = new Geometry(name, shape);
+        geo.setMaterial(createColorMat(color));
+        geo.setShadowMode(ShadowMode.Off);
+        debugNode.attachChild(geo);
+        return geo;
     }
 
     /**
@@ -112,20 +94,17 @@ public class DebugShapes {
      * to see whether your code scales, positions, or orients, loaded models
      * right.
      *
-     * @param pos
      * @param size
      * @param color
      * @return
      */
-    public Geometry createWireBox(float size, ColorRGBA color) {
-        Geometry g = new Geometry("WireBox.Geo", new WireBox(size, size, size));
-        Material mat = new Material(assetManager, Materials.UNSHADED);
-        mat.getAdditionalRenderState().setWireframe(true);
-        mat.setColor("Color", color);
-        g.setMaterial(mat);
-        g.setShadowMode(ShadowMode.Off);
-        debugNode.attachChild(g);
-        return g;
+    public Geometry drawWireCube(float size, ColorRGBA color) {
+        WireBox box = new WireBox(size, size, size);
+        Geometry geo = new Geometry("WireBox", box);
+        geo.setMaterial(createWireMat(color));
+        geo.setShadowMode(ShadowMode.Off);
+        debugNode.attachChild(geo);
+        return geo;
     }
 
     /**
@@ -133,23 +112,30 @@ public class DebugShapes {
      * object to see whether your code scales, positions, or orients, loaded
      * models right.
      *
-     * @param pos
-     * @param size
+     * @param radius
      * @param color
      * @return
      */
-    public Geometry createWireSphere(float radius, ColorRGBA color) {
-        Geometry g = new Geometry("WireSphere.Geo", new WireSphere(radius));
-        Material mat = new Material(assetManager, Materials.UNSHADED);
-        mat.getAdditionalRenderState().setWireframe(true);
-        mat.setColor("Color", color);
-        g.setMaterial(mat);
-        g.setShadowMode(ShadowMode.Off);
-        debugNode.attachChild(g);
-        return g;
+    public Geometry drawWireSphere(float radius, ColorRGBA color) {
+        WireSphere sphere = new WireSphere(radius);
+        Geometry geo = new Geometry("WireSphere", sphere);
+        geo.setMaterial(createWireMat(color));
+        geo.setShadowMode(ShadowMode.Off);
+        debugNode.attachChild(geo);
+        return geo;
     }
-    
-    public Geometry createCameraFrustum(Camera cam) {
+
+    public Geometry drawSphereDebug(float radius, ColorRGBA color) {
+        BoundingSphereDebug sphere = new BoundingSphereDebug();
+        Geometry geo = new Geometry("SphereDebug", sphere);
+        geo.setMaterial(createWireMat(color));
+        geo.setShadowMode(RenderQueue.ShadowMode.Off);
+        geo.setLocalScale(radius);
+        debugNode.attachChild(geo);
+        return geo;
+    }
+
+    public Geometry drawCameraFrustum(Camera cam) {
 
         Vector3f[] points = new Vector3f[8];
         for (int i = 0; i < 8; i++) {
@@ -172,13 +158,19 @@ public class DebugShapes {
         debugNode.attachChild(frustumGeo);
         return frustumGeo;
     }
-    
-    public Geometry createDebugSphere(float radius) {
-        Geometry geo = BoundingSphereDebug.createDebugSphere(assetManager);
-        geo.setShadowMode(RenderQueue.ShadowMode.Off);
-        geo.setLocalScale(radius);
-        debugNode.attachChild(geo);
-        return geo;
+
+    private Material createColorMat(ColorRGBA color) {
+        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat.setColor("Color", color);
+        return mat;
+    }
+
+    private Material createWireMat(ColorRGBA color) {
+        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat.setColor("Color", color);
+        mat.getAdditionalRenderState().setWireframe(true);
+        mat.getAdditionalRenderState().setLineWidth(lineWidth);
+        return mat;
     }
 
     /**
