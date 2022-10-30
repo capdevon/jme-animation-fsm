@@ -223,8 +223,8 @@ public class Test_OverlappingSphere extends SimpleApplication implements ActionL
     }
     
     private void setupKeys() {
-        addMapping("OverlapSphere", new KeyTrigger(KeyInput.KEY_SPACE));
-        addMapping("ContactTest", new KeyTrigger(KeyInput.KEY_RETURN));
+        addMapping("checkSphere", new KeyTrigger(KeyInput.KEY_SPACE));
+        addMapping("overlapSphere", new KeyTrigger(KeyInput.KEY_RETURN));
         addMapping("TogglePhysxDebug", new KeyTrigger(KeyInput.KEY_0));
     }
     
@@ -246,7 +246,7 @@ public class Test_OverlappingSphere extends SimpleApplication implements ActionL
             boolean debugEnabled = physics.isDebugEnabled();
             physics.setDebugEnabled(!debugEnabled);
             
-        } else if (name.equals("ContactTest") && isPressed) {
+        } else if (name.equals("overlapSphere") && isPressed) {
 
             System.out.println("\n--OverlapSphere with ContactTest:");
             Set<PhysicsCollisionObject> set = Physics.overlapSphere(player.getWorldTranslation(), radius, LAYER_2);
@@ -254,9 +254,9 @@ public class Test_OverlappingSphere extends SimpleApplication implements ActionL
                 printDetails(pco);
             }
 
-        } else if (name.equals("OverlapSphere") && isPressed) {
+        } else if (name.equals("checkSphere") && isPressed) {
 
-            System.out.println("\n--OverlapSphere with Math:");
+            System.out.println("\n--CheckSphere with Math:");
             List<PhysicsRigidBody> lst = PhysxQuery.checkSphere(player.getWorldTranslation(), radius); // LAYER_1, dynamicObjects));
             for (PhysicsRigidBody pco : lst) {
                 printDetails(pco);
