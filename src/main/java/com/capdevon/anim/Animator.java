@@ -3,7 +3,7 @@ package com.capdevon.anim;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-import com.capdevon.control.AdapterControl;
+import com.capdevon.demo.control.AdapterControl;
 import com.jme3.anim.AnimClip;
 import com.jme3.anim.AnimComposer;
 import com.jme3.anim.Armature;

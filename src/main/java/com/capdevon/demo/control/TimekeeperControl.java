@@ -1,4 +1,4 @@
-package com.capdevon.control;
+package com.capdevon.demo.control;
 
 import java.util.LinkedList;
 
@@ -94,11 +94,6 @@ public class TimekeeperControl extends AbstractControl implements ActionListener
         rgb.setKinematic(false);
     }
 
-    /**
-     * ------------------------------------------------------------
-     * @class TrasformPoint
-     * ------------------------------------------------------------
-     */
     private class TrasformPoint {
 
         Vector3f position;

@@ -5,7 +5,7 @@
  */
 package com.capdevon.demo;
 
-import com.capdevon.control.TimekeeperControl;
+import com.capdevon.demo.control.TimekeeperControl;
 import com.capdevon.physx.TogglePhysicsDebugState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bounding.BoundingBox;

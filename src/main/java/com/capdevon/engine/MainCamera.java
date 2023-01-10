@@ -105,7 +105,8 @@ public class MainCamera {
     public static Ray screenPointToRay(Camera cam, Vector2f screenXY) {
         // Convert screen click to 3D position
         Vector3f nearPos = cam.getWorldCoordinates(screenXY, nearZ);
-        Vector3f dir = cam.getWorldCoordinates(screenXY, farZ).subtractLocal(nearPos).normalizeLocal();
+        Vector3f farPos = cam.getWorldCoordinates(screenXY, farZ);
+        Vector3f dir = farPos.subtract(nearPos).normalizeLocal();
         // Aim the ray from the clicked spot forwards.
         Ray ray = new Ray(nearPos, dir);
         return ray;

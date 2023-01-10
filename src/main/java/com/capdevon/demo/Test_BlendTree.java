@@ -1,10 +1,10 @@
 package com.capdevon.demo;
 
 import com.capdevon.anim.AnimUtils;
+import com.capdevon.anim.MixamoBodyBones;
 import com.capdevon.anim.fsm.AnimatorConditionMode;
 import com.capdevon.anim.fsm.AnimatorController;
 import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParameterType;
-import com.capdevon.animation.MixamoBodyBones;
 import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;

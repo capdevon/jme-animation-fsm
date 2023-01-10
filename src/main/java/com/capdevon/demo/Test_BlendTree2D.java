@@ -1,13 +1,13 @@
 package com.capdevon.demo;
 
 import com.capdevon.anim.AnimUtils;
+import com.capdevon.anim.MixamoBodyBones;
 import com.capdevon.anim.fsm.AnimatorController;
 import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParameterType;
 import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.BlendTree;
 import com.capdevon.anim.fsm.BlendTree.BlendTreeType;
-import com.capdevon.animation.MixamoBodyBones;
 import com.capdevon.engine.FRotator;
 import com.capdevon.physx.TogglePhysicsDebugState;
 import com.jme3.anim.AnimComposer;

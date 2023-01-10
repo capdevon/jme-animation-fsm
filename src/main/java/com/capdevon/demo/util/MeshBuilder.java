@@ -1,4 +1,4 @@
-package com.capdevon.util;
+package com.capdevon.demo.util;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
@@ -17,16 +17,16 @@ import com.jme3.scene.shape.Sphere;
  * 
  * @author capdevon
  */
-public class PrimitiveUtils {
+public class MeshBuilder {
 	
     private static AssetManager assetManager;
 
-    private PrimitiveUtils() {
+    private MeshBuilder() {
         //private constructor.
     }
 
     public static void init(AssetManager assetManager) {
-        PrimitiveUtils.assetManager = assetManager;
+        MeshBuilder.assetManager = assetManager;
     }
 	
     /**
@@ -53,11 +53,11 @@ public class PrimitiveUtils {
      */
     public static Geometry createArrow(String name, Vector3f dir, ColorRGBA color) {
         Arrow arrow = new Arrow(dir);
-        Geometry g = new Geometry(name, arrow);
+        Geometry geo = new Geometry(name, arrow);
         Material mat = new Material(assetManager, Materials.UNSHADED);
         mat.setColor("Color", color);
-        g.setMaterial(mat);
-        return g;
+        geo.setMaterial(mat);
+        return geo;
     }
 
     /**

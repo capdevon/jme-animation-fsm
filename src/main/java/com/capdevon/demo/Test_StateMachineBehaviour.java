@@ -5,14 +5,14 @@ import com.capdevon.anim.fsm.AnimatorConditionMode;
 import com.capdevon.anim.fsm.AnimatorController;
 import com.capdevon.anim.fsm.AnimatorControllerLayer;
 import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParameterType;
+import com.capdevon.demo.control.PlayerBaseControl;
+import com.capdevon.demo.util.MeshBuilder;
 import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;
 import com.capdevon.anim.fsm.StateMachineBehaviour;
 import com.capdevon.anim.fsm.StateMachineListener;
-import com.capdevon.control.PlayerBaseControl;
 import com.capdevon.physx.TogglePhysicsDebugState;
-import com.capdevon.util.PrimitiveUtils;
 import com.jme3.anim.AnimComposer;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
@@ -79,7 +79,7 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
     @Override
     public void simpleInitApp() {
 
-        PrimitiveUtils.init(assetManager);
+        MeshBuilder.init(assetManager);
         initPhysics();
         createFloor();
         setupPlayer();
@@ -233,8 +233,8 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
     
     private void setupPlayer() {
         player = new Node("Player");
-        player.attachChild(PrimitiveUtils.createCapsule(ColorRGBA.Green, .5f, 1.4f));
-        player.attachChild(PrimitiveUtils.createAxes("MyAxes"));
+        player.attachChild(MeshBuilder.createCapsule(ColorRGBA.Green, .5f, 1.4f));
+        player.attachChild(MeshBuilder.createAxes("MyAxes"));
         player.setLocalTranslation(0, 0, -10f);
         rootNode.attachChild(player);
 

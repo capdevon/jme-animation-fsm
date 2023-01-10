@@ -1,4 +1,4 @@
-package com.capdevon.control;
+package com.capdevon.demo.control;
 
 import com.capdevon.engine.FRotator;
 import com.jme3.app.Application;

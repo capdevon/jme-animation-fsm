@@ -1,8 +1,5 @@
 package com.capdevon.anim;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 import com.jme3.anim.AnimClip;
@@ -17,8 +14,6 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.Control;
 import com.jme3.util.SafeArrayList;
-import java.lang.reflect.Field;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -26,44 +21,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class AnimUtils {
 
-    private AnimUtils() {
-    }
-
-    /**
-     * Running Mixamo Armature Renaming Script.
-     */
-    public static void renameMixamoArmature(Spatial sp) {
-        Armature skeleton = getSkinningControl(sp).getArmature();
-        for (int i = 0; i < skeleton.getJointCount(); ++i) {
-            Joint joint = skeleton.getJoint(i);
-
-            String replacement = StringUtils.substringAfterLast(joint.getName(), ":");
-            if (StringUtils.isNotBlank(replacement)) {
-                renameJoint(joint, replacement);
-            }
-        }
-    }
-
-    public static void renameJoint(Joint joint, String newName) {
-        try {
-            System.out.println("Renaming Joint= " + joint.getName() + " to= " + newName);
-
-            Field fieldName = Joint.class.getDeclaredField("name");
-            fieldName.setAccessible(true);
-            fieldName.set(joint, newName);
-
-            Field fieldAttachNode = Joint.class.getDeclaredField("attachedNode");
-            fieldAttachNode.setAccessible(true);
-
-            Node node = (Node) fieldAttachNode.get(joint);
-            if (node != null) {
-                node.setName(newName + "_attachedNode");
-            }
-
-        } catch (ReflectiveOperationException e) {
-            e.printStackTrace();
-        }
-    }
+    private AnimUtils() {}
 
     /**
      * @param from
@@ -135,36 +93,6 @@ public class AnimUtils {
         return tracks.getArray();
     }
 
-    @SuppressWarnings("rawtypes")
-    public static AnimClip retargetClip(String name, AnimClip sourceClip, Spatial target) {
-        Spatial animRoot = findAnimRoot(target);
-        if (animRoot == null) {
-            System.err.println("Anim root is null!");
-            return null;
-        }
-
-        SkinningControl sc = animRoot.getControl(SkinningControl.class);
-        AnimClip copy = new AnimClip(name);
-        AnimTrack[] tracks = copyAnimTracks(sourceClip, sc.getArmature());
-        copy.setTracks(tracks);
-        return copy;
-    }
-
-    private static Spatial findAnimRoot(Spatial s) {
-        if (s.getControl(AnimComposer.class) != null) {
-            return s;
-        }
-        if (s instanceof Node) {
-            for (Spatial child : ((Node) s).getChildren()) {
-                Spatial result = findAnimRoot(child);
-                if (result != null) {
-                    return result;
-                }
-            }
-        }
-        return null;
-    }
-
     public static AnimComposer getAnimComposer(Spatial sp) {
         AnimComposer control = findControl(sp, AnimComposer.class);
         return Objects.requireNonNull(control, "AnimComposer not found: " + sp);
@@ -173,21 +101,6 @@ public class AnimUtils {
     public static SkinningControl getSkinningControl(Spatial sp) {
         SkinningControl control = findControl(sp, SkinningControl.class);
         return Objects.requireNonNull(control, "SkinningControl not found: " + sp);
-    }
-
-    public static List<String> listJoints(Spatial sp) {
-        SkinningControl sc = getSkinningControl(sp);
-        return listJoints(sc.getArmature());
-    }
-
-    public static List<String> listJoints(Armature skeleton) {
-        int boneCount = skeleton.getJointCount();
-        List<String> lst = new ArrayList<>(boneCount);
-        for (Joint bone : skeleton.getJointList()) {
-            lst.add(bone.getName());
-        }
-        Collections.sort(lst);
-        return lst;
     }
 
     /**

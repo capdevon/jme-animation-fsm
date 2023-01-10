@@ -1,10 +1,6 @@
 package com.capdevon.engine;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.jme3.scene.Node;
-import com.jme3.scene.SceneGraphVisitorAdapter;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.Control;
 
@@ -18,26 +14,6 @@ public class GameObject {
      * A private constructor to inhibit instantiation of this class.
      */
     private GameObject() {
-    }
-
-    /**
-     * Returns all components of Type type in the GameObject.
-     *
-     * @param <T>
-     * @param clazz
-     * @return
-     */
-    public static <T extends Control> T[] getComponents(Spatial spatial, Class<T> clazz) {
-        final List<Node> lst = new ArrayList<>(5);
-        spatial.breadthFirstTraversal(new SceneGraphVisitorAdapter() {
-            @Override
-            public void visit(Node node) {
-                if (node.getControl(clazz) != null) {
-                    lst.add(node);
-                }
-            }
-        });
-        return (T[]) lst.toArray();
     }
 
     /**

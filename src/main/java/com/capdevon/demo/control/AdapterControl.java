@@ -1,4 +1,4 @@
-package com.capdevon.control;
+package com.capdevon.demo.control;
 
 import java.util.Objects;
 
@@ -39,13 +39,6 @@ public abstract class AdapterControl extends AbstractControl {
             return Objects.requireNonNull(objValue, String.format(error, key));
         }
         return objValue;
-    }
-
-    /**
-     * Returns all components of Type type in the GameObject.
-     */
-    public <T extends Control> T[] getComponents(Class<T> clazz) {
-        return GameObject.getComponents(spatial, clazz);
     }
 
     /**

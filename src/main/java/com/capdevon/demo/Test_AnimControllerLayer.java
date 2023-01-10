@@ -2,11 +2,11 @@ package com.capdevon.demo;
 
 import com.capdevon.anim.AnimMaskBuilder;
 import com.capdevon.anim.AnimUtils;
+import com.capdevon.anim.MixamoBodyBones;
 import com.capdevon.anim.fsm.AnimatorConditionMode;
 import com.capdevon.anim.fsm.AnimatorController;
 import com.capdevon.anim.fsm.AnimatorControllerLayer;
 import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParameterType;
-import com.capdevon.animation.MixamoBodyBones;
 import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;
@@ -184,7 +184,6 @@ public class Test_AnimControllerLayer extends SimpleApplication {
     private void setupAnimator(Spatial player) {
         AnimComposer animComposer = AnimUtils.getAnimComposer(player);
         SkinningControl skeleton = AnimUtils.getSkinningControl(player);
-        AnimUtils.listJoints(skeleton.getArmature()).forEach(System.out::println);
 
         // Create the controller and the parameters
         //------------------------------------------------------------------------

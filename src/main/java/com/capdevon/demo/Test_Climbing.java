@@ -1,8 +1,8 @@
 package com.capdevon.demo;
 
-import com.capdevon.animation.MixamoBodyBones;
-import com.capdevon.control.AdapterControl;
+import com.capdevon.anim.MixamoBodyBones;
 import com.capdevon.debug.DebugShapes;
+import com.capdevon.demo.control.AdapterControl;
 import com.capdevon.engine.FVector;
 import com.capdevon.physx.Physics;
 import com.capdevon.physx.TogglePhysicsDebugState;
