@@ -79,7 +79,7 @@ public class Physics {
         Vector3f beginVec = t.vect1.set(ray.origin);
         Vector3f finalVec = t.vect2.set(ray.direction).scaleAdd(maxDistance, ray.origin);
 
-        List<PhysicsRayTestResult> results = PhysicsSpace.getPhysicsSpace().rayTestRaw(beginVec, finalVec);
+        List<PhysicsRayTestResult> results = PhysicsSpace.getPhysicsSpace().rayTest(beginVec, finalVec);
 
         for (PhysicsRayTestResult phyRay : results) {
             PhysicsCollisionObject pco = phyRay.getCollisionObject();
