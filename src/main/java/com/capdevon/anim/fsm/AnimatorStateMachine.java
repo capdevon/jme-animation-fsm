@@ -100,6 +100,7 @@ public class AnimatorStateMachine {
             LinearBlendSpace blendSpace = new LinearBlendSpace(blendTree.minThreshold, blendTree.maxThreshold);
             String[] clips = blendTree.getAnimMotionsNames();
             BlendAction action = animator.animComposer.actionBlended(blendTree.name, blendSpace, clips);
+            action.clearSpeedFactors();
             logger.log(Level.INFO, "BlendAction created: {0}", blendTree.name);
 
         } else if (blendTree.blendType == BlendTreeType.SimpleDirectional2D) {

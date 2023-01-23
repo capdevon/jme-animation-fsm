@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.capdevon.anim.fsm.BlendTree.BlendTreeType;
+import com.jme3.anim.AnimComposer;
 import com.jme3.anim.tween.action.Action;
 import com.jme3.anim.tween.action.BlendAction;
 import com.jme3.anim.tween.action.BlendableAction;
@@ -155,8 +156,8 @@ public class AnimatorState {
                 Action action = animator.animComposer.getAction(childMotion.animName);
 
                 if (animator.animComposer.getCurrentAction(layerName) != action) {
-                    animator.animComposer.setCurrentAction(childMotion.animName, layerName);
-                    animator.animComposer.setTime(layerName, childMotion.cycleOffset * action.getLength());
+                	animator.animComposer.setCurrentAction(childMotion.animName, layerName);
+                	animator.animComposer.setTime(layerName, childMotion.cycleOffset * action.getLength());
                     action.setSpeed(childMotion.timeScale);
                 }
             }
