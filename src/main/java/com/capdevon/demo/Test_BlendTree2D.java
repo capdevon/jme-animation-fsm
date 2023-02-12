@@ -96,7 +96,6 @@ public class Test_BlendTree2D extends SimpleApplication {
 
     /**
      * Initialize the physics simulation
-     *
      */
     public void initPhysics() {
         physics = new BulletAppState();
@@ -282,7 +281,6 @@ public class Test_BlendTree2D extends SimpleApplication {
 
         @Override
         public void onAnalog(String name, float value, float tpf) {
-            // TODO Auto-generated method stub
         }
 
         @Override

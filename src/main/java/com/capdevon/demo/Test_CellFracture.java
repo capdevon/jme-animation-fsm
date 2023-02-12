@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.capdevon.demo;
 
 import com.capdevon.demo.control.TimekeeperControl;
@@ -50,7 +45,7 @@ public class Test_CellFracture extends SimpleApplication {
         app.start();
     }
 
-    private static final String SCENE_MODEL = "Models/gltf2/CellFracture/cube-cell-fracture.j3o";
+    private static final String SCENE_MODEL = "Models/CellFracture/cube-cell-fracture.j3o";
 
     @Override
     public void simpleInitApp() {

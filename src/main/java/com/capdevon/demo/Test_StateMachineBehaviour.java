@@ -5,18 +5,19 @@ import com.capdevon.anim.fsm.AnimatorConditionMode;
 import com.capdevon.anim.fsm.AnimatorController;
 import com.capdevon.anim.fsm.AnimatorControllerLayer;
 import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParameterType;
-import com.capdevon.demo.control.PlayerBaseControl;
-import com.capdevon.demo.util.MeshBuilder;
 import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;
 import com.capdevon.anim.fsm.StateMachineBehaviour;
 import com.capdevon.anim.fsm.StateMachineListener;
+import com.capdevon.demo.control.PlayerBaseControl;
+import com.capdevon.demo.util.MeshBuilder;
 import com.capdevon.physx.TogglePhysicsDebugState;
 import com.jme3.anim.AnimComposer;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
@@ -75,7 +76,7 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
     
     private BulletAppState physics;
     private Node player;
-    
+
     @Override
     public void simpleInitApp() {
 
@@ -87,36 +88,35 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         setupEnemyAI();
         setupSky();
         setupLights();
+
+        stateManager.attach(new TogglePhysicsDebugState());
     }
-    
+
     /**
      * Initialize the physics simulation
-     *
      */
     public void initPhysics() {
         physics = new BulletAppState();
         stateManager.attach(physics);
-        stateManager.attach(new TogglePhysicsDebugState());
-
         physics.setDebugAxisLength(1);
         physics.setDebugEnabled(false);
     }
-    
+
     /**
      * An ambient light and a directional sun light
      */
     private void setupLights() {
-    	DirectionalLight sun = new DirectionalLight();
+        DirectionalLight sun = new DirectionalLight();
         sun.setDirection(new Vector3f(-0.2f, -1, -0.3f).normalizeLocal());
         rootNode.addLight(sun);
 
         AmbientLight ambient = new AmbientLight();
         ambient.setColor(new ColorRGBA(0.25f, 0.25f, 0.25f, 1));
         rootNode.addLight(ambient);
-        
+
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
         viewPort.addProcessor(fpp);
-        
+
         DirectionalLightShadowFilter shadowFilter = new DirectionalLightShadowFilter(assetManager, 2_048, 3);
         shadowFilter.setLight(sun);
         shadowFilter.setShadowIntensity(0.4f);
@@ -153,7 +153,7 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
     }
     
     private void setupEnemyAI() {
-    	// setup enemy model
+        // setup enemy model
         Node soldier = (Node) assetManager.loadModel(AnimDefs.MODEL);
         soldier.setName("SoldierAI");
         soldier.setLocalTranslation(4, 0, 4);
@@ -168,8 +168,8 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         BetterCharacterControl bcc = new BetterCharacterControl(.4f, 1.8f, 40f);
         soldier.addControl(bcc);
         physics.getPhysicsSpace().add(bcc);
-        bcc.getRigidBody().setCollisionGroup(RigidBodyControl.COLLISION_GROUP_02);
-        bcc.getRigidBody().setCollideWithGroups(RigidBodyControl.COLLISION_GROUP_01);
+        bcc.getRigidBody().setCollisionGroup(PhysicsCollisionObject.COLLISION_GROUP_02);
+        bcc.getRigidBody().setCollideWithGroups(PhysicsCollisionObject.COLLISION_GROUP_01);
         
         // Create the controller and the parameters
         AnimatorController animator = new AnimatorController(AnimUtils.getAnimComposer(soldier));
@@ -328,7 +328,8 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         }
 
         @Override
-        protected void controlRender(RenderManager rm, ViewPort vp) {}
+        protected void controlRender(RenderManager rm, ViewPort vp) {
+        }
 
         public void rotateTo(Vector3f direction, float angularSpeed) {
             float angle = FastMath.atan2(direction.x, direction.z);
@@ -368,11 +369,16 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         public float runSpeed = 3f;
         public float rotSpeed = 10f;
         public float accuracy = 0.5f;
+        
+        private boolean initialized = false;
 
         @Override
         public void onStateEnter(AnimatorController animator) {
-            spatial = animator.getSpatial();
-            aiControl = spatial.getControl(SoldierAI.class);
+            if (!initialized) {
+                spatial = animator.getSpatial();
+                aiControl = spatial.getControl(SoldierAI.class);
+                initialized = true;
+            }
         }
     }
 
@@ -418,7 +424,8 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         }
 
         @Override
-        public void onStateExit(AnimatorController animator) {}
+        public void onStateExit(AnimatorController animator) {
+        }
 
     }
 
@@ -445,7 +452,8 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         }
 
         @Override
-        public void onStateExit(AnimatorController animator) {}
+        public void onStateExit(AnimatorController animator) {
+        }
 
     }
 

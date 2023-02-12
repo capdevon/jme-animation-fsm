@@ -76,7 +76,7 @@ public class Test_Climbing extends SimpleApplication {
     private BulletAppState physics;
     private Node scene;
     private Node player;
-    private final String CHARACTER_MODEL = "Models/Climbing/climbing-export.gltf";
+    private final String CHARACTER_MODEL = "Models/YBot/YBot.j3o";
     private final String SCENE_MODEL = "Models/Climbing/scene.j3o";
 
     @Override
@@ -114,9 +114,9 @@ public class Test_Climbing extends SimpleApplication {
         rootNode.attachChild(scene);
         
         CollisionShape shape = CollisionShapeFactory.createMeshShape(scene);
-        RigidBodyControl rgb = new RigidBodyControl(shape, 0f);
-        scene.addControl(rgb);
-        physics.getPhysicsSpace().add(rgb);
+        RigidBodyControl rbc = new RigidBodyControl(shape, 0f);
+        scene.addControl(rbc);
+        physics.getPhysicsSpace().add(rbc);
     }
     
     private void setupLights() {
@@ -145,7 +145,7 @@ public class Test_Climbing extends SimpleApplication {
     	DebugShapes debugShapes = new DebugShapes(assetManager);
     	
     	//
-        player = new Node("MainCharacter");
+        player = new Node("Player");
         player.attachChild(debugShapes.drawAxis());
         player.setLocalTranslation(0, 1, -1);
         rootNode.attachChild(player);
@@ -168,7 +168,7 @@ public class Test_Climbing extends SimpleApplication {
         player.attachChild(model);
         
 //        SkinningControl skeleton = AnimUtils.getSkinningControl(model);
-//        Joint hips = skeleton.getArmature().getJoint("Armature_mixamorig:" + MixamoBodyBones.Hips);
+//        Joint hips = skeleton.getArmature().getJoint("mixamorig:" + MixamoBodyBones.Hips);
 //        Vector3f negate = hips.getModelTransform().getTranslation().negate();
 //        model.setLocalTranslation(negate);
         
@@ -214,17 +214,13 @@ public class Test_Climbing extends SimpleApplication {
     private interface AnimDefs {
         final String Idle               = "Idle";
         final String Running            = "Running";
-        final String Running_2          = "Running_1";
-        final String SneakingForward    = "SneakingForward";
+        final String Sprinting          = "Sprinting";
         final String Climbing           = "Climbing";
-        final String CrouchedToStanding = "CrouchedToStanding";
-
         final String RightShimmy        = "RightShimmy";
         final String LeftShimmy         = "LeftShimmy";
         final String HangingIdle        = "HangingIdle";
-        final String HangingIdle_1      = "HangingIdle_1";
+        final String HangingIdle_2      = "HangingIdle_2";
         final String ClimbingUpWall     = "ClimbingUpWall";
-        final String FreeHangToBraced   = "FreeHangToBraced";
     }
 
     /**
@@ -287,7 +283,7 @@ public class Test_Climbing extends SimpleApplication {
                 animComposer.addAction(animName, action);
                 
                 SkinningControl sc = getComponentInChildren(SkinningControl.class); 
-                Joint hips = sc.getArmature().getJoint("Armature_mixamorig:" + MixamoBodyBones.Hips);
+                Joint hips = sc.getArmature().getJoint("mixamorig:" + MixamoBodyBones.Hips);
                 tt = MyAnimation.findJointTrack(animComposer.getAnimClip(AnimDefs.Climbing), hips.getId());
             }
         }

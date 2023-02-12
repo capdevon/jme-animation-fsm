@@ -11,6 +11,7 @@ import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;
 import com.capdevon.engine.FRotator;
+import com.capdevon.engine.SimpleAppState;
 import com.capdevon.physx.TogglePhysicsDebugState;
 import com.jme3.anim.AnimComposer;
 import com.jme3.anim.AnimationMask;
@@ -18,14 +19,13 @@ import com.jme3.anim.SkinningControl;
 import com.jme3.app.Application;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
-import com.jme3.app.state.BaseAppState;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.collision.PhysicsCollisionObject;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.input.ChaseCamera;
-import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -94,17 +94,16 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         setupSky();
         setupLights();
 
+        stateManager.attach(new TogglePhysicsDebugState());
         stateManager.attach(new PlayerInputAppState());
     }
 
     /**
      * Initialize the physics simulation
-     *
      */
     public void initPhysics() {
         physics = new BulletAppState();
         stateManager.attach(physics);
-        stateManager.attach(new TogglePhysicsDebugState());
     }
 
     /**
@@ -160,7 +159,7 @@ public class Test_AnimControllerLayer extends SimpleApplication {
     private void setupPlayer() {
         // setup Player model
         player = (Node) assetManager.loadModel(AnimDefs.MODEL);
-        player.setName("Player.Character");
+        player.setName("Player");
         rootNode.attachChild(player);
 
         // setup flashlight
@@ -172,8 +171,8 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         BetterCharacterControl bcc = new BetterCharacterControl(.4f, 1.8f, 10f);
         player.addControl(bcc);
         physics.getPhysicsSpace().add(bcc);
-        bcc.getRigidBody().setCollisionGroup(RigidBodyControl.COLLISION_GROUP_02);
-        bcc.getRigidBody().setCollideWithGroups(RigidBodyControl.COLLISION_GROUP_01);
+        bcc.getRigidBody().setCollisionGroup(PhysicsCollisionObject.COLLISION_GROUP_02);
+        bcc.getRigidBody().setCollideWithGroups(PhysicsCollisionObject.COLLISION_GROUP_01);
 
         setupAnimator(player);
 
@@ -266,8 +265,8 @@ public class Test_AnimControllerLayer extends SimpleApplication {
 
     private class PlayerMovementControl extends AbstractControl implements ActionListener, AnalogListener {
 
-        public float m_MoveSpeed = 3.6f;
-        public float m_TurnSpeed = 10f;
+        private float moveSpeed = 3.6f;
+        private float turnSpeed = 10f;
 
         private Camera camera;
         private AnimatorController animator;
@@ -278,7 +277,7 @@ public class Test_AnimControllerLayer extends SimpleApplication {
         private final Vector3f cameraLeft = new Vector3f();
         private final Vector3f walkDirection = new Vector3f();
         private final Vector3f viewDirection = new Vector3f(0, 0, 1);
-        private boolean _MoveForward, _MoveBackward, _TurnLeft, _TurnRight;
+        private boolean moveForward, moveBackward, turnLeft, turnRight;
 
         public PlayerMovementControl(Application app) {
             this.camera = app.getCamera();
@@ -295,20 +294,18 @@ public class Test_AnimControllerLayer extends SimpleApplication {
 
         @Override
         public void onAnalog(String name, float value, float tpf) {
-            // TODO Auto-generated method stub
         }
 
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
-            //To change body of generated methods, choose Tools | Templates.
             if (name.equals(InputMapping.MOVE_FORWARD)) {
-                _MoveForward = isPressed;
+                moveForward = isPressed;
             } else if (name.equals(InputMapping.MOVE_BACKWARD)) {
-                _MoveBackward = isPressed;
+                moveBackward = isPressed;
             } else if (name.equals(InputMapping.MOVE_LEFT)) {
-                _TurnLeft = isPressed;
+                turnLeft = isPressed;
             } else if (name.equals(InputMapping.MOVE_RIGHT)) {
-                _TurnRight = isPressed;
+                turnRight = isPressed;
             } else if (name.equals(InputMapping.RELOAD) && isPressed) {
                 animator.setTrigger("isReloading");
             }
@@ -322,14 +319,14 @@ public class Test_AnimControllerLayer extends SimpleApplication {
 
             walkDirection.set(0, 0, 0);
 
-            if (_MoveForward) {
+            if (moveForward) {
                 walkDirection.addLocal(cameraDir);
-            } else if (_MoveBackward) {
+            } else if (moveBackward) {
                 walkDirection.subtractLocal(cameraDir);
             }
-            if (_TurnLeft) {
+            if (turnLeft) {
                 walkDirection.addLocal(cameraLeft);
-            } else if (_TurnRight) {
+            } else if (turnRight) {
                 walkDirection.subtractLocal(cameraLeft);
             }
 
@@ -340,12 +337,12 @@ public class Test_AnimControllerLayer extends SimpleApplication {
                 // smooth rotation
                 float angle = FastMath.atan2(walkDirection.x, walkDirection.z);
                 lookRotation.fromAngleNormalAxis(angle, Vector3f.UNIT_Y);
-                float smoothTime = m_TurnSpeed * tpf;
+                float smoothTime = turnSpeed * tpf;
                 FRotator.smoothDamp(spatial.getWorldRotation(), lookRotation, smoothTime, viewDirection);
                 bcc.setViewDirection(viewDirection);
             }
 
-            bcc.setWalkDirection(walkDirection.multLocal(m_MoveSpeed));
+            bcc.setWalkDirection(walkDirection.multLocal(moveSpeed));
 
             animator.setBool("isRunning", isMoving);
         }
@@ -359,46 +356,24 @@ public class Test_AnimControllerLayer extends SimpleApplication {
 
     private interface InputMapping {
 
-        final String MOVE_LEFT = "MOVE_LEFT";
-        final String MOVE_RIGHT = "MOVE_RIGHT";
-        final String MOVE_FORWARD = "MOVE_FORWARD";
-        final String MOVE_BACKWARD = "MOVE_BACKWARD";
-        final String RUNNING = "RUNNING";
-        final String RELOAD = "RELOAD";
-        final String FIRE = "FIRE";
+        final String MOVE_LEFT      = "MOVE_LEFT";
+        final String MOVE_RIGHT     = "MOVE_RIGHT";
+        final String MOVE_FORWARD   = "MOVE_FORWARD";
+        final String MOVE_BACKWARD  = "MOVE_BACKWARD";
+        final String RUNNING        = "RUNNING";
+        final String RELOAD         = "RELOAD";
+        final String FIRE           = "FIRE";
     }
 
-    private class PlayerInputAppState extends BaseAppState implements AnalogListener, ActionListener {
+    private class PlayerInputAppState extends SimpleAppState implements AnalogListener, ActionListener {
 
-        private InputManager inputManager;
         private PlayerMovementControl playerControl;
 
         @Override
-        protected void initialize(Application app) {
-            this.inputManager = app.getInputManager();
-            Spatial player = getRootNode().getChild("Player.Character");
-            playerControl = player.getControl(PlayerMovementControl.class);
+        public void initialize(Application app) {
+            super.initialize(app);
+            playerControl = find("Player").getControl(PlayerMovementControl.class);
             addInputMappings();
-        }
-
-        @Override
-        protected void cleanup(Application app) {
-        }
-
-        @Override
-        protected void onEnable() {
-        }
-
-        @Override
-        protected void onDisable() {
-        }
-
-        public Node getRootNode() {
-            return ((SimpleApplication) getApplication()).getRootNode();
-        }
-
-        public Node getGuiNode() {
-            return ((SimpleApplication) getApplication()).getGuiNode();
         }
 
         private void addInputMappings() {

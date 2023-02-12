@@ -8,19 +8,18 @@ import com.capdevon.anim.fsm.AnimatorControllerParameter.AnimatorControllerParam
 import com.capdevon.anim.fsm.AnimatorState;
 import com.capdevon.anim.fsm.AnimatorStateMachine;
 import com.capdevon.anim.fsm.AnimatorStateTransition;
+import com.capdevon.engine.SimpleAppState;
 import com.capdevon.physx.TogglePhysicsDebugState;
 import com.jme3.anim.AnimComposer;
 import com.jme3.app.Application;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
-import com.jme3.app.state.BaseAppState;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.input.ChaseCamera;
-import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -34,7 +33,6 @@ import com.jme3.light.PointLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.post.FilterPostProcessor;
@@ -81,7 +79,6 @@ public class Test_AnimStateController extends SimpleApplication {
     
     private BulletAppState physics;
     private Node player;
-    private PlayerMovementControl playerControl;
     
     @Override
     public void simpleInitApp() {
@@ -93,38 +90,33 @@ public class Test_AnimStateController extends SimpleApplication {
         setupSky();
         setupLights();
         
+        stateManager.attach(new TogglePhysicsDebugState());
         stateManager.attach(new TPSInputAppState());
     }
     
     /**
      * Initialize the physics simulation
-     *
      */
     public void initPhysics() {
         physics = new BulletAppState();
-        //physics.setThreadingType(ThreadingType.SEQUENTIAL);
         stateManager.attach(physics);
-        stateManager.attach(new TogglePhysicsDebugState());
-
-        physics.setDebugAxisLength(1);
-        physics.setDebugEnabled(false);
     }
-    
+
     /**
      * An ambient light and a directional sun light
      */
     private void setupLights() {
-    	DirectionalLight sun = new DirectionalLight();
+        DirectionalLight sun = new DirectionalLight();
         sun.setDirection(new Vector3f(-0.2f, -1, -0.3f).normalizeLocal());
         rootNode.addLight(sun);
 
         AmbientLight ambient = new AmbientLight();
         ambient.setColor(new ColorRGBA(0.25f, 0.25f, 0.25f, 1));
         rootNode.addLight(ambient);
-        
+
         FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
         viewPort.addProcessor(fpp);
-        
+
         DirectionalLightShadowFilter shadowFilter = new DirectionalLightShadowFilter(assetManager, 2_048, 3);
         shadowFilter.setLight(sun);
         shadowFilter.setShadowIntensity(0.4f);
@@ -161,9 +153,9 @@ public class Test_AnimStateController extends SimpleApplication {
     }
     
     private void setupPlayer() {
-    	// setup Player model
+        // setup Player model
         player = (Node) assetManager.loadModel(AnimDefs.MODEL);
-        player.setName("Player.Character");
+        player.setName("Player");
         rootNode.attachChild(player);
         
         // setup flashlight
@@ -197,7 +189,7 @@ public class Test_AnimStateController extends SimpleApplication {
         sm.setDefaultState(idle);
         
         // setup Player Movement Control
-        playerControl = new PlayerMovementControl(this);
+        PlayerMovementControl playerControl = new PlayerMovementControl(this);
         player.addControl(playerControl);
     }
     
@@ -238,23 +230,22 @@ public class Test_AnimStateController extends SimpleApplication {
     
     private class PlayerMovementControl extends AbstractControl implements ActionListener, AnalogListener {
 
-        public float m_MoveSpeed = 4.5f;
-        public float m_TurnSpeed = 6f;
-        
+        private float moveSpeed = 4.5f;
+        private float turnSpeed = 6f;
+
         private Camera camera;
         private AnimatorController animator;
         private BetterCharacterControl bcc;
-        
-        private final Quaternion dr = new Quaternion();
+
         private final Vector3f cameraDir = new Vector3f();
         private final Vector3f cameraLeft = new Vector3f();
         private final Vector3f walkDirection = new Vector3f();
-        private boolean _MoveForward, _MoveBackward, _TurnLeft, _TurnRight;
+        private boolean moveForward, moveBackward, turnLeft, turnRight;
         
         public PlayerMovementControl(Application app) {
             this.camera = app.getCamera();
         }
-        
+
         @Override
         public void setSpatial(Spatial sp) {
             super.setSpatial(sp);
@@ -266,20 +257,18 @@ public class Test_AnimStateController extends SimpleApplication {
 
         @Override
         public void onAnalog(String name, float value, float tpf) {
-            // TODO Auto-generated method stub
         }
 
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
-            //To change body of generated methods, choose Tools | Templates.
             if (name.equals(InputMapping.MOVE_FORWARD)) {
-                _MoveForward = isPressed;
+                moveForward = isPressed;
             } else if (name.equals(InputMapping.MOVE_BACKWARD)) {
-                _MoveBackward = isPressed;
+                moveBackward = isPressed;
             } else if (name.equals(InputMapping.MOVE_LEFT)) {
-                _TurnLeft = isPressed;
+                turnLeft = isPressed;
             } else if (name.equals(InputMapping.MOVE_RIGHT)) {
-                _TurnRight = isPressed;
+                turnRight = isPressed;
             }
         }
 
@@ -291,14 +280,14 @@ public class Test_AnimStateController extends SimpleApplication {
 
             walkDirection.set(0, 0, 0);
 
-            if (_MoveForward) {
+            if (moveForward) {
                 walkDirection.addLocal(cameraDir);
-            } else if (_MoveBackward) {
+            } else if (moveBackward) {
                 walkDirection.subtractLocal(cameraDir);
             }
-            if (_TurnLeft) {
+            if (turnLeft) {
                 walkDirection.addLocal(cameraLeft);
-            } else if (_TurnRight) {
+            } else if (turnRight) {
                 walkDirection.subtractLocal(cameraLeft);
             }
 
@@ -306,12 +295,13 @@ public class Test_AnimStateController extends SimpleApplication {
             boolean isMoving = walkDirection.lengthSquared() > 0;
 
             if (isMoving) {
-            	// smooth rotation
-            	bcc.setViewDirection(bcc.getViewDirection().interpolateLocal(walkDirection, m_TurnSpeed * tpf));
+                // smooth rotation
+                Vector3f viewDirection = bcc.getViewDirection().interpolateLocal(walkDirection, turnSpeed * tpf);
+                bcc.setViewDirection(viewDirection);
             }
-            
-            bcc.setWalkDirection(walkDirection.multLocal(m_MoveSpeed));
-            
+
+            bcc.setWalkDirection(walkDirection.multLocal(moveSpeed));
+
             animator.setBool("isRunning", isMoving);
         }
 
@@ -324,57 +314,35 @@ public class Test_AnimStateController extends SimpleApplication {
 	
     private interface InputMapping {
 
-        final String MOVE_LEFT 		= "MOVE_LEFT";
-        final String MOVE_RIGHT 	= "MOVE_RIGHT";
-        final String MOVE_FORWARD 	= "MOVE_FORWARD";
-        final String MOVE_BACKWARD 	= "MOVE_BACKWARD";
-        final String RUNNING 		= "RUNNING";
-        final String RELOAD		= "RELOAD";
-        final String FIRE 		= "FIRE";
+        final String MOVE_LEFT      = "MOVE_LEFT";
+        final String MOVE_RIGHT     = "MOVE_RIGHT";
+        final String MOVE_FORWARD   = "MOVE_FORWARD";
+        final String MOVE_BACKWARD  = "MOVE_BACKWARD";
+        final String RUNNING        = "RUNNING";
+        final String RELOAD         = "RELOAD";
+        final String FIRE           = "FIRE";
     }
 	
-    private class TPSInputAppState extends BaseAppState implements AnalogListener, ActionListener {
+    private class TPSInputAppState extends SimpleAppState implements AnalogListener, ActionListener {
 
-        private InputManager inputManager;
         private PlayerMovementControl playerControl;
 
         @Override
-        protected void initialize(Application app) {
-            this.inputManager = app.getInputManager();
-            Spatial player = getRootNode().getChild("Player.Character");
-            playerControl = player.getControl(PlayerMovementControl.class);
+        public void initialize(Application app) {
+            super.initialize(app);
+            playerControl = find("Player").getControl(PlayerMovementControl.class);
             addInputMappings();
-        }
-        
-        public Node getRootNode() {
-            return ((SimpleApplication) getApplication()).getRootNode();
-        }
-
-        public Node getGuiNode() {
-            return ((SimpleApplication) getApplication()).getGuiNode();
-        }
-
-        @Override
-        protected void cleanup(Application app) {
-        }
-
-        @Override
-        protected void onEnable() {
-        }
-
-        @Override
-        protected void onDisable() {
         }
 
         private void addInputMappings() {
 
-            addMapping(InputMapping.MOVE_FORWARD, 	new KeyTrigger(KeyInput.KEY_W));
-            addMapping(InputMapping.MOVE_BACKWARD, 	new KeyTrigger(KeyInput.KEY_S));
-            addMapping(InputMapping.MOVE_LEFT, 		new KeyTrigger(KeyInput.KEY_A));
-            addMapping(InputMapping.MOVE_RIGHT, 	new KeyTrigger(KeyInput.KEY_D));
-            addMapping(InputMapping.RUNNING, 		new KeyTrigger(KeyInput.KEY_SPACE));
-            addMapping(InputMapping.FIRE, 		new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
-            addMapping(InputMapping.RELOAD, 		new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
+            addMapping(InputMapping.MOVE_FORWARD,   new KeyTrigger(KeyInput.KEY_W));
+            addMapping(InputMapping.MOVE_BACKWARD,  new KeyTrigger(KeyInput.KEY_S));
+            addMapping(InputMapping.MOVE_LEFT,      new KeyTrigger(KeyInput.KEY_A));
+            addMapping(InputMapping.MOVE_RIGHT,     new KeyTrigger(KeyInput.KEY_D));
+            addMapping(InputMapping.RUNNING,        new KeyTrigger(KeyInput.KEY_SPACE));
+            addMapping(InputMapping.FIRE,           new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
+            addMapping(InputMapping.RELOAD,         new MouseButtonTrigger(MouseInput.BUTTON_RIGHT));
         }
 
         private void addMapping(String bindingName, Trigger...triggers) {

@@ -278,7 +278,6 @@ public class Test_BlendTree extends SimpleApplication {
 
         @Override
         public void onAnalog(String name, float value, float tpf) {
-            // TODO Auto-generated method stub
         }
 
         @Override
