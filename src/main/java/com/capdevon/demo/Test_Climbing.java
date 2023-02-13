@@ -77,7 +77,7 @@ public class Test_Climbing extends SimpleApplication {
     private Node scene;
     private Node player;
     private final String CHARACTER_MODEL = "Models/YBot/YBot.j3o";
-    private final String SCENE_MODEL = "Models/Climbing/scene.j3o";
+    private final String SCENE_MODEL = "Scenes/scene.gltf";
 
     @Override
     public void simpleInitApp() {
@@ -142,26 +142,26 @@ public class Test_Climbing extends SimpleApplication {
     }
 
     private void setupPlayer() {
-    	DebugShapes debugShapes = new DebugShapes(assetManager);
-    	
-    	//
+        DebugShapes debugShapes = new DebugShapes(assetManager);
+
+        //
         player = new Node("Player");
         player.attachChild(debugShapes.drawAxis());
         player.setLocalTranslation(0, 1, -1);
         rootNode.attachChild(player);
-        
+
         // vertical
         Node ledgeRayV = new Node("LedgeRayV");
         ledgeRayV.attachChild(debugShapes.drawWireCube(0.1f, ColorRGBA.Red));
         player.attachChild(ledgeRayV);
         ledgeRayV.setLocalTranslation(FVector.forward(player).multLocal(0.5f).addLocal(0, 3, 0));
-        
+
         // horizontal
         Node ledgeRayH = new Node("LedgeRayH");
         ledgeRayH.attachChild(debugShapes.drawWireCube(0.1f, ColorRGBA.Blue));
         player.attachChild(ledgeRayH);
         ledgeRayH.setLocalTranslation(FVector.forward(player).multLocal(0.2f).addLocal(0, 1.5f, 0));
-        
+
         // setup model
         Spatial model = assetManager.loadModel(CHARACTER_MODEL);
         model.setName("Character.Model");
@@ -180,7 +180,7 @@ public class Test_Climbing extends SimpleApplication {
         // setup third person camera
         setupChaseCamera();
         
-        Geometry rootBoneRef = debugShapes.drawWireSphere(0.4f, ColorRGBA.White);
+        Geometry rootBoneRef = debugShapes.drawWireCube(0.2f, ColorRGBA.White);
         rootNode.attachChild(rootBoneRef);
         
         // setup player control
@@ -235,11 +235,11 @@ public class Test_Climbing extends SimpleApplication {
         public Spatial model;
         public Geometry rootBoneRef;
         
-        Camera camera;
-        DebugTools debugTools;
-        InputManager inputManager;
-        AnimComposer animComposer;
-        BetterCharacterControl bcc;
+        private Camera camera;
+        private DebugTools debugTools;
+        private InputManager inputManager;
+        private AnimComposer animComposer;
+        private BetterCharacterControl bcc;
         
         private final Vector3f walkDirection = new Vector3f(0, 0, 0);
         private final Vector3f viewDirection = new Vector3f(0, 0, 1);
@@ -248,13 +248,13 @@ public class Test_Climbing extends SimpleApplication {
         private final Quaternion lookRotation = new Quaternion();
         private final RaycastHit hitInfo = new RaycastHit();
 
-        float m_MoveSpeed = 4.5f;
-        float m_TurnSpeed = 10f;
-        boolean _MoveForward, _MoveBackward, _MoveLeft, _MoveRight;
-        boolean isClimbingMode, startClimb;
-        boolean isClimbingAnimDone = true;
-        TransformTrack tt;
-        Transform rootMotion = new Transform();
+        private float m_MoveSpeed = 4.5f;
+        private float m_TurnSpeed = 10f;
+        private boolean _MoveForward, _MoveBackward, _MoveLeft, _MoveRight;
+        private boolean isClimbingMode, startClimb;
+        private boolean isClimbingAnimDone = true;
+        private TransformTrack tt;
+        private Transform rootMotion = new Transform();
         
         /**
          * Constructor.
@@ -314,11 +314,11 @@ public class Test_Climbing extends SimpleApplication {
                 if (startClimb && !isClimbingAnimDone) {
                     // align with wall
                     //spatial.getWorldRotation().slerp(helper.getRotation(), tpf * 5);
-                	
-                	tt.getDataAtTime(animComposer.getTime(), rootMotion);
-                	Vector3f vec = animComposer.getSpatial().localToWorld(rootMotion.getTranslation(), null);
-                	rootBoneRef.setLocalTranslation(vec);
-                	rootBoneRef.setLocalRotation(rootMotion.getRotation());
+
+                    tt.getDataAtTime(animComposer.getTime(), rootMotion);
+                    Vector3f vec = animComposer.getSpatial().localToWorld(rootMotion.getTranslation(), null);
+                    rootBoneRef.setLocalTranslation(vec);
+                    rootBoneRef.setLocalRotation(rootMotion.getRotation());
 
                 } else if (isClimbingAnimDone) {
                     isClimbingMode = false;
@@ -330,10 +330,10 @@ public class Test_Climbing extends SimpleApplication {
             }
         }
 
-        float hDistAwayFromLedge = 0.1f;
-        float vDistAwayFromLedge = 0.1f;
-        Transform helper = new Transform();
-        Vector3f goalPosition = new Vector3f();
+        private float hDistAwayFromLedge = 0.1f;
+        private float vDistAwayFromLedge = 0.1f;
+        private Transform helper = new Transform();
+        private Vector3f goalPosition = new Vector3f();
 
         private void checkLedgeGrab() {
 

@@ -1,6 +1,8 @@
 package com.capdevon.anim;
 
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.jme3.anim.AnimClip;
 import com.jme3.anim.AnimComposer;
@@ -20,6 +22,8 @@ import com.jme3.util.SafeArrayList;
  * @author capdevon
  */
 public class AnimUtils {
+
+    private static final Logger logger = Logger.getLogger(AnimUtils.class.getName());
 
     private AnimUtils() {}
 
@@ -43,13 +47,14 @@ public class AnimUtils {
      * @param targetArmature
      */
     public static void copyAnimation(AnimComposer source, AnimComposer target, Armature targetArmature) {
-        for (String animName : source.getAnimClipsNames()) {
-            if (!target.getAnimClipsNames().contains(animName)) {
-                System.out.println("Copying Animation: " + animName);
+        for (AnimClip sourceClip : source.getAnimClips()) {
+            String clipName = sourceClip.getName();
+            if (!target.getAnimClipsNames().contains(clipName)) {
+                logger.log(Level.INFO, "Copying Animation: {0}", clipName);
 
-                AnimClip clip = new AnimClip(animName);
-                clip.setTracks(copyAnimTracks(source.getAnimClip(animName), targetArmature));
-                target.addAnimClip(clip);
+                AnimClip copy = new AnimClip(clipName);
+                copy.setTracks(copyAnimTracks(sourceClip, targetArmature));
+                target.addAnimClip(copy);
             }
         }
     }
@@ -85,11 +90,11 @@ public class AnimUtils {
                 tracks.add(newTrack);
 
             } else {
-                throw new IllegalStateException("Joint not found in the target Armature: " + tt.getTarget());
+                logger.log(Level.WARNING, "Joint not found in the target Armature: {0}", tt.getTarget());
             }
         }
 
-        System.out.println("Copied tracks " + tracks.size() + " of " + sourceClip.getTracks().length);
+        logger.log(Level.INFO, "Copied tracks {0} of {1}", new Object[]{tracks.size(), sourceClip.getTracks().length});
         return tracks.getArray();
     }
 
