@@ -9,7 +9,7 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 //ext.jmeVersion = '3.5.2-stable' // from mavenCentral
-ext.jmeVersion = '3.6.0-beta1' // from mavenCentral
+ext.jmeVersion = '3.6.0-beta2' // from mavenCentral
 //ext.jmeVersion = '3.6.0-SNAPSHOT' // from mavenLocal
 
 gradle.projectsEvaluated {
