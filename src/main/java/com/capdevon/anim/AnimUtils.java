@@ -25,7 +25,8 @@ public class AnimUtils {
 
     private static final Logger logger = Logger.getLogger(AnimUtils.class.getName());
 
-    private AnimUtils() {}
+    private AnimUtils() {
+    }
 
     /**
      * @param from
@@ -106,6 +107,10 @@ public class AnimUtils {
     public static SkinningControl getSkinningControl(Spatial sp) {
         SkinningControl control = findControl(sp, SkinningControl.class);
         return Objects.requireNonNull(control, "SkinningControl not found: " + sp);
+    }
+
+    public static Spatial getAnimRoot(Spatial sp) {
+        return getAnimComposer(sp).getSpatial();
     }
 
     /**
