@@ -9,7 +9,6 @@ import com.capdevon.anim.MixamoBodyBones;
 import com.capdevon.debug.DebugShapes;
 import com.capdevon.demo.control.AdapterControl;
 import com.capdevon.engine.FVector;
-import com.capdevon.physx.MyBetterCharacterControl;
 import com.capdevon.physx.Physics;
 import com.capdevon.physx.RaycastHit;
 import com.capdevon.physx.TogglePhysicsDebugState;
@@ -26,6 +25,7 @@ import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.CollisionShape;
+import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.bullet.debug.DebugTools;
 import com.jme3.bullet.util.CollisionShapeFactory;
@@ -175,7 +175,7 @@ public class Test_Climbing3 extends SimpleApplication {
         ledgeRayH.setLocalTranslation(FVector.forward(animRoot).multLocal(0.2f).addLocal(0, 1.5f, 0));
 
         // setup physics character
-        MyBetterCharacterControl bcc = new MyBetterCharacterControl(.4f, 1.8f, 40f);
+        BetterCharacterControl bcc = new BetterCharacterControl(.4f, 1.8f, 40f);
 
         // setup player control
         PlayerControl playerControl = new PlayerControl(this);
@@ -205,7 +205,7 @@ public class Test_Climbing3 extends SimpleApplication {
         AnimComposer animComposer = sp.getControl(AnimComposer.class);
         SkinningControl skinningControl = sp.getControl(SkinningControl.class);
         PlayerControl pc = sp.getControl(PlayerControl.class);
-        MyBetterCharacterControl bcc = sp.getControl(MyBetterCharacterControl.class);
+        BetterCharacterControl bcc = sp.getControl(BetterCharacterControl.class);
 
         // setup animations
         animComposer.getAnimClipsNames().forEach(animName -> animComposer.action(animName));
@@ -286,7 +286,7 @@ public class Test_Climbing3 extends SimpleApplication {
         private DebugTools debugTools;
         private InputManager inputManager;
         private AnimComposer animComposer;
-        private MyBetterCharacterControl bcc;
+        private BetterCharacterControl bcc;
 
         private final Vector3f walkDirection = new Vector3f(0, 0, 0);
         private final Vector3f viewDirection = new Vector3f(0, 0, 1);
