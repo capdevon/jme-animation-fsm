@@ -10,7 +10,7 @@ targetCompatibility = JavaVersion.VERSION_1_8
 
 //ext.jmeVersion = '3.5.2-stable' // from mavenCentral
 ext.jmeVersion = '3.6.0-stable' // from mavenCentral
-//ext.jmeVersion = '3.6.0-SNAPSHOT' // from mavenLocal
+//ext.jmeVersion = '3.7.0-SNAPSHOT' // from mavenLocal
 
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) { // compile-time options:
@@ -39,7 +39,6 @@ repositories {
     //jcenter()
     //maven { url 'http://nifty-gui.sourceforge.net/nifty-maven-repo' }
     maven { url 'https://jitpack.io' }
-    maven { url 'https://jcenter.bintray.com/' } // for Lemur
 
     // Read more about repositories here:
     //   https://docs.gradle.org/current/userguide/dependency_management.html#sec:repositories
@@ -71,14 +70,14 @@ dependencies {
     //runtimeOnly 'org.jmonkeyengine:jme3-testdata:' + jmeVersion
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.4.0-alpha6'
         
-    // Lemur GUI and Groovy:
-    //implementation 'com.simsilica:lemur:1.15.0'
-    //implementation 'com.simsilica:lemur-props:1.1.1'
-    //implementation 'com.simsilica:lemur-proto:1.12.0'
-    //runtimeOnly 'org.codehaus.groovy:groovy-jsr223:3.0.7'
+    // libraries related to the Lemur GUI and Groovy:
+    //implementation 'com.simsilica:lemur:1.16.0'
+    //implementation 'com.simsilica:lemur-props:1.2.0'
+    //implementation 'com.simsilica:lemur-proto:1.13.0'
+    //runtimeOnly 'org.codehaus.groovy:groovy-jsr223:3.0.16'
     
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    implementation 'org.apache.commons:commons-lang3:3.10'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
 }
 
 // cleanup tasks
