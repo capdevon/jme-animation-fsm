@@ -8,9 +8,7 @@ description = 'prototypical JMonkeyEngine application'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-//ext.jmeVersion = '3.5.2-stable' // from mavenCentral
 ext.jmeVersion = '3.6.0-stable' // from mavenCentral
-//ext.jmeVersion = '3.7.0-SNAPSHOT' // from mavenLocal
 
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) { // compile-time options:
@@ -34,31 +32,18 @@ gradle.projectsEvaluated {
 }
 
 repositories {
-    //mavenLocal()
     mavenCentral()
-    //jcenter()
-    //maven { url 'http://nifty-gui.sourceforge.net/nifty-maven-repo' }
-    maven { url 'https://jitpack.io' }
-
-    // Read more about repositories here:
-    //   https://docs.gradle.org/current/userguide/dependency_management.html#sec:repositories
 }
 
 dependencies {
-    // You can read more about how to add dependencies here:
-    //   https://docs.gradle.org/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
-
     // Engine
     implementation 'org.jmonkeyengine:jme3-core:' + jmeVersion
     implementation 'org.jmonkeyengine:jme3-desktop:' + jmeVersion
     implementation 'org.jmonkeyengine:jme3-effects:' + jmeVersion
-    //implementation 'org.jmonkeyengine:jme3-networking:' + jmeVersion
-    //implementation 'org.jmonkeyengine:jme3-niftygui:' + jmeVersion
-    //implementation 'org.jmonkeyengine:jme3-terrain:' + jmeVersion
-    runtimeOnly    'org.jmonkeyengine:jme3-awt-dialogs:' + jmeVersion // JMonkeyEngine v3.6 only!
+    runtimeOnly    'org.jmonkeyengine:jme3-awt-dialogs:' + jmeVersion
     
     // Physics
-    implementation 'com.github.stephengold:Minie:7.5.0+big3'
+    implementation 'com.github.stephengold:Minie:7.6.0+big3'
 
     // select one version of LWJGL
     //runtimeOnly 'org.jmonkeyengine:jme3-lwjgl:' + jmeVersion  // LWJGL 2.x
@@ -70,12 +55,6 @@ dependencies {
     //runtimeOnly 'org.jmonkeyengine:jme3-testdata:' + jmeVersion
     runtimeOnly 'org.jmonkeyengine:jme3-testdata:3.4.0-alpha6'
         
-    // libraries related to the Lemur GUI and Groovy:
-    //implementation 'com.simsilica:lemur:1.16.0'
-    //implementation 'com.simsilica:lemur-props:1.2.0'
-    //implementation 'com.simsilica:lemur-proto:1.13.0'
-    //runtimeOnly 'org.codehaus.groovy:groovy-jsr223:3.0.16'
-    
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 }
