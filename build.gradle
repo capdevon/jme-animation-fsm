@@ -8,7 +8,7 @@ description = 'prototypical JMonkeyEngine application'
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
-ext.jmeVersion = '3.6.0-stable' // from mavenCentral
+ext.jmeVersion = '3.6.1-stable' // from mavenCentral
 
 gradle.projectsEvaluated {
     tasks.withType(JavaCompile) { // compile-time options:
