@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.capdevon.anim.fsm;
 
 import java.util.List;
@@ -14,13 +9,13 @@ import java.util.List;
  */
 public class AnimatorCondition {
 
-    //The mode of the condition.
+    // The mode of the condition.
     protected AnimatorConditionMode mode;
-    //The name of the parameter used in the condition.
+    // The name of the parameter used in the condition.
     protected String parameter;
-    //The AnimatorParameter's threshold value for the condition to be true.
+    // The AnimatorParameter's threshold value for the condition to be true.
     protected float threshold;
-    
+
     protected AnimatorCondition() {
         // default constructor.
     }
@@ -36,14 +31,14 @@ public class AnimatorCondition {
                     case Bool:
                         return evaluateBool(param);
                     case Trigger:
-                    	return evaluateTrigger(param);
+                        return evaluateTrigger(param);
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     private boolean evaluateInt(AnimatorControllerParameter param) {
         switch (mode) {
             case Greater:
@@ -58,7 +53,7 @@ public class AnimatorCondition {
                 return false;
         }
     }
-    
+
     private boolean evaluateFloat(AnimatorControllerParameter param) {
         switch (mode) {
             case Greater:
@@ -69,7 +64,7 @@ public class AnimatorCondition {
                 return false;
         }
     }
-    
+
     private boolean evaluateBool(AnimatorControllerParameter param) {
         switch (mode) {
             case If:
@@ -80,7 +75,7 @@ public class AnimatorCondition {
                 return false;
         }
     }
-    
+
     private boolean evaluateTrigger(AnimatorControllerParameter param) {
         boolean triggered = param.defaultBool;
         if (triggered) {
@@ -88,7 +83,7 @@ public class AnimatorCondition {
         }
         return triggered;
     }
-    
+
     public AnimatorConditionMode getMode() {
         return mode;
     }

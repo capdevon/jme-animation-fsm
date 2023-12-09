@@ -27,15 +27,15 @@ public class AnimatorState {
 
     private AnimatorController animator;
 
-    //The motion assigned to this state.
+    // The motion assigned to this state.
     protected Motion motion;
-    //A name can be used to identify a state.
+    // A name can be used to identify a state.
     protected String name;
-    //The default speed of the motion.
+    // The default speed of the motion.
     protected float speed = 1f;
-    //The transitions that are going out of the state.
+    // The transitions that are going out of the state.
     protected List<AnimatorStateTransition> transitions = new ArrayList<>();
-    //The behaviour list assigned to this state.
+    // The behaviour list assigned to this state.
     protected List<StateMachineBehaviour> behaviours = new ArrayList<>();
 
     /**
@@ -100,23 +100,25 @@ public class AnimatorState {
      * @return
      */
     protected AnimatorState checkTransitions(String layerName) {
-        for (AnimatorStateTransition transition: transitions) {
+        for (AnimatorStateTransition transition : transitions) {
             if (!transition.mute && transition.checkConditions(this, layerName)) {
 
+                AnimComposer animComposer = animator.animComposer;
+                
                 // do transition
                 AnimatorState nextState = transition.destinationState;
                 String animName = nextState.motion.name;
 
-                // Some states may not have an associated animation.
                 if (animName != null) {
-                    BlendableAction action = (BlendableAction) animator.animComposer.getAction(animName);
+                    BlendableAction action = (BlendableAction) animComposer.getAction(animName);
                     action.setSpeed(nextState.speed);
                     action.setTransitionLength(transition.duration);
-                    animator.animComposer.setCurrentAction(animName, layerName);
-                    animator.animComposer.setTime(layerName, transition.offset);
+                    animComposer.setCurrentAction(animName, layerName);
+                    animComposer.setTime(layerName, transition.offset);
                 } else {
+                    // Some states may not have an associated animation.
                     // In this case, remove the previous state animation from the layer.
-                    animator.animComposer.removeCurrentAction(layerName);
+                    animComposer.removeCurrentAction(layerName);
                 }
 
                 return nextState;
@@ -134,6 +136,7 @@ public class AnimatorState {
 
         if (motion instanceof BlendTree) {
 
+            AnimComposer animComposer = animator.animComposer;
             BlendTree blendTree = (BlendTree) motion;
 
             if (blendTree.blendType == BlendTreeType.Simple1D) {
@@ -141,8 +144,8 @@ public class AnimatorState {
                 // Update blend value
                 float blendPos = animator.getFloat(blendTree.blendParameter);
                 ChildMotion childMotion = blendTree.getBlendMotion(blendPos);
-                
-                BlendAction action = (BlendAction) animator.animComposer.getAction(blendTree.name);
+
+                BlendAction action = (BlendAction) animComposer.getAction(blendTree.name);
                 action.getBlendSpace().setValue(blendPos);
                 action.setSpeed(childMotion.timeScale);
 
@@ -155,9 +158,9 @@ public class AnimatorState {
                 ChildMotion childMotion = blendTree.getBlendMotion(blendPos);
                 Action action = animator.animComposer.getAction(childMotion.animName);
 
-                if (animator.animComposer.getCurrentAction(layerName) != action) {
-                	animator.animComposer.setCurrentAction(childMotion.animName, layerName);
-                	animator.animComposer.setTime(layerName, childMotion.cycleOffset * action.getLength());
+                if (animComposer.getCurrentAction(layerName) != action) {
+                    animComposer.setCurrentAction(childMotion.animName, layerName);
+                    animComposer.setTime(layerName, childMotion.cycleOffset * action.getLength());
                     action.setSpeed(childMotion.timeScale);
                 }
             }

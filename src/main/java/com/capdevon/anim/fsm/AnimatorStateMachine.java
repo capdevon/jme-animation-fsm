@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.capdevon.anim.fsm;
 
 import java.util.ArrayList;
@@ -29,15 +24,15 @@ public class AnimatorStateMachine {
 
     private AnimatorController animator;
 
-    //The name of the state machine.
+    // The name of the state machine.
     protected String layerName;
-    //The anyState, not a proper state but used as dummy.
+    // The anyState, not a proper state but used as dummy.
     protected AnimatorState anyState;
-    //The state that the state machine will be in when it starts.
+    // The state that the state machine will be in when it starts.
     protected AnimatorState currentState;
-    //The list of states.
+    // The list of states.
     protected Map<String, AnimatorState> states = new HashMap<>();
-    //The list of listeners.
+    // The list of listeners.
     protected List<StateMachineListener> listeners = new ArrayList<>();
 
     /**
@@ -56,7 +51,8 @@ public class AnimatorStateMachine {
      */
     public void addListener(StateMachineListener listener) {
         if (listeners.contains(listener)) {
-            throw new IllegalArgumentException("The given listener is already registed at this AnimatorStateMachine");
+            throw new IllegalArgumentException(
+                    "The given listener is already registed at this AnimatorStateMachine");
         }
 
         listeners.add(listener);
@@ -68,7 +64,8 @@ public class AnimatorStateMachine {
      */
     public void removeListener(StateMachineListener listener) {
         if (!listeners.remove(listener)) {
-            throw new IllegalArgumentException("The given listener is not registed at this AnimatorStateMachine");
+            throw new IllegalArgumentException(
+                    "The given listener is not registed at this AnimatorStateMachine");
         }
     }
 

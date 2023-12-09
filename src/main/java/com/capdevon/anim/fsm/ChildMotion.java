@@ -9,15 +9,15 @@ import com.jme3.math.Vector2f;
  */
 public class ChildMotion {
 
-    //The motion itself.
+    // The motion itself.
     protected String animName;
-    //The position of the child. Used in 2D blend trees.
+    // The position of the child. Used in 2D blend trees.
     protected Vector2f position;
-    //The threshold of the child. Used in 1D blend trees.
+    // The threshold of the child. Used in 1D blend trees.
     protected float threshold;
-    //The relative speed of the child.
+    // The relative speed of the child.
     protected float timeScale = 1f;
-    //Normalized time offset of the child.
+    // Normalized time offset of the child.
     protected float cycleOffset = 0;
 
     public String getAnimName() {

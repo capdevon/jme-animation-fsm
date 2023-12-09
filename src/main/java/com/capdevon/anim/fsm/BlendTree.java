@@ -21,17 +21,19 @@ public class BlendTree extends Motion {
 //        Direct
     }
 
-    //Parameter that is used to compute the blending weight of the childs in 1D blend trees or on the X axis of a 2D blend tree.
+    // Parameter that is used to compute the blending weight of the childs in 1D
+    // blend trees or on the X axis of a 2D blend tree.
     protected String blendParameter;
-    //Parameter that is used to compute the blending weight of the childs on the Y axis of a 2D blend tree.
+    // Parameter that is used to compute the blending weight of the childs on the Y
+    // axis of a 2D blend tree.
     protected String blendParameterY;
-    //The Blending type can be either 1D or different types of 2D.
+    // The Blending type can be either 1D or different types of 2D.
     protected BlendTreeType blendType = BlendTreeType.Simple1D;
-    //Sets the maximum threshold that will be used by the ChildMotion.
+    // Sets the maximum threshold that will be used by the ChildMotion.
     protected float maxThreshold = 1f;
-    //Sets the minimum threshold that will be used by the ChildMotion.
+    // Sets the minimum threshold that will be used by the ChildMotion.
     protected float minThreshold = 0f;
-    //The list of the blend tree child motions.
+    // The list of the blend tree child motions.
     protected List<ChildMotion> motions = new ArrayList<>();
     
     /**
@@ -42,7 +44,8 @@ public class BlendTree extends Motion {
     }
 
     /**
-     * Create blend tree with the minimum and maximum threshold for the LinearBlendSpace.
+     * Create blend tree with the minimum and maximum threshold for the
+     * LinearBlendSpace.
      * 
      * @param minThreshold
      * @param maxThreshold
@@ -142,7 +145,7 @@ public class BlendTree extends Motion {
         ChildMotion closestChild = null;
         float minDistance = Float.MAX_VALUE;
 
-        for (ChildMotion childMotion: motions) {
+        for (ChildMotion childMotion : motions) {
             float d = childMotion.position.distanceSquared(blendPos);
             if (d < minDistance) {
                 minDistance = d;
@@ -215,7 +218,7 @@ public class BlendTree extends Motion {
         return motions.get(getIndexOfMax(weights));
     }
 
-    protected int getIndexOfMax(float[] array) {
+    private int getIndexOfMax(float[] array) {
         if (array == null || array.length == 0)
             return -1; // null or empty
 

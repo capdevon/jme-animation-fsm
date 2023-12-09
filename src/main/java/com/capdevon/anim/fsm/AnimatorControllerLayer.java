@@ -3,17 +3,18 @@ package com.capdevon.anim.fsm;
 import com.jme3.anim.AnimationMask;
 
 /**
- * The Animation Layer contains a state machine that controls animations of a model or part of it.
+ * The Animation Layer contains a state machine that controls animations of a
+ * model or part of it.
  * 
  * @author capdevon
  */
 public class AnimatorControllerLayer {
 
-    //The name of the layer.
+    // The name of the layer.
     protected String name;
-    //The state machine for the layer.
+    // The state machine for the layer.
     protected AnimatorStateMachine stateMachine;
-    //The AvatarMask that is used to mask the animation on the given layer.
+    // The AvatarMask that is used to mask the animation on the given layer.
     protected AnimationMask avatarMask;
 
     /**
