@@ -1,6 +1,8 @@
 # jme-animation-fsm
 For more details visit the [Wiki](https://github.com/capdevon/jme-capdevon-examples/wiki) section.
 
+🔔 If you found this project useful, please let me know by leaving a star to motivate me to improve it. Thanks.
+
 ## YouTube videos
 - [AnimatorStateMachine: BlendTree 1D](https://youtu.be/rVFFjLQMysQ)
 - [AnimatorStateMachine: BlendTree 2D](https://www.youtube.com/watch?v=G-Cd120hSlI)
