@@ -11,6 +11,7 @@ import com.capdevon.anim.fsm.AnimatorStateTransition;
 import com.capdevon.anim.fsm.StateMachineBehaviour;
 import com.capdevon.anim.fsm.StateMachineListener;
 import com.capdevon.demo.control.PlayerBaseControl;
+import com.capdevon.demo.util.DefaultSceneAppState;
 import com.capdevon.demo.util.MeshBuilder;
 import com.capdevon.physx.TogglePhysicsDebugState;
 import com.jme3.anim.AnimComposer;
@@ -18,39 +19,26 @@ import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.PhysicsCollisionObject;
-import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.BetterCharacterControl;
-import com.jme3.bullet.control.RigidBodyControl;
-import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.font.BitmapFont;
 import com.jme3.font.BitmapText;
 import com.jme3.font.Rectangle;
 import com.jme3.input.ChaseCamera;
-import com.jme3.light.AmbientLight;
-import com.jme3.light.DirectionalLight;
 import com.jme3.light.PointLight;
-import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
-import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.scene.control.BillboardControl;
 import com.jme3.scene.control.LightControl;
-import com.jme3.scene.shape.Box;
-import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.jme3.system.AppSettings;
-import com.jme3.texture.Texture;
-import com.jme3.util.SkyFactory;
 
 /**
  * 
@@ -65,11 +53,11 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
     public static void main(String[] args) {
         Test_StateMachineBehaviour app = new Test_StateMachineBehaviour();
         AppSettings settings = new AppSettings(true);
-        settings.setResolution(1024, 768);
+        settings.setResolution(1280, 720);
         settings.setSamples(4);
         settings.setBitsPerPixel(32);
         app.setSettings(settings);
-        //app.setShowSettings(false);
+        app.setShowSettings(false);
         app.setPauseOnLostFocus(false);
         app.start();
     }
@@ -82,14 +70,11 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
 
         MeshBuilder.init(assetManager);
         initPhysics();
-        createFloor();
         setupPlayer();
         setupChaseCamera();
         setupEnemyAI();
-        setupSky();
-        setupLights();
-
-        stateManager.attach(new TogglePhysicsDebugState());
+        
+        stateManager.attach(new DefaultSceneAppState());
     }
 
     /**
@@ -99,59 +84,9 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         physics = new BulletAppState();
         stateManager.attach(physics);
         physics.setDebugAxisLength(1);
-        physics.setDebugEnabled(false);
+        stateManager.attach(new TogglePhysicsDebugState());
     }
 
-    /**
-     * An ambient light and a directional sun light
-     */
-    private void setupLights() {
-        DirectionalLight sun = new DirectionalLight();
-        sun.setDirection(new Vector3f(-0.2f, -1, -0.3f).normalizeLocal());
-        rootNode.addLight(sun);
-
-        AmbientLight ambient = new AmbientLight();
-        ambient.setColor(new ColorRGBA(0.25f, 0.25f, 0.25f, 1));
-        rootNode.addLight(ambient);
-
-        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
-        viewPort.addProcessor(fpp);
-
-        DirectionalLightShadowFilter shadowFilter = new DirectionalLightShadowFilter(assetManager, 2_048, 3);
-        shadowFilter.setLight(sun);
-        shadowFilter.setShadowIntensity(0.4f);
-        shadowFilter.setShadowZExtend(256);
-        fpp.addFilter(shadowFilter);
-    }
-    
-    /**
-     * a sky as background
-     */
-    private void setupSky() {
-        Spatial sky = SkyFactory.createSky(assetManager, "Scenes/Beach/FullskiesSunset0068.dds", SkyFactory.EnvMapType.CubeMap);
-        sky.setShadowMode(RenderQueue.ShadowMode.Off);
-        rootNode.attachChild(sky);
-    }
-    
-    private void createFloor() {
-        rootNode.setShadowMode(ShadowMode.CastAndReceive);
-        
-        Box box = new Box(20, .1f, 20);
-        box.scaleTextureCoordinates(new Vector2f(20, 20));
-        Geometry floorGeo = new Geometry("Floor.GeoMesh", box);
-        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        Texture tex = assetManager.loadTexture("Textures/white_grid.jpg");
-        tex.setWrap(Texture.WrapMode.Repeat);
-        mat.setTexture("ColorMap", tex);
-        floorGeo.setMaterial(mat);
-        rootNode.attachChild(floorGeo);
-
-        CollisionShape collShape = CollisionShapeFactory.createMeshShape(floorGeo);
-        RigidBodyControl rBody = new RigidBodyControl(collShape, 0f);
-        floorGeo.addControl(rBody);
-        physics.getPhysicsSpace().add(rBody);
-    }
-    
     private void setupEnemyAI() {
         // setup enemy model
         Node soldier = (Node) assetManager.loadModel(AnimDefs.MODEL);
@@ -270,27 +205,9 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
         chaseCam.setDefaultDistance(chaseCam.getMinDistance());
     }
 
-    private interface AnimDefs {
-
-        final String MODEL              = "Models/Rifle/rifle.glb";
-        final String RifleIdle          = "RifleIdle";
-        final String RifleWalk          = "RifleWalk";
-        final String RifleRun           = "RifleRun";
-        final String WalkWithRifle      = "WalkWithRifle";
-        final String ThrowGrenade       = "ThrowGrenade";
-        final String Reloading          = "Reloading";
-        final String RifleAimingIdle    = "RifleAimingIdle";
-        final String FiringRifleSingle  = "FiringRifleSingle";
-        final String FiringRifleAuto    = "FiringRifleAuto";
-        final String DeathFromRight     = "DeathFromRight";
-        final String DeathFromHeadshot  = "DeathFromHeadshot";
-        final String TPose              = "TPose";
-
-    }
-    
     /**
      * -----------------------------------------------
-     * @SoldierAI
+     * SoldierAI
      * -----------------------------------------------
      */
     private class SoldierAI extends AbstractControl implements StateMachineListener {
@@ -358,7 +275,7 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
     
     /**
      * -----------------------------------------------
-     * @SoldierBaseFSM
+     * SoldierBaseFSM
      * -----------------------------------------------
      */
     private abstract class SoldierBaseFSM implements StateMachineBehaviour {
@@ -384,7 +301,7 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
 
     /**
      * -----------------------------------------------
-     * @PatrolState
+     * PatrolState
      * -----------------------------------------------
      */
     private class PatrolState extends SoldierBaseFSM {
@@ -431,7 +348,7 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
 
     /**
      * -----------------------------------------------
-     * @ChaseState
+     * ChaseState
      * -----------------------------------------------
      */
     private class ChaseState extends SoldierBaseFSM {
@@ -459,7 +376,7 @@ public class Test_StateMachineBehaviour extends SimpleApplication {
 
     /**
      * -----------------------------------------------
-     * @AttackState
+     * AttackState
      * -----------------------------------------------
      */
     private class AttackState extends SoldierBaseFSM {
