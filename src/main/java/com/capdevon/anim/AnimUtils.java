@@ -29,8 +29,14 @@ public class AnimUtils {
     }
 
     /**
-     * @param from
-     * @param to
+     * Copies all animations from the source spatial to the target spatial, adapting
+     * them to the target's armature.
+     *
+     * This method retrieves the {@link AnimComposer} from both the source and
+     * target spatial using the {@link #getAnimComposer(Spatial)} method.
+     *
+     * @param from The source spatial containing the animations to copy.
+     * @param to   The target spatial where the animations will be added.
      */
     public static void copyAnimation(Spatial from, Spatial to) {
 
@@ -42,10 +48,13 @@ public class AnimUtils {
     }
 
     /**
-     *
-     * @param source
-     * @param target
-     * @param targetArmature
+     * Copies animations from a source {@link AnimComposer} to a target
+     * {@link AnimComposer}, applying the animations to the specified target
+     * armature.
+     * 
+     * @param source         The source AnimComposer containing the animations to copy.
+     * @param target         The target AnimComposer where the animations will be added.
+     * @param targetArmature The armature in the target composer to which the animations should be applied.
      */
     public static void copyAnimation(AnimComposer source, AnimComposer target, Armature targetArmature) {
         for (AnimClip sourceClip : source.getAnimClips()) {
@@ -61,10 +70,13 @@ public class AnimUtils {
     }
 
     /**
+     * Copies animation tracks from a source animation clip, adapting them to the
+     * target armature.
      *
-     * @param sourceClip
-     * @param targetArmature
-     * @return
+     * @param sourceClip     The source animation clip containing the tracks to copy.
+     * @param targetArmature The target armature to which the tracks should be adapted.
+     * @return An array of copied {@link TransformTrack} objects targeting joints in
+     *         the target armature, or an empty array if no tracks were copied.
      */
     private static AnimTrack[] copyAnimTracks(AnimClip sourceClip, Armature targetArmature) {
 
@@ -114,10 +126,14 @@ public class AnimUtils {
     }
 
     /**
-     * @param <T>
-     * @param sp
-     * @param clazz
-     * @return
+     * Finds a control of the specified type within a given spatial and its children
+     * recursively.
+     *
+     * @param <T>   The type of the control to find.
+     * @param sp    The spatial to search for the control.
+     * @param clazz The class object representing the type of control to find.
+     * @return The first encountered control of the specified type within the
+     *         spatial and its children, or null if no such control is found.
      */
     private static <T extends Control> T findControl(Spatial sp, Class<T> clazz) {
         T control = sp.getControl(clazz);
