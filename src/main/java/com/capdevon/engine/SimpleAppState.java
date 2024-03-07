@@ -64,10 +64,12 @@ public abstract class SimpleAppState extends BaseAppState {
     }
 
     /**
-     * Finds a GameObject by name and returns it.
+     * Attempts to find a child spatial with the specified 
+     * name within the scene's root node.
      *
-     * @param childName
-     * @return
+     * @param childName The name of the child spatial to search for.
+     * @return The found child spatial if successful.
+     * @throws NullPointerException if no child with the specified name is found.
      */
     public Spatial find(String childName) {
         Spatial child = rootNode.getChild(childName);
