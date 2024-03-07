@@ -103,7 +103,6 @@ public class PlayerBaseControl extends AbstractControl implements ActionListener
 
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
-        //To change body of generated methods, choose Tools | Templates.
         if (name.equals(InputMapping.MOVE_FORWARD)) {
             _MoveForward = isPressed;
         } else if (name.equals(InputMapping.MOVE_BACKWARD)) {
@@ -127,7 +126,6 @@ public class PlayerBaseControl extends AbstractControl implements ActionListener
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //To change body of generated methods, choose Tools | Templates.
     }
 
     /**
