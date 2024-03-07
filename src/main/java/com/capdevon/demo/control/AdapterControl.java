@@ -2,7 +2,7 @@ package com.capdevon.demo.control;
 
 import java.util.Objects;
 
-import com.capdevon.engine.GameObject;
+import com.capdevon.demo.util.GameObject;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Node;
@@ -17,10 +17,9 @@ import com.jme3.scene.control.Control;
 public abstract class AdapterControl extends AbstractControl {
 
     /**
-     * Returns the first child found with exactly the given name
-     * (case-sensitive).
+     * Returns the first child found with exactly the given name (case-sensitive).
      *
-     * @param name - the name of the child to retrieve
+     * @param name The name of the child to retrieve
      * @return
      */
     public Spatial getChild(String name) {
@@ -42,24 +41,23 @@ public abstract class AdapterControl extends AbstractControl {
     }
 
     /**
-     * Returns the component of Type type if the game object has one attached,
-     * null if it doesn't.
+     * Returns the component of Type type if the game object has one attached, null
+     * if it doesn't.
      */
     public <T extends Control> T getComponent(Class<T> type) {
         return spatial.getControl(type);
     }
 
     /**
-     * Returns the component of Type type in the GameObject or any of its
-     * children using depth first search.
+     * Returns the component of Type type in the GameObject or any of its children
+     * using depth first search.
      */
     public <T extends Control> T getComponentInChildren(Class<T> type) {
         return GameObject.getComponentInChildren(spatial, type);
     }
 
     /**
-     * Retrieves the component of Type type in the GameObject or any of its
-     * parents.
+     * Retrieves the component of Type type in the GameObject or any of its parents.
      */
     public <T extends Control> T getComponentInParent(Class<T> type) {
         return GameObject.getComponentInParent(spatial, type);
@@ -67,12 +65,10 @@ public abstract class AdapterControl extends AbstractControl {
 
     @Override
     protected void controlUpdate(float tpf) {
-        //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        //To change body of generated methods, choose Tools | Templates.
     }
 
 }

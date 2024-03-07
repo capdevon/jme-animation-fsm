@@ -1,6 +1,6 @@
 package com.capdevon.demo.control;
 
-import com.capdevon.engine.FRotator;
+import com.capdevon.demo.util.FRotator;
 import com.jme3.app.Application;
 import com.jme3.bullet.control.BetterCharacterControl;
 import com.jme3.input.InputManager;

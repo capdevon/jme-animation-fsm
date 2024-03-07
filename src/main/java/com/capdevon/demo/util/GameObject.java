@@ -1,4 +1,4 @@
-package com.capdevon.engine;
+package com.capdevon.demo.util;
 
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;

@@ -1,6 +1,5 @@
-package com.capdevon.demo.util;
+package com.capdevon.demo.states;
 
-import com.capdevon.engine.SimpleAppState;
 import com.jme3.app.Application;
 import com.jme3.bullet.collision.shapes.CollisionShape;
 import com.jme3.bullet.control.RigidBodyControl;
