@@ -2,11 +2,11 @@ package com.capdevon.demo.util;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
-import com.jme3.material.Materials;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.debug.Arrow;
 import com.jme3.scene.shape.Box;
@@ -29,12 +29,6 @@ public class MeshBuilder {
         MeshBuilder.assetManager = assetManager;
     }
 	
-    /**
-     * Get default axes.
-     *
-     * @param id
-     * @return 
-     */
     public static Node createAxes(String id) {
         Node node = new Node(id);
         node.attachChild(createArrow("X", Vector3f.UNIT_X, ColorRGBA.Red));
@@ -43,59 +37,33 @@ public class MeshBuilder {
         return node;
     }
 
-    /**
-     * Get an arrow with name, dir and color.
-     *
-     * @param name
-     * @param dir
-     * @param color
-     * @return
-     */
     public static Geometry createArrow(String name, Vector3f dir, ColorRGBA color) {
         Arrow arrow = new Arrow(dir);
         Geometry geo = new Geometry(name, arrow);
-        Material mat = new Material(assetManager, Materials.UNSHADED);
-        mat.setColor("Color", color);
+        Material mat = createMaterial(color);
         geo.setMaterial(mat);
         return geo;
     }
 
-    /**
-     * Get a solid cube with color and size.
-     *
-     * @param color
-     * @param size
-     * @return
-     */
     public static Geometry createCube(ColorRGBA color, Vector3f size) {
-        Material mat = new Material(assetManager, Materials.UNSHADED);
-        mat.setColor("Color", color);
-        return createCube(mat, size);
-    }
-    
-    public static Geometry createCube(Material mat, Vector3f size) {
         Box box = new Box(size.x, size.y, size.z);
-        Geometry geo = new Geometry("Box.GeoMesh", box);
+        Geometry geo = new Geometry("Cube", box);
+        Material mat = createMaterial(color);
         geo.setMaterial(mat);
         return geo;
     }
 
-    /**
-     * Get a solid sphere with color and radius.
-     *
-     * @param color
-     * @param radius
-     * @return
-     */
     public static Geometry createSphere(ColorRGBA color, float radius) {
-        Material mat = new Material(assetManager, Materials.UNSHADED);
-        mat.setColor("Color", color);
-        return createSphere(mat, radius);
+        Sphere sphere = new Sphere(6, 6, radius);
+        Geometry geo = new Geometry("Sphere", sphere);
+        Material mat = createMaterial(color);
+        geo.setMaterial(mat);
+        return geo;
     }
     
-    public static Geometry createSphere(Material mat, float radius) {
-        Sphere sphere = new Sphere(6, 6, radius);
-        Geometry geo = new Geometry("Sphere.GeoMesh", sphere);
+    public static Geometry createMesh(ColorRGBA color, Mesh mesh) {
+        Geometry geo = new Geometry("Mesh", mesh);
+        Material mat = createMaterial(color);
         geo.setMaterial(mat);
         return geo;
     }
@@ -104,8 +72,8 @@ public class MeshBuilder {
         Node capsule = new Node("Capsule");
         capsule.setLocalTranslation(0, height/2, 0);
         buildCapsule(capsule, radius, height);
-        Material mat = new Material(assetManager, Materials.UNSHADED);
-        mat.setColor("Color", color);
+        
+        Material mat = createMaterial(color);
         capsule.setMaterial(mat);
         return capsule;
     }
@@ -120,6 +88,12 @@ public class MeshBuilder {
         node.attachChild(cylinder);
         node.attachChild(bottom);
         node.attachChild(top);
+    }
+    
+    private static Material createMaterial(ColorRGBA color) {
+        Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        mat.setColor("Color", color);
+        return mat;
     }
 
 }
