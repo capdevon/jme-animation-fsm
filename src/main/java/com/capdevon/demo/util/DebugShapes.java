@@ -1,4 +1,4 @@
-package com.capdevon.debug;
+package com.capdevon.demo.util;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
