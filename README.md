@@ -18,4 +18,5 @@ For more details visit the [Wiki](https://github.com/capdevon/jme-capdevon-examp
 - [Mixamo](https://www.mixamo.com/)
 - [Blender](https://www.blender.org/download/)
 
-
+## Bug report / feature request
+The best way to report bug or feature request is [github's issues page](https://github.com/capdevon/jme-animation-fsm/issues).
